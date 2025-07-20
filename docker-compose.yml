@@ -1,0 +1,86 @@
+# docker-compose.yml
+# Orchestrates all services for the local HTTP development environment.
+
+version: '3.8'
+
+services:
+  # Traefik: The reverse proxy
+  traefik:
+    image: "traefik:v3.0"
+    container_name: "oli-cms-traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080" # Dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/local/traefik.yml:/etc/traefik/traefik.yml:ro"
+    networks:
+      - oli-cms-network
+
+  # Database: PostgreSQL
+  database:
+    image: postgres:16-alpine
+    container_name: oli-cms-database
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-oli_cms}
+      POSTGRES_USER: ${DB_USERNAME:-oli_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - oli-cms-db-data:/var/lib/postgresql/data
+    networks:
+      - oli-cms-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-oli_user} -d ${DB_DATABASE:-oli_cms}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend: Laravel API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: oli-cms-backend
+    volumes:
+      - ./backend:/var/www/html
+    networks:
+      - oli-cms-network
+    depends_on:
+      database:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`api.oli-cms.test`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.services.backend.loadbalancer.server.port=80"
+
+  # Frontend: Next.js App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: oli-cms-frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - oli-cms-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`oli-cms.test`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+
+networks:
+  oli-cms-network:
+    driver: bridge
+
+volumes:
+  oli-cms-db-data:
+    driver: local

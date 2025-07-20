@@ -1,0 +1,23 @@
+
+# traefik/local/traefik.yml
+# Configuration for LOCAL DEVELOPMENT (HTTP ONLY).
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+# API and dashboard, accessible for local development
+api:
+  dashboard: true
+  insecure: true
+
+# Define the HTTP entrypoint
+entryPoints:
+  web:
+    address: ":80"
+
+# Configure the Docker provider
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false
