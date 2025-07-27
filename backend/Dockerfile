@@ -1,46 +1,59 @@
-
 # backend/Dockerfile
-# Dockerfile for the Laravel backend service (API only).
 
-# Use official PHP 8.3 FPM image as a base
-FROM php:8.3-fpm-alpine
-
-# Set working directory
+# =========================================================
+# Stage 1: PHP with Swoole extensions
+# =========================================================
+FROM phpswoole/swoole:php8.4-alpine AS base
 WORKDIR /var/www/html
 
-# Install system dependencies required by Laravel
-# - postgresql-dev: for pdo_pgsql extension
-# - libzip-dev: for zip extension
-# - oniguruma-dev: for mbstring extension
+# Install system dependencies for PHP extensions
 RUN apk add --no-cache \
-    nginx \
-    supervisor \
-    curl \
     libzip-dev \
-    zip \
-    unzip \
-    postgresql-dev
+    postgresql-dev \
+    bash \
+    curl \
+    git \
+    unzip
 
 # Install PHP extensions
-RUN docker-php-ext-install pdo pdo_pgsql zip
+RUN docker-php-ext-install pdo pdo_pgsql zip pcntl
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# =========================================================
+# Stage 2: Install Composer dependencies
+# =========================================================
+FROM composer:2.8.10 AS composer_deps
+WORKDIR /app
+COPY composer.json ./
+RUN composer install --no-dev --no-scripts --ignore-platform-reqs
 
-# Copy existing application directory contents
-COPY . /var/www/html
+# =========================================================
+# Stage 3: Final Production Image
+# =========================================================
+FROM base AS production
+WORKDIR /var/www/html
 
-# Copy Nginx and Supervisor configurations
-# These will be created in a later step
-# COPY docker/nginx.conf /etc/nginx/nginx.conf
-# COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Copy vendor from previous stage
+COPY --from=composer_deps /app/vendor /var/www/html/vendor
 
-# Expose port 80 and start php-fpm and nginx
-EXPOSE 80
+# Copy application code
+COPY . .
 
-# We will use a startup script later to run migrations and start services
-# CMD ["/var/www/html/docker/start.sh"]
+# Ensure .env exists for artisan commands
+RUN cp .env.example .env || true
 
-# For now, just start the services
-CMD ["/bin/sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
+# Optimize autoloader
+RUN composer dump-autoload --optimize
 
+# Create storage/octane and set permissions
+RUN mkdir -p /var/www/html/storage/octane \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Switch to www-data for security
+USER www-data
+
+# Expose Octane default port
+EXPOSE 8000
+
+# Start Laravel Octane with Swoole
+CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000", "--workers=auto"]

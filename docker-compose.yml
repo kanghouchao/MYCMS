@@ -1,7 +1,6 @@
 # docker-compose.yml
 # Orchestrates all services for the local HTTP development environment.
-
-version: '3.8'
+name: oli-cms
 
 services:
   # Traefik: The reverse proxy
@@ -46,8 +45,6 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: oli-cms-backend
-    volumes:
-      - ./backend:/var/www/html
     networks:
       - oli-cms-network
     depends_on:
@@ -57,7 +54,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.backend.rule=Host(`api.oli-cms.test`)"
       - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=80"
+      - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
   # Frontend: Next.js App
   frontend:
