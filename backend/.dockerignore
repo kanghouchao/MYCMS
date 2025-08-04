@@ -3,7 +3,7 @@
 .gitignore
 
 # Local environment files
-.env
+# .env - 注释掉，允许复制.env文件到容器
 .env.example
 
 # Dependencies managed by Composer
@@ -13,13 +13,17 @@ composer.lock
 # Node.js dependencies
 /node_modules
 
-# Laravel Storage files
-/storage/app/public
-/storage/framework/cache/
-/storage/framework/sessions/
-/storage/framework/views/
-/storage/logs/
+# Laravel Storage files - 保留目录结构但排除内容
+/storage/app/public/*
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
 !/storage/logs/.gitignore
+# 保留目录结构
+!/storage/framework/cache/.gitignore
+!/storage/framework/sessions/.gitignore
+!/storage/framework/views/.gitignore
 
 # Testing directory
 /tests/

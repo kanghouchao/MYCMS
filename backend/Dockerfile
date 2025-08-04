@@ -10,6 +10,7 @@ WORKDIR /var/www/html
 RUN apk add --no-cache \
     libzip-dev \
     postgresql-dev \
+    postgresql-client \
     bash \
     curl \
     git \
@@ -38,22 +39,34 @@ COPY --from=composer_deps /app/vendor /var/www/html/vendor
 # Copy application code
 COPY . .
 
+# Copy and set permissions for start script
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
 # Ensure .env exists for artisan commands
 RUN cp .env.example .env || true
 
 # Optimize autoloader
 RUN composer dump-autoload --optimize
 
-# Create storage/octane and set permissions
-RUN mkdir -p /var/www/html/storage/octane \
+# Create storage directories and set permissions
+RUN mkdir -p /var/www/html/storage/logs \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
     && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Generate application key if not exists
+RUN php artisan key:generate --force || true
+
+# Clear and cache configuration
+RUN php artisan config:clear \
+    && php artisan config:cache \
+    && php artisan route:clear
 
 # Switch to www-data for security
 USER www-data
 
-# Expose Octane default port
+# Expose Laravel default port
 EXPOSE 8000
 
-# Start Laravel Octane with Swoole
-CMD ["php", "artisan", "octane:start", "--server=swoole", "--host=0.0.0.0", "--port=8000", "--workers=auto"]
+# Start Laravel with traditional artisan serve
+CMD ["/usr/local/bin/start.sh"]
