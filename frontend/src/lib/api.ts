@@ -3,9 +3,6 @@ import Cookies from 'js-cookie';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://api.oli-cms.test/api';
 
-import axios from 'axios';
-import Cookies from 'js-cookie';
-
 // 创建API客户端实例
 const apiClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://api.oli-cms.test/api',

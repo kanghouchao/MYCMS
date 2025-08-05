@@ -1,39 +1,42 @@
 # Git
 .git
 .gitignore
+.gitattributes
 
-# Local environment files
-# .env - 注释掉，允许复制.env文件到容器
+# Environment files
 .env.example
 
-# Dependencies managed by Composer
+# Dependencies (managed by multi-stage build)
 /vendor
 composer.lock
 
-# Node.js dependencies
+# Node.js (not needed for backend)
 /node_modules
+package*.json
 
-# Laravel Storage files - 保留目录结构但排除内容
-/storage/app/public/*
-/storage/framework/cache/*
-/storage/framework/sessions/*
-/storage/framework/views/*
-/storage/logs/*
-!/storage/logs/.gitignore
-# 保留目录结构
-!/storage/framework/cache/.gitignore
-!/storage/framework/sessions/.gitignore
-!/storage/framework/views/.gitignore
+# Storage files (will be created at runtime)
+/storage/**
 
-# Testing directory
+# Cache files
+/bootstrap/cache/**
+
+# Testing
 /tests/
+phpunit.xml
 
 # Documentation
-README.md
+*.md
 
-# Docker files
+# Docker files (avoid recursion)
 Dockerfile
+.dockerignore
 
-# IDE / Editor specific settings
-.idea/
+Makefile
+
+# IDE / Editor settings
 .vscode/
+.editorconfig
+
+# Temporary files
+*.tmp
+*.log

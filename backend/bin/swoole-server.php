@@ -1,13 +1,13 @@
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Swoole\Http\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 
 // 启动应用
-$app = require_once __DIR__ . '/bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 // 创建 Swoole HTTP 服务器
 $server = new Server('0.0.0.0', 8000);
@@ -16,7 +16,7 @@ $server = new Server('0.0.0.0', 8000);
 $server->set([
     'worker_num' => 1,
     'daemonize' => false,
-    'log_file' => '/var/www/html/storage/logs/swoole.log',
+    'log_file' => __DIR__ . '/../storage/logs/swoole.log',
     'log_level' => SWOOLE_LOG_INFO,
 ]);
 

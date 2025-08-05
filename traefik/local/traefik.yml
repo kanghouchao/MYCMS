@@ -11,6 +11,9 @@ api:
   dashboard: true
   insecure: true
 
+# Enable ping for health checks
+ping: {}
+
 # Define the HTTP entrypoint
 entryPoints:
   web:

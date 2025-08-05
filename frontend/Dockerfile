@@ -1,25 +1,55 @@
 
 # frontend/Dockerfile
-# Dockerfile for the Next.js frontend service.
+# Two-stage build for Next.js frontend with Nginx
 
-# Use official Node.js 20 Alpine image as a base
-FROM node:20-alpine
-
-# Set working directory
+# =========================================================
+# Stage 1: Build the application
+# =========================================================
+FROM node:24.5.0-alpine3.22 AS builder
 WORKDIR /app
 
-# Install dependencies
-# Copy package.json and lock files
-COPY package*.json ./
-
-# Install dependencies
+# Copy package.json and install dependencies
+COPY package.json ./
 RUN npm install
 
-# Copy the rest of the application source code
+# Copy source code and build
 COPY . .
+RUN npm run build
 
-# Expose port 3000 for the Next.js dev server
-EXPOSE 3000
+# Verify that the build output exists
+RUN ls -la /app/out || (echo "Build output directory not found!" && exit 1)
 
-# Command to run the development server
-CMD ["npm", "run", "dev"]
+# =========================================================
+# Stage 2: Production runtime with Nginx
+# =========================================================
+FROM nginx:stable-alpine3.21 AS production
+
+# Copy built static files from builder stage
+COPY --from=builder /app/out /usr/share/nginx/html
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# Install curl for health check
+RUN apk add --no-cache curl
+
+# Set correct permissions for nginx user (already exists in nginx:alpine)
+RUN chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/log/nginx \
+    && chown -R nginx:nginx /etc/nginx/conf.d \
+    && touch /var/run/nginx.pid \
+    && chown -R nginx:nginx /var/run/nginx.pid
+
+# Switch to non-root user
+USER nginx
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost/ || exit 1
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

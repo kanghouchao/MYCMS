@@ -1,72 +1,59 @@
 # backend/Dockerfile
 
 # =========================================================
-# Stage 1: PHP with Swoole extensions
+# Stage 1: Base PHP with system dependencies and extensions
 # =========================================================
 FROM phpswoole/swoole:php8.4-alpine AS base
-WORKDIR /var/www/html
 
-# Install system dependencies for PHP extensions
-RUN apk add --no-cache \
-    libzip-dev \
-    postgresql-dev \
-    postgresql-client \
-    bash \
-    curl \
-    git \
-    unzip
-
-# Install PHP extensions
-RUN docker-php-ext-install pdo pdo_pgsql zip pcntl
+# Install system dependencies and PHP extensions
+RUN apk add --no-cache postgresql-dev \
+    && docker-php-ext-install pgsql pdo_pgsql pcntl \
+    && rm -rf /var/cache/apk/*
 
 # =========================================================
 # Stage 2: Install Composer dependencies
 # =========================================================
 FROM composer:2.8.10 AS composer_deps
-WORKDIR /app
+WORKDIR /home/www-data
+
+# Copy composer files
+# Do not copy the composer.lock file. We always install the latest dependencies
 COPY composer.json ./
-RUN composer install --no-dev --no-scripts --ignore-platform-reqs
+
+# Install dependencies and generate optimized autoloader
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --ignore-platform-reqs \
+    && composer dump-autoload --optimize --no-scripts \
+    && composer clear-cache
 
 # =========================================================
-# Stage 3: Final Production Image
+# Stage 3: Production image
 # =========================================================
 FROM base AS production
+
+# Set working directory for application
 WORKDIR /var/www/html
 
-# Copy vendor from previous stage
-COPY --from=composer_deps /app/vendor /var/www/html/vendor
+# Copy application files first
+COPY --chown=www-data:www-data . .
 
-# Copy application code
-COPY . .
+# Copy vendor dependencies from composer stage
+COPY --from=composer_deps --chown=www-data:www-data /home/www-data/vendor ./vendor
 
-# Copy and set permissions for start script
-COPY start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
+# Set executable permissions on start script
+RUN chmod +x /var/www/html/bin/start.sh
 
-# Ensure .env exists for artisan commands
-RUN cp .env.example .env || true
-
-# Optimize autoloader
-RUN composer dump-autoload --optimize
-
-# Create storage directories and set permissions
-RUN mkdir -p /var/www/html/storage/logs \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Generate application key if not exists
-RUN php artisan key:generate --force || true
-
-# Clear and cache configuration
-RUN php artisan config:clear \
-    && php artisan config:cache \
-    && php artisan route:clear
-
-# Switch to www-data for security
+# Switch to non-root user
 USER www-data
 
-# Expose Laravel default port
+# Expose port for Swoole server
 EXPOSE 8000
 
-# Start Laravel with traditional artisan serve
-CMD ["/usr/local/bin/start.sh"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/api/health || exit 1
+
+# Start the application
+CMD ["sh", "/var/www/html/bin/start.sh"]
