@@ -160,12 +160,14 @@ oli-CMS/
 ### 安装步骤
 
 1. **克隆项目**
+
    ```bash
    git clone <repository-url>
    cd oli-CMS
    ```
 
 2. **构建并启动服务**
+
    ```bash
    # 使用 Make 命令（推荐）
    make build  # 构建所有镜像
@@ -176,6 +178,7 @@ oli-CMS/
    ```
 
 3. **初始化数据库**
+
    ```bash
    # 运行数据库迁移
    make backend-migrate
@@ -193,14 +196,14 @@ oli-CMS/
    - Traefik 面板: <http://localhost:8080>
 
 5. **默认管理员账户**
-   - 超级管理员：admin@cms.com / admin123
-   - 普通管理员：user@cms.com / user123
+   - 超级管理员：`admin@cms.com` / `admin123`
+   - 普通管理员：`user@cms.com` / `user123`
 
 ### 本地开发配置
 
 如果你需要自定义域名，请将以下内容添加到 `/etc/hosts` 文件：
 
-```
+``` text
 127.0.0.1 oli-cms.test
 127.0.0.1 api.oli-cms.test
 ```
@@ -249,6 +252,7 @@ oli-CMS/
 ### 开发环境
 
 1. 克隆项目并启动服务：
+
    ```bash
    git clone <repository-url>
    cd oli-CMS
@@ -260,17 +264,20 @@ oli-CMS/
 ### 生产环境
 
 1. **环境变量配置**
+
    ```bash
    cp backend/.env.example backend/.env
    # 编辑 .env 文件，配置生产环境参数
    ```
 
 2. **构建生产镜像**
+
    ```bash
    ENVIRONMENT=prod make build
    ```
 
 3. **启动生产服务**
+
    ```bash
    ENVIRONMENT=prod docker-compose up -d
    ```
@@ -295,6 +302,7 @@ terraform apply
 ### 后端开发
 
 1. **代码规范**
+
    ```bash
    # 代码格式化
    docker-compose exec backend ./vendor/bin/pint
@@ -304,6 +312,7 @@ terraform apply
    ```
 
 2. **数据库操作**
+
    ```bash
    # 创建迁移
    docker-compose exec backend php artisan make:migration create_example_table
@@ -316,6 +325,7 @@ terraform apply
    ```
 
 3. **多租户开发**
+
    ```bash
    # 创建租户迁移
    docker-compose exec backend php artisan make:migration create_tenant_posts_table
@@ -327,18 +337,21 @@ terraform apply
 ### 前端开发
 
 1. **开发服务器**
+
    ```bash
    cd frontend
    npm run dev
    ```
 
 2. **代码检查**
+
    ```bash
    npm run lint
    npm run type-check
    ```
 
 3. **构建生产版本**
+
    ```bash
    npm run build
    npm run start
@@ -388,6 +401,7 @@ make build       # 构建所有镜像
 ### v1.0.0 (2024-01-01)
 
 **新功能：**
+
 - ✅ 多租户架构实现
 - ✅ 管理员认证系统
 - ✅ 租户管理功能
