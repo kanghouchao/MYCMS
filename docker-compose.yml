@@ -7,17 +7,13 @@ services:
   traefik:
     image: "traefik:v3.5.0"
     container_name: "oli-cms-traefik"
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
     ports:
       - "80:80"
-      - "8080:8080" # Dashboard
+      - "443:443"
+      - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/local/traefik.yml:/etc/traefik/traefik.yml:ro"
+      - "./traefik/${ENVIRONMENT:-local}/:/etc/traefik/:ro"
     networks:
       - oli-cms-network
     depends_on:

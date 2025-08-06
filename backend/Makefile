@@ -19,11 +19,11 @@ help: ## 显示帮助信息
 # Docker 镜像管理
 # ======================
 build: ## 构建Docker镜像
-	@echo "🏗️  构建Docker镜像..."
+	@echo "🏗️  构建后端Docker镜像..."
 	@docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 rmi: ## 删除Docker镜像
-	@echo "🗑️  删除Docker镜像..."
+	@echo "🗑️  删除后端Docker镜像..."
 	@docker rmi $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null || echo "镜像不存在或已删除"
 
 .PHONY: help build rmi

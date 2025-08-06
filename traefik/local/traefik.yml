@@ -6,7 +6,6 @@ global:
   checkNewVersion: false
   sendAnonymousUsage: false
 
-# API and dashboard, accessible for local development
 api:
   dashboard: true
   insecure: true

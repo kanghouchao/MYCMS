@@ -1,8 +1,8 @@
 # Oli CMS Project Makefile
 # ======================
 
-# 默认目标
-.DEFAULT_GOAL := build
+# 默认环境
+ENV ?= local
 
 # ======================
 # 帮助信息
@@ -18,25 +18,20 @@ help: ## 显示帮助信息
 # ======================
 # 服务管理
 # ======================
-build: ## 构建所有服务
+build: ## 构建镜像
 	@if [ -z "$(service)" ]; then \
 		make -C backend build; \
 		make -C frontend build; \
 	fi
-	@echo "🔨 构建中..."
 	@make -C $(service) build
 
-up: ## 启动所有服务
-	@echo "🚀 启动服务..."
-	@docker-compose up -d
+up: ## 启动服务
+	@echo "🚀 启动$(ENV)环境..."
+	ENVIRONMENT=$(ENV) docker-compose up -d --timestamps  --wait
 
-down: ## 停止所有服务
+down: ## 停止服务
 	@echo "🛑 停止服务..."
 	@docker-compose down
-
-restart: ## 重启所有服务
-	@echo "🔄 重启服务..."
-	@docker-compose restart
 
 ps: ## 查看服务状态
 	@docker-compose ps

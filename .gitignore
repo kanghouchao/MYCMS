@@ -2,7 +2,8 @@
 .DS_Store
 
 # environment variables
-.env
+.env*
+!.env.example
 
 # Certificates
 /traefik/acme.json
