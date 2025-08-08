@@ -1,18 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable static export for production builds
-  output: "export",
+  // 动态多租户需要 Middleware，不能使用 static export
+  // output: 'export' 已移除
 
-  // Disable telemetry (use env variable instead)
-  // telemetry: false,  // This should be set via NEXT_TELEMETRY_DISABLED=1
-
-  // Trailing slashes for static hosting
-  trailingSlash: true,
-
-  // Disable image optimization for static export
   images: {
     unoptimized: true,
   },
+
+  // 告诉 Next.js 在反向代理后信任传入的 Host 头 (Traefik 会保留原始域名)
+  // Next 13.4+ 支持，防止 hostname 被解析成 container 内部名字或 localhost
+  trustHostHeader: true,
 
   // Asset prefix for CDN (if needed)
   // assetPrefix: process.env.NODE_ENV === 'production' ? '/static' : '',

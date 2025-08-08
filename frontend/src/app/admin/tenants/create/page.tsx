@@ -29,9 +29,19 @@ export default function CreateTenantPage() {
 
     if (!formData.domain.trim()) {
       newErrors.domain = "域名不能为空";
-    } else if (!/^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/.test(formData.domain)) {
-      newErrors.domain =
-        "域名格式不正确（只能包含小写字母、数字和连字符，且不能以连字符开头或结尾）";
+    } else {
+      // 检查域名格式（允许完整域名）
+      const domainRegex =
+        /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/;
+      if (!domainRegex.test(formData.domain)) {
+        newErrors.domain = "域名格式不正确";
+      }
+
+      // 检查是否是保留域名
+      const domain = formData.domain.toLowerCase();
+      if (domain.startsWith("api.") || domain === "api") {
+        newErrors.domain = "不能使用 api 相关的域名";
+      }
     }
 
     if (!formData.email.trim()) {
@@ -174,7 +184,7 @@ export default function CreateTenantPage() {
                   >
                     域名 <span className="text-red-500">*</span>
                   </label>
-                  <div className="mt-1 flex rounded-md shadow-sm">
+                  <div className="mt-1">
                     <input
                       type="text"
                       name="domain"
@@ -186,20 +196,17 @@ export default function CreateTenantPage() {
                           e.target.value.toLowerCase()
                         )
                       }
-                      className={`flex-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full min-w-0 rounded-none rounded-l-md sm:text-sm border-gray-300 ${
+                      className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
                         errors.domain ? "border-red-300" : ""
                       }`}
-                      placeholder="abc-company"
+                      placeholder="example.com 或 tenant1.oli-cms.test"
                     />
-                    <span className="inline-flex items-center px-3 rounded-r-md border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                      .yourdomain.com
-                    </span>
                   </div>
                   {errors.domain && (
                     <p className="mt-2 text-sm text-red-600">{errors.domain}</p>
                   )}
                   <p className="mt-2 text-sm text-gray-500">
-                    域名只能包含小写字母、数字和连字符，且不能以连字符开头或结尾
+                    请输入完整域名，支持任意格式（如：company.com、shop.example.org）
                   </p>
                 </div>
 
@@ -293,9 +300,7 @@ export default function CreateTenantPage() {
                         访问域名
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
-                        {formData.domain
-                          ? `${formData.domain}.yourdomain.com`
-                          : "未填写"}
+                        {formData.domain || "未填写"}
                       </dd>
                     </div>
                     <div>

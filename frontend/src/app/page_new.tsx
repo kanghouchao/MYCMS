@@ -9,28 +9,14 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (isLoading) return;
-
-    const adminDomains = new Set([
-      "oli-cms.test",
-      "admin.oli-cms.test",
-      "localhost",
-      "127.0.0.1",
-    ]);
-
-    const host = typeof window !== "undefined" ? window.location.hostname : "";
-
-    // 非管理员域名 => 交给 /tenant 页面（若 middleware 没触发作兜底）
-    if (!adminDomains.has(host)) {
-      router.replace("/tenant");
-      return;
-    }
-
-    // 管理域名逻辑
-    if (isAuthenticated) {
-      router.replace("/admin/dashboard");
-    } else {
-      router.replace("/admin/login");
+    // 主页面现在只处理管理后台逻辑
+    // 租户域名会在 middleware 中被重定向到 /tenant
+    if (!isLoading) {
+      if (isAuthenticated) {
+        router.push("/admin/dashboard");
+      } else {
+        router.push("/admin/login");
+      }
     }
   }, [isAuthenticated, isLoading, router]);
 

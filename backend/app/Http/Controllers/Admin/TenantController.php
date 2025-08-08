@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Stancl\Tenancy\Database\Models\Tenant;
+use App\Models\Tenant;
 use Stancl\Tenancy\Database\Models\Domain;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -33,9 +33,30 @@ class TenantController extends Controller
      */
     public function store(Request $request)
     {
+        // 手动检查域名唯一性，避免多租户中间件干扰
+        $existingDomain = Domain::where('domain', $request->domain)->first();
+        if ($existingDomain) {
+            return back()->withErrors(['domain' => '该域名已被使用'])->withInput();
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
-            'domain' => 'required|string|max:255|unique:domains,domain',
+            'domain' => [
+                'required',
+                'string',
+                'max:255',
+                function ($attribute, $value, $fail) {
+                    // 检查基本域名格式
+                    if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/', $value)) {
+                        $fail('域名格式不正确');
+                    }
+
+                    // 检查是否使用了保留域名
+                    if (strpos($value, 'api.') === 0 || $value === 'api') {
+                        $fail('不能使用 api 相关的域名');
+                    }
+                },
+            ],
             'email' => 'required|email|max:255',
             'plan' => 'required|in:basic,premium,enterprise',
         ]);

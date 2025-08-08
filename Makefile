@@ -25,6 +25,7 @@ build: ## 构建镜像
 	fi
 	@make -C $(service) build
 
+
 up: ## 启动服务
 	@echo "🚀 启动$(ENV)环境..."
 	ENVIRONMENT=$(ENV) docker-compose up -d --timestamps  --wait

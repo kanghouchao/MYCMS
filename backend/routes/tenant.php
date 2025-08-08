@@ -18,12 +18,5 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
-Route::middleware([
-    'web',
-    InitializeTenancyByDomain::class,
-    PreventAccessFromCentralDomains::class,
-])->group(function () {
-    Route::get('/', function () {
-        return 'This is your multi-tenant application. The id of the current tenant is ' . tenant('id');
-    });
-});
+// 已弃用：所有租户域名解析统一使用中心路由 GET /api/tenants/{domain}
+// 此文件暂保留占位，后续可整体删除 TenantRouteServiceProvider。

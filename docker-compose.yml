@@ -46,6 +46,21 @@ services:
       timeout: 5s
       retries: 5
 
+  # Cache: Redis
+  redis:
+    image: redis:8.2.0-alpine3.22
+    container_name: oli-cms-redis
+    command: redis-server --appendonly yes
+    volumes:
+      - oli-cms-redis-data:/data
+    networks:
+      - oli-cms-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # Backend: PHP Laravel
   backend:
     image: cms-backend:latest
@@ -55,9 +70,12 @@ services:
     depends_on:
       database:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`api.oli-cms.test`)"
+      # 所有 /api/* 路径都路由到后端
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
 
@@ -67,11 +85,15 @@ services:
     container_name: oli-cms-frontend
     networks:
       - oli-cms-network
+    depends_on:
+      backend:
+        condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`oli-cms.test`)"
+      # 所有非 /api/ 路径都路由到前端
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=web"
-      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
 networks:
   oli-cms-network:
@@ -79,4 +101,6 @@ networks:
 
 volumes:
   oli-cms-db-data:
+    driver: local
+  oli-cms-redis-data:
     driver: local

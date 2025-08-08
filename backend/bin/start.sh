@@ -5,10 +5,11 @@ mkdir -p storage/logs bootstrap/cache
 
 # 等待数据库连接
 echo "等待数据库连接..."
-until php artisan migrate:status >/dev/null 2>&1; do
+until php artisan migrate:status 2>&1 | grep -E "(Ran|Pending|Migration table not found)" >/dev/null; do
     echo "数据库尚未就绪，等待中..."
     sleep 2
 done
+echo "数据库连接成功！"
 
 # 运行迁移
 echo "运行数据库迁移..."

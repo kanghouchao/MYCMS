@@ -41,7 +41,7 @@ export default function TenantsPage() {
         setTenants(response.data);
       }
     } catch (error) {
-      toast.error("加载租户列表失败");
+      toast.error("店舗一覧の読み込みに失敗しました");
     } finally {
       setLoadingTenants(false);
     }
@@ -54,18 +54,18 @@ export default function TenantsPage() {
   };
 
   const handleDeleteTenant = async (id: string, name: string) => {
-    if (!confirm(`确定要删除租户 "${name}" 吗？此操作不可恢复。`)) {
+    if (!confirm(`店舗「${name}」を削除しますか？この操作は取り消せません。`)) {
       return;
     }
 
     try {
       const response = await tenantApi.delete(id);
       if (response.success) {
-        toast.success("租户删除成功");
+        toast.success("店舗を削除しました");
         loadTenants();
       }
     } catch (error) {
-      toast.error("删除租户失败");
+      toast.error("店舗の削除に失敗しました");
     }
   };
 
@@ -93,17 +93,19 @@ export default function TenantsPage() {
                 onClick={() => router.push("/admin/dashboard")}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
               >
-                ← 返回仪表板
+                ← ダッシュボードへ戻る
               </button>
-              <h1 className="text-xl font-semibold text-gray-900">租户管理</h1>
+              <h1 className="text-xl font-semibold text-gray-900">店舗管理</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">欢迎，{admin?.name}</span>
+              <span className="text-sm text-gray-700">
+                ようこそ、{admin?.name} さん
+              </span>
               <button
                 onClick={handleLogout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
-                退出
+                ログアウト
               </button>
             </div>
           </div>
@@ -117,9 +119,11 @@ export default function TenantsPage() {
           <div className="md:flex md:items-center md:justify-between mb-6">
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-                租户列表
+                店舗一覧
               </h2>
-              <p className="mt-1 text-sm text-gray-500">管理系统中的所有租户</p>
+              <p className="mt-1 text-sm text-gray-500">
+                システム内の全ての店舗を管理します
+              </p>
             </div>
             <div className="mt-4 flex md:mt-0 md:ml-4">
               <button
@@ -139,7 +143,7 @@ export default function TenantsPage() {
                     d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                   />
                 </svg>
-                添加租户
+                店舗を追加
               </button>
             </div>
           </div>
@@ -150,7 +154,7 @@ export default function TenantsPage() {
               <form onSubmit={handleSearch} className="sm:flex sm:items-center">
                 <div className="w-full sm:max-w-xs">
                   <label htmlFor="search" className="sr-only">
-                    搜索租户
+                    店舗を検索
                   </label>
                   <input
                     type="text"
@@ -159,14 +163,14 @@ export default function TenantsPage() {
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    placeholder="搜索租户名称、域名..."
+                    placeholder="店舗名またはドメインで検索..."
                   />
                 </div>
                 <button
                   type="submit"
                   className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-transparent shadow-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                 >
-                  搜索
+                  検索
                 </button>
                 {searchTerm && (
                   <button
@@ -177,19 +181,19 @@ export default function TenantsPage() {
                     }}
                     className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
                   >
-                    清除
+                    クリア
                   </button>
                 )}
               </form>
             </div>
           </div>
 
-          {/* 租户列表 */}
+          {/* 店舗一覧 */}
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             {loadingTenants ? (
               <div className="px-4 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-                <p className="mt-2 text-sm text-gray-500">加载中...</p>
+                <p className="mt-2 text-sm text-gray-500">読み込み中...</p>
               </div>
             ) : tenants && tenants.data.length > 0 ? (
               <>
@@ -217,7 +221,7 @@ export default function TenantsPage() {
                                     : "bg-red-100 text-red-800"
                                 }`}
                               >
-                                {tenant.is_active ? "活跃" : "停用"}
+                                {tenant.is_active ? "有効" : "無効"}
                               </span>
                             </div>
                             <div className="mt-1">
@@ -225,10 +229,18 @@ export default function TenantsPage() {
                                 {tenant.email}
                               </p>
                               <p className="text-sm text-gray-500">
-                                域名: {tenant.domain}
+                                ドメイン:{" "}
+                                <a
+                                  href={`//${tenant.domain}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-indigo-600 hover:underline break-all"
+                                >
+                                  {tenant.domain}
+                                </a>
                               </p>
                               <p className="text-sm text-gray-500">
-                                套餐:{" "}
+                                プラン:{" "}
                                 <span className="font-medium">
                                   {tenant.plan}
                                 </span>
@@ -239,7 +251,7 @@ export default function TenantsPage() {
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-500">
                             {new Date(tenant.created_at).toLocaleDateString(
-                              "zh-CN"
+                              "ja-JP"
                             )}
                           </span>
                           <div className="flex space-x-2">
@@ -249,7 +261,7 @@ export default function TenantsPage() {
                               }
                               className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
-                              编辑
+                              編集
                             </button>
                             <button
                               onClick={() =>
@@ -257,7 +269,7 @@ export default function TenantsPage() {
                               }
                               className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
-                              删除
+                              削除
                             </button>
                           </div>
                         </div>
@@ -275,25 +287,21 @@ export default function TenantsPage() {
                         disabled={currentPage <= 1}
                         className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        上一页
+                        前へ
                       </button>
                       <button
                         onClick={() => setCurrentPage(currentPage + 1)}
                         disabled={currentPage >= tenants.last_page}
                         className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        下一页
+                        次へ
                       </button>
                     </div>
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm text-gray-700">
-                          显示第{" "}
-                          <span className="font-medium">{tenants.from}</span> 到{" "}
-                          <span className="font-medium">{tenants.to}</span> 条，
-                          共{" "}
-                          <span className="font-medium">{tenants.total}</span>{" "}
-                          条结果
+                          {tenants.total} 件中 {tenants.from}-{tenants.to}{" "}
+                          を表示
                         </p>
                       </div>
                       <div>
@@ -376,10 +384,12 @@ export default function TenantsPage() {
                   />
                 </svg>
                 <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  暂无租户
+                  店舗がありません
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {searchTerm ? "没有找到匹配的租户" : "开始创建您的第一个租户"}
+                  {searchTerm
+                    ? "該当する店舗が見つかりません"
+                    : "最初の店舗を作成しましょう"}
                 </p>
                 <div className="mt-6">
                   <button
@@ -399,7 +409,7 @@ export default function TenantsPage() {
                         d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                       />
                     </svg>
-                    添加租户
+                    店舗を追加
                   </button>
                 </div>
               </div>

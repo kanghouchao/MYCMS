@@ -20,14 +20,15 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        // 启用CORS中间件
+        // 使用动态 CORS 中间件替代默认的 HandleCors
         $middleware->api(prepend: [
-            \Illuminate\Http\Middleware\HandleCors::class,
+            \App\Http\Middleware\DynamicCors::class,
         ]);
 
         // 注册自定义中间件
         $middleware->alias([
             'guard' => \App\Http\Middleware\AdminGuard::class,
+            'stateless_auth' => \App\Http\Middleware\StatelessAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
