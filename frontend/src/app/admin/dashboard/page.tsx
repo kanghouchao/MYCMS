@@ -40,7 +40,7 @@ export default function AdminDashboard() {
         setRecentTenants(tenantsResponse.data.data);
       }
     } catch (error) {
-      toast.error("加载数据失败");
+      toast.error("データの読み込みに失敗しました");
     } finally {
       setLoadingStats(false);
     }
@@ -61,40 +61,42 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 导航栏 */}
+      {/* ナビゲーションバー */}
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <h1 className="text-xl font-semibold text-gray-900">
-                管理员控制台
+                管理コンソール
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">欢迎，{admin?.name}</span>
+              <span className="text-sm text-gray-700">
+                ようこそ、{admin?.name} さん
+              </span>
               <button
                 onClick={() => router.push("/admin/tenants")}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
-                管理租户
+                店舗管理
               </button>
               <button
                 onClick={handleLogout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
-                退出
+                ログアウト
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* 主要内容 */}
+      {/* メインコンテンツ */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             {loadingStats ? (
-              // 统计数据加载状态
+              // 統計データ読み込み状態
               Array.from({ length: 4 }).map((_, i) => (
                 <div
                   key={i}
@@ -109,7 +111,7 @@ export default function AdminDashboard() {
                 </div>
               ))
             ) : (
-              // 统计数据卡片
+              // 統計データカード
               <>
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                   <div className="p-5">
@@ -132,7 +134,7 @@ export default function AdminDashboard() {
                       <div className="ml-5 w-0 flex-1">
                         <dl>
                           <dt className="text-sm font-medium text-gray-500 truncate">
-                            总租户数
+                            総店舗数
                           </dt>
                           <dd className="text-lg font-medium text-gray-900">
                             {stats?.total || 0}
@@ -164,7 +166,7 @@ export default function AdminDashboard() {
                       <div className="ml-5 w-0 flex-1">
                         <dl>
                           <dt className="text-sm font-medium text-gray-500 truncate">
-                            活跃租户
+                            有効店舗
                           </dt>
                           <dd className="text-lg font-medium text-gray-900">
                             {stats?.active || 0}
@@ -196,7 +198,7 @@ export default function AdminDashboard() {
                       <div className="ml-5 w-0 flex-1">
                         <dl>
                           <dt className="text-sm font-medium text-gray-500 truncate">
-                            待审核
+                            審査待ち
                           </dt>
                           <dd className="text-lg font-medium text-gray-900">
                             {stats?.pending || 0}
@@ -228,7 +230,7 @@ export default function AdminDashboard() {
                       <div className="ml-5 w-0 flex-1">
                         <dl>
                           <dt className="text-sm font-medium text-gray-500 truncate">
-                            已停用
+                            無効店舗
                           </dt>
                           <dd className="text-lg font-medium text-gray-900">
                             {stats?.inactive || 0}
@@ -242,28 +244,28 @@ export default function AdminDashboard() {
             )}
           </div>
 
-          {/* 最近租户列表 */}
+          {/* 直近追加店舗一覧 */}
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
               <div>
                 <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  最近添加的租户
+                  最近追加された店舗
                 </h3>
                 <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                  最新创建的5个租户
+                  直近で作成された5件
                 </p>
               </div>
               <button
                 onClick={() => router.push("/admin/tenants/create")}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"
               >
-                添加租户
+                店舗追加
               </button>
             </div>
             <ul className="divide-y divide-gray-200">
               {recentTenants.length === 0 ? (
                 <li className="px-4 py-4 text-center text-gray-500">
-                  暂无租户数据
+                  店舗データがありません
                 </li>
               ) : (
                 recentTenants.map((tenant) => (
@@ -294,11 +296,11 @@ export default function AdminDashboard() {
                               : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {tenant.is_active ? "活跃" : "停用"}
+                          {tenant.is_active ? "有効" : "無効"}
                         </span>
                         <span className="text-sm text-gray-500">
                           {new Date(tenant.created_at).toLocaleDateString(
-                            "zh-CN"
+                            "ja-JP"
                           )}
                         </span>
                       </div>
@@ -309,7 +311,7 @@ export default function AdminDashboard() {
             </ul>
           </div>
 
-          {/* 快速操作 */}
+          {/* クイック操作 */}
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-6">
@@ -331,9 +333,9 @@ export default function AdminDashboard() {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900">
-                      创建租户
+                      店舗作成
                     </h3>
-                    <p className="text-sm text-gray-500">添加新的租户到系统</p>
+                    <p className="text-sm text-gray-500">新しい店舗を追加</p>
                   </div>
                 </div>
                 <div className="mt-4">
@@ -341,7 +343,7 @@ export default function AdminDashboard() {
                     onClick={() => router.push("/admin/tenants/create")}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-sm font-medium"
                   >
-                    立即创建
+                    今すぐ作成
                   </button>
                 </div>
               </div>
@@ -367,9 +369,11 @@ export default function AdminDashboard() {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900">
-                      管理租户
+                      店舗管理
                     </h3>
-                    <p className="text-sm text-gray-500">查看和编辑现有租户</p>
+                    <p className="text-sm text-gray-500">
+                      既存店舗の閲覧と編集
+                    </p>
                   </div>
                 </div>
                 <div className="mt-4">
@@ -377,7 +381,7 @@ export default function AdminDashboard() {
                     onClick={() => router.push("/admin/tenants")}
                     className="w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md text-sm font-medium"
                   >
-                    查看全部
+                    すべて表示
                   </button>
                 </div>
               </div>
@@ -403,17 +407,17 @@ export default function AdminDashboard() {
                   </div>
                   <div className="ml-4">
                     <h3 className="text-lg font-medium text-gray-900">
-                      系统统计
+                      システム統計
                     </h3>
-                    <p className="text-sm text-gray-500">查看详细的系统报告</p>
+                    <p className="text-sm text-gray-500">詳細レポートを表示</p>
                   </div>
                 </div>
                 <div className="mt-4">
                   <button
-                    onClick={() => toast("功能开发中...", { icon: "ℹ️" })}
+                    onClick={() => toast("機能開発中...", { icon: "ℹ️" })}
                     className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-sm font-medium"
                   >
-                    查看报告
+                    レポートを見る
                   </button>
                 </div>
               </div>

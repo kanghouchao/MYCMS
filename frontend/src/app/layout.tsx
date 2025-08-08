@@ -7,8 +7,9 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Oli CMS - 多租户内容管理系统",
-  description: "一个基于Laravel和Next.js的多租户内容管理系统",
+  title: "Oli CMS - マルチ店舗CMS",
+  description:
+    "Laravel と Next.js を基盤としたマルチ店舗型コンテンツ管理システム",
 };
 
 export default function RootLayout({
@@ -17,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="ja">
       <body className={inter.className}>
         <AuthProvider>
           {children}

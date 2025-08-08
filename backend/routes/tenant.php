@@ -18,5 +18,5 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
-// 已弃用：所有租户域名解析统一使用中心路由 GET /api/tenants/{domain}
-// 此文件暂保留占位，后续可整体删除 TenantRouteServiceProvider。
+// 非推奨: すべてのテナントドメイン解決は中央ルート GET /api/tenants/{domain} に統一
+// このファイルはプレースホルダとして保持。後で TenantRouteServiceProvider ごと削除予定。

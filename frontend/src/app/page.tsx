@@ -20,13 +20,13 @@ export default function Home() {
 
     const host = typeof window !== "undefined" ? window.location.hostname : "";
 
-    // 非管理员域名 => 交给 /tenant 页面（若 middleware 没触发作兜底）
+    // 管理者用ドメイン以外 => /tenant ページへ (middleware が処理しなかった場合のフォールバック)
     if (!adminDomains.has(host)) {
       router.replace("/tenant");
       return;
     }
 
-    // 管理域名逻辑
+    // 管理ドメインの処理
     if (isAuthenticated) {
       router.replace("/admin/dashboard");
     } else {
@@ -34,11 +34,11 @@ export default function Home() {
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // 显示加载状态
+  // ローディング表示
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      <p className="mt-4 text-lg text-gray-600">重定向中...</p>
+      <p className="mt-4 text-lg text-gray-600">リダイレクト中...</p>
     </main>
   );
 }

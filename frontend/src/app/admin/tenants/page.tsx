@@ -84,7 +84,7 @@ export default function TenantsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 导航栏 */}
+      {/* ナビゲーションバー */}
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
@@ -115,7 +115,7 @@ export default function TenantsPage() {
       {/* 主要内容 */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
-          {/* 页面头部 */}
+          {/* ページヘッダー */}
           <div className="md:flex md:items-center md:justify-between mb-6">
             <div className="flex-1 min-w-0">
               <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
@@ -148,7 +148,7 @@ export default function TenantsPage() {
             </div>
           </div>
 
-          {/* 搜索表单 */}
+          {/* 検索フォーム */}
           <div className="bg-white shadow rounded-lg mb-6">
             <div className="px-4 py-5 sm:p-6">
               <form onSubmit={handleSearch} className="sm:flex sm:items-center">
@@ -278,7 +278,7 @@ export default function TenantsPage() {
                   ))}
                 </ul>
 
-                {/* 分页 */}
+                {/* ページネーション */}
                 {tenants.last_page > 1 && (
                   <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
                     <div className="flex-1 flex justify-between sm:hidden">
@@ -324,7 +324,7 @@ export default function TenantsPage() {
                             </svg>
                           </button>
 
-                          {/* 页码按钮 */}
+                          {/* ページ番号ボタン */}
                           {Array.from(
                             { length: Math.min(5, tenants.last_page) },
                             (_, i) => {

@@ -27,12 +27,12 @@ export default function TenantPage() {
         });
 
         if (response.status === 404) {
-          setError("租户不存在");
+          setError("店舗が存在しません");
           return;
         }
 
         if (!response.ok) {
-          setError("获取租户信息失败");
+          setError("店舗情報の取得に失敗しました");
           return;
         }
 
@@ -45,11 +45,11 @@ export default function TenantPage() {
             tenant_name: data.tenant_name,
           });
         } else {
-          setError("租户信息无效");
+          setError("店舗情報が無効です");
         }
       } catch (err) {
-        setError("网络错误");
-        console.error("获取租户信息时出错:", err);
+        setError("ネットワークエラー");
+        console.error("店舗情報取得時のエラー:", err);
       } finally {
         setLoading(false);
       }
@@ -62,7 +62,7 @@ export default function TenantPage() {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-24">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-        <p className="mt-4 text-lg text-gray-600">加载租户信息中...</p>
+        <p className="mt-4 text-lg text-gray-600">店舗情報を読み込み中...</p>
       </main>
     );
   }
@@ -70,7 +70,7 @@ export default function TenantPage() {
   if (error) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-24">
-        <div className="text-red-600 text-xl mb-4">错误</div>
+        <div className="text-red-600 text-xl mb-4">エラー</div>
         <p className="text-gray-600">{error}</p>
       </main>
     );
@@ -79,8 +79,10 @@ export default function TenantPage() {
   if (!tenantInfo) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-24">
-        <div className="text-yellow-600 text-xl mb-4">租户未找到</div>
-        <p className="text-gray-600">当前域名没有对应的租户信息</p>
+        <div className="text-yellow-600 text-xl mb-4">店舗が見つかりません</div>
+        <p className="text-gray-600">
+          このドメインに対応する店舗情報はありません
+        </p>
       </main>
     );
   }

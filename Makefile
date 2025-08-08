@@ -19,10 +19,7 @@ help: ## 显示帮助信息
 # 服务管理
 # ======================
 build: ## 构建镜像
-	@if [ -z "$(service)" ]; then \
-		make -C backend build; \
-		make -C frontend build; \
-	fi
+	@echo "🛠️  构建$(ENV)环境..."
 	@make -C $(service) build
 
 

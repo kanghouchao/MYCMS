@@ -21,13 +21,13 @@ export default function AdminLogin() {
     try {
       const success = await login(email, password);
       if (success) {
-        toast.success("登录成功！");
+        toast.success("ログインに成功しました");
         router.push("/admin/dashboard");
       } else {
-        toast.error("邮箱或密码错误");
+        toast.error("メールアドレスまたはパスワードが正しくありません");
       }
     } catch (error) {
-      toast.error("登录失败，请稍后重试");
+      toast.error("ログインに失敗しました。しばらくしてから再度お試しください");
     } finally {
       setIsLoading(false);
     }
@@ -53,10 +53,10 @@ export default function AdminLogin() {
             </svg>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            管理员登录
+            管理者ログイン
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            请使用您的管理员账户登录系统
+            管理者アカウントでログインしてください
           </p>
         </div>
 
@@ -64,7 +64,7 @@ export default function AdminLogin() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email" className="sr-only">
-                邮箱地址
+                メールアドレス
               </label>
               <input
                 id="email"
@@ -75,12 +75,12 @@ export default function AdminLogin() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="邮箱地址"
+                placeholder="メールアドレス"
               />
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                密码
+                パスワード
               </label>
               <input
                 id="password"
@@ -91,7 +91,7 @@ export default function AdminLogin() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="密码"
+                placeholder="パスワード"
               />
             </div>
           </div>
@@ -110,7 +110,7 @@ export default function AdminLogin() {
                 htmlFor="remember-me"
                 className="ml-2 block text-sm text-gray-900"
               >
-                记住我
+                ログイン状態を保持
               </label>
             </div>
           </div>
@@ -134,13 +134,13 @@ export default function AdminLogin() {
                   />
                 </svg>
               </span>
-              {isLoading ? "登录中..." : "登录"}
+              {isLoading ? "ログイン中..." : "ログイン"}
             </button>
           </div>
 
           <div className="mt-4 text-center">
             <div className="text-sm text-gray-600">
-              <p>测试账户：</p>
+              <p>テスト用アカウント:</p>
               <p className="font-mono text-xs">admin@cms.com / admin123</p>
               <p className="font-mono text-xs">user@cms.com / user123</p>
             </div>
