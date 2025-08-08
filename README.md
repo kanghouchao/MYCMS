@@ -1,4 +1,4 @@
-# Oli CMS - 多租户内容管理系统
+# Oli CMS - マルチ店舗コンテンツ管理システム
 
 ![Laravel](https://img.shields.io/badge/Laravel-11+-red.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14+-blue.svg)
@@ -6,61 +6,62 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-latest-blue.svg)
 
-一个基于 Laravel + Next.js 构建的现代化多租户内容管理系统，采用前后端分离架构和容器化部署。
+Laravel + Next.js をベースにしたモダンなマルチ店舗（マルチテナント）型コンテンツ管理システム。フロント/バックエンド分離と Docker / Traefik によるコンテナオーケストレーションを採用しています。
 
-## 📋 目录
+## 📋 目次
 
-- [项目概述](#-项目概述)
-- [技术栈](#-技术栈)
-- [架构设计](#-架构设计)
-- [快速开始](#-快速开始)
-- [核心功能](#-核心功能)
-- [部署指南](#-部署指南)
-- [开发指南](#-开发指南)
-- [贡献指南](#-贡献指南)
+- [概要](#-概要)
+- [技術スタック](#-技術スタック)
+- [アーキテクチャ](#-アーキテクチャ)
+- [クイックスタート](#-クイックスタート)
+- [主な機能](#-主な機能)
+- [デプロイ](#-デプロイ)
+- [開発ガイド](#-開発ガイド)
+- [コントリビュート方法](#-コントリビュート方法)
 
-## 🎯 项目概述
+## 🎯 概要
 
-Oli CMS 是一个企业级的多租户内容管理系统，支持：
+Oli CMS は以下を特徴とするエンタープライズ志向のマルチ店舗 CMS です：
 
-- **多租户架构**：每个租户拥有独立的数据空间和域名
-- **前后端分离**：Laravel API + Next.js 前端
-- **现代化 UI**：基于 Tailwind CSS 的响应式设计
-- **完整的认证系统**：管理员和租户用户分离认证
-- **Docker 化部署**：一键启动开发环境
-- **可扩展架构**：支持水平扩展和容器化部署
+- **マルチ店舗（テナント）**：各店舗が独立したデータ空間とドメインを持つ
+- **フロント/バック分離**：Backend(Laravel API) + Frontend(Next.js)
+- **モダン UI**：Tailwind CSS によるレスポンシブ
+- **管理者認証**：JWT ベースの管理 API
+- **コンテナ構成**：Docker / Traefik による簡易起動
+- **水平スケール容易**：サービス分離 & Stateless 設計
 
-## 🛠 技术栈
+## 🛠 技術スタック
 
 | 分类 | 技术选型 | 版本 | 备注 |
 |------|----------|------|------|
-| **后端框架** | Laravel | 11+ | Headless API，基于 Swoole 运行 |
-| **前端框架** | Next.js | 14+ | React + TypeScript，静态构建 |
-| **Web服务器** | Nginx | latest | 托管前端静态文件 |
-| **数据库** | PostgreSQL | 16+ | 支持多租户数据隔离 |
-| **缓存** | Redis | 7+ | 会话存储和缓存 |
-| **反向代理** | Traefik | 3.5+ | 域名路由和负载均衡 |
-| **容器化** | Docker | latest | 开发和生产环境 |
-| **包管理器** | Composer | latest | PHP 依赖管理 |
-| **包管理器** | npm/yarn | latest | Node.js 依赖管理 |
-| **样式框架** | Tailwind CSS | 3.4+ | 原子化 CSS 框架 |
-| **多租户** | stancl/tenancy | 3.9+ | Laravel 多租户包 |
-| **API认证** | Laravel Sanctum | 4.0+ | SPA 认证 |
+| カテゴリ | 技術 | バージョン | 用途 |
+|----------|------|-----------|------|
+| Backend | Laravel | 11+ | Headless API (Swoole ランタイム) |
+| Frontend | Next.js | 14+ | SSR/Middleware 対応ランタイム実行 |
+| DB | PostgreSQL | 16+ | マルチ店舗データ隔離 |
+| Cache | Redis | 7+ | キャッシュ & セッション |
+| 逆プロキシ | Traefik | 3.5+ | ルーティング & L7 制御 |
+| コンテナ | Docker | latest | 本番/開発統一化 |
+| PHP 依存 | Composer | 2.x | ライブラリ管理 |
+| Node 依存 | npm | 10+ | Frontend 依存管理 |
+| スタイル | Tailwind CSS | 3.4+ | ユーティリティ CSS |
+| マルチ店舗 | stancl/tenancy | 3.9+ | テナント管理 |
+| 認証 | JWT + Stateless 中間層 | - | 管理者 API 認証 |
 
-## 🏗 架构设计
+## 🏗 アーキテクチャ
 
-### 整体架构
+### 全体構成
 
 ```text
-                       ┌─────────────────┐
-                       │   Frontend      │
-                       │   Nginx         │
-                  ┌───►│   HTML/JS/CSS   │
-                  │    │   Port: 80      │
-                  │    └─────────────────┘
+                        ┌─────────────────┐
+                        │   Frontend      │
+                        │   Next.js (Node)│
+           ┌───────────►│   Runtime App   │
+           │            │   Port: 3000    │
+           │            └────────────────┘
 ┌─────────────────┐
 │   Traefik       │        ┌─────────────────┐
-│   (反向代理)    │◄───────►│   Backend       │
+│   (反向代理)    │◄────────►│   Backend       │
 │   Port: 80      │        │   Laravel +     │
 └─────────────────┘         │   Swoole        │
                             │   Port: 8000    │
@@ -73,32 +74,34 @@ Oli CMS 是一个企业级的多租户内容管理系统，支持：
                             └─────────────────┘
 ```
 
-**架构说明：**
+**構成ポイント：**
 
-- **前端**：Next.js 构建为静态文件（`output: "export"`），由 Nginx 提供服务
-- **后端**：Laravel API 基于 Swoole 高性能运行时
-- **代理**：Traefik 直接路由到前端静态资源和后端 API
-- **数据**：PostgreSQL 提供多租户数据隔离
+- **Frontend**: Next.js を Node ランタイムで動的実行（Middleware 利用可能）
+- **Backend**: Laravel (Swoole) による長常駐・高性能 HTTP サーバ
+- **Routing**: Traefik が `/api/*` を backend、その他を frontend へ動的振り分け
+- **Data Layer**: PostgreSQL + Redis（将来 S3 等の外部ストレージ拡張想定）
 
-**请求流程：**
+**リクエストフロー：**
 
-- 静态资源请求：`Browser → Traefik → Frontend (Nginx)`
-- API 请求：`Browser → Traefik → Backend (Laravel + Swoole)`
-- 数据库连接：`Backend → PostgreSQL`
+- フロント配信: `Browser → Traefik → Frontend (Next.js 3000)`
+- API: `Browser → Traefik → Backend (Swoole 8000)`
+- DB/Cache: `Backend → PostgreSQL / Redis`
 
-**路由配置：**
+**Traefik ルール（簡略）:**
 
-- `oli-cms.test` → Frontend (Nginx 静态文件)
-- `api.oli-cms.test` → Backend (Laravel API)
+| 条件 | 宛先サービス |
+|------|--------------|
+| PathPrefix(`/api/`) | backend(8000) |
+| その他 | frontend(3000) |
 
-**架构特点：**
+**特徴:**
 
-- **前后端分离**：前端静态化，后端 API 化
-- **单体应用**：后端为单一 Laravel 应用，便于维护
-- **容器化部署**：每个组件独立容器，易于扩展
-- **多租户支持**：基于域名的租户隔离
+- 明確な境界（/api 経由で統一）
+- Stateless スケール（Frontend/Backend 水平展開容易）
+- テナント解決はドメインベース（DB + キャッシュ）
+- Swoole により低レイテンシ/常駐実行
 
-### 多租户架构
+### マルチ店舗構造
 
 ```text
 Central Application (管理后台)
@@ -112,7 +115,7 @@ Tenant Applications (租户应用)
 └── Custom Configurations
 ```
 
-### 项目结构
+### プロジェクト構成
 
 ```text
 oli-CMS/
@@ -150,14 +153,14 @@ oli-CMS/
 └── Makefile              # 项目管理命令
 ```
 
-## 🚀 快速开始
+## 🚀 クイックスタート
 
-### 环境要求
+### 必要環境
 
 - Docker & Docker Compose
 - Make (可选，用于快捷命令)
 
-### 安装步骤
+### セットアップ手順
 
 1. **克隆项目**
 
@@ -166,7 +169,7 @@ oli-CMS/
    cd oli-CMS
    ```
 
-2. **构建并启动服务**
+2. **サービス起動**
 
    ```bash
    # 使用 Make 命令（推荐）
@@ -177,7 +180,7 @@ oli-CMS/
    docker-compose up -d --build
    ```
 
-3. **初始化数据库**
+3. **データベース初期化**
 
    ```bash
    # 运行数据库迁移
@@ -190,16 +193,17 @@ oli-CMS/
    docker-compose exec backend php artisan db:seed
    ```
 
-4. **访问应用**
-   - 管理后台: <http://oli-cms.test> 或 <http://localhost>
-   - API 接口: <http://api.oli-cms.test>
-   - Traefik 面板: <http://localhost:8080>
+4. **アクセス**
 
-5. **默认管理员账户**
-   - 超级管理员：`admin@cms.com` / `admin123`
-   - 普通管理员：`user@cms.com` / `user123`
+   - 管理 UI: [http://localhost](http://localhost) （または hosts 設定後 [http://oli-cms.test](http://oli-cms.test)）
+   - API: [http://localhost/api](http://localhost/api) 以下
+   - Traefik Dashboard: [http://localhost:8080](http://localhost:8080)
 
-### 本地开发配置
+5. **初期管理者アカウント（例）**
+   - Super Admin: `admin@cms.com` / `admin123`
+   - General Admin: `user@cms.com` / `user123`
+
+### ローカルドメイン設定
 
 如果你需要自定义域名，请将以下内容添加到 `/etc/hosts` 文件：
 
@@ -208,48 +212,51 @@ oli-CMS/
 127.0.0.1 api.oli-cms.test
 ```
 
-## 📁 核心功能
+## 📁 主な機能
 
-### 管理后台功能
+### 管理機能
 
-- **🔐 管理员认证**
-  - JWT Token 认证
-  - 角色权限管理（超级管理员、普通管理员）
-  - 账户状态控制
+#### 🔐 管理者認証
 
-- **🏢 租户管理**
-  - 创建、编辑、删除租户
-  - 域名绑定管理
-  - 套餐计划选择（基础版、高级版、企业版）
-  - 租户状态监控
+- JWT ベース / Stateless
+- ロール（Super / Admin）
+- アカウント有効/無効
 
-- **📊 仪表板**
-  - 系统概览统计
-  - 租户使用情况
-  - 实时状态监控
+#### 🏢 店舗管理
 
-### 多租户系统
+- 作成 / 更新 / 削除
+- ドメイン紐付け
+- プラン (basic / premium / enterprise)
+- 状態表示
 
-- **🌐 域名隔离**
-  - 每个租户独立域名
-  - 自动路由识别
-  - 防止跨租户访问
+#### 📊 ダッシュボード
 
-- **💾 数据隔离**
-  - 租户数据库隔离
-  - 文件存储隔离
-  - 缓存空间隔离
+- 全体店舗カウント
+- 最近作成一覧
+- （将来）利用状況指標
 
-- **⚙️ 配置隔离**
-  - 租户独立配置
-  - 自定义主题支持
-  - 功能模块控制
+### マルチ店舗システム
 
-## � 部署指南
+#### 🌐 ドメイン分離
 
-## 🚀 部署指南
+- 独立ドメイン単位解決
+- Traefik + アプリ層キャッシュ
+- クロステナント防止
 
-### 开发环境
+#### 💾 データ分離
+
+- （現在）ロジカル分離（同一 DB 内テーブル）
+- 将来: 物理 DB / スキーマ分離拡張可能
+- キャッシュタグスコープ
+
+#### ⚙️ 設定/拡張
+
+- data JSON 属性への柔軟メタ格納
+- 将来: テーマ / モジュール切替
+
+## 🚀 デプロイ
+
+### 開発環境
 
 1. 克隆项目并启动服务：
 
@@ -261,32 +268,32 @@ oli-CMS/
 
 2. 访问应用进行开发测试
 
-### 生产环境
+### 本番環境
 
-1. **环境变量配置**
+1. **環境変数設定**
 
    ```bash
    cp backend/.env.example backend/.env
    # 编辑 .env 文件，配置生产环境参数
    ```
 
-2. **构建生产镜像**
+2. **本番ビルド**
 
    ```bash
    ENVIRONMENT=prod make build
    ```
 
-3. **启动生产服务**
+3. **本番起動**
 
    ```bash
    ENVIRONMENT=prod docker-compose up -d
    ```
 
-4. **SSL 证书配置**
-   - 更新 `traefik/prod/traefik.yml` 配置
-   - 配置 Let's Encrypt 或自签名证书
+4. **SSL/TLS**
+   - `traefik/prod/traefik.yml` に ACME 設定追加
+   - Let’s Encrypt / 企業証明書対応
 
-### 云平台部署
+### インフラ (Terraform)
 
 项目包含 Terraform 配置，支持 AWS 等云平台部署：
 
@@ -297,9 +304,9 @@ terraform plan
 terraform apply
 ```
 
-## 💻 开发指南
+## 💻 開発ガイド
 
-### 后端开发
+### Backend 開発
 
 1. **代码规范**
 
@@ -324,17 +331,17 @@ terraform apply
    docker-compose exec backend php artisan make:model Example
    ```
 
-3. **多租户开发**
+3. **マルチ店舗（テナント）開発**
 
    ```bash
-   # 创建租户迁移
-   docker-compose exec backend php artisan make:migration create_tenant_posts_table
+   # 创建店铺（租户）迁移（仍使用 tenants 命令空间）
+   docker-compose exec backend php artisan make:migration create_shop_posts_table
    
-   # 为租户运行迁移
+   # 为所有店铺运行迁移（包内命令名仍为 tenants:migrate）
    docker-compose exec backend php artisan tenants:migrate
    ```
 
-### 前端开发
+### Frontend 開発
 
 1. **开发服务器**
 
@@ -357,7 +364,7 @@ terraform apply
    npm run start
    ```
 
-### 常用命令
+### Make コマンド
 
 使用项目根目录的 Makefile：
 
@@ -371,17 +378,17 @@ make ps          # 查看服务状态
 make build       # 构建所有镜像
 ```
 
-## 🤝 贡献指南
+## 🤝 コントリビュート方法
 
 我们欢迎任何形式的贡献！
 
-### 提交 Issue
+### Issue 提出
 
 - 使用 Issue 模板
 - 提供详细的重现步骤
 - 包含环境信息
 
-### 提交 Pull Request
+### Pull Request 手順
 
 1. Fork 项目
 2. 创建特性分支：`git checkout -b feature/amazing-feature`
@@ -389,18 +396,18 @@ make build       # 构建所有镜像
 4. 推送到分支：`git push origin feature/amazing-feature`
 5. 开启 Pull Request
 
-### 开发规范
+### コーディング規約
 
 - 遵循 PSR-12 代码规范（PHP）
 - 使用 ESLint + Prettier（JavaScript/TypeScript）
 - 编写测试用例
 - 更新文档
 
-## 📝 更新日志
+## 📝 更新履歴
 
 ### v1.0.0 (2024-01-01)
 
-**新功能：**
+**追加機能:**
 
 - ✅ 多租户架构实现
 - ✅ 管理员认证系统
@@ -408,19 +415,19 @@ make build       # 构建所有镜像
 - ✅ Docker 化部署
 - ✅ API 接口开发
 
-**技术栈：**
+**技術内訳:**
 
 - Laravel 11+ 后端 API (Swoole 运行时)
-- Next.js 14+ 静态构建 + Nginx 服务
+- Next.js 14+ Node.js ランタイム実行 (Middleware 対応)
 - PostgreSQL 16 数据库
 - Traefik 3.5 反向代理
 - Docker & Docker Compose
 
-## 📄 许可证
+## 📄 ライセンス
 
 本项目采用 [MIT License](LICENSE) 许可证。
 
-## 🙋‍♂️ 支持
+## 🙋‍♂️ サポート
 
 如果你在使用过程中遇到问题，请：
 
@@ -430,6 +437,6 @@ make build       # 构建所有镜像
 
 ---
 
-**作者：** [kanghouchao](https://github.com/kanghouchao)  
-**项目地址：** [oli-CMS](https://github.com/kanghouchao/MYCMS)  
-**最后更新：** 2024年8月6日
+**作者:** [kanghouchao](https://github.com/kanghouchao)  
+**リポジトリ:** [oli-CMS](https://github.com/kanghouchao/MYCMS)  
+**最終更新:** 2025-08-08
