@@ -17,34 +17,27 @@ class ShopController extends Controller
         $perPage = $request->get('per_page', 15);
         $search = $request->get('search');
 
-    $query = Shop::on('central')->with('domains');
-
+        $query = Shop::on('central')->with('domains');
         if ($search) {
             $query->where('data->name', 'like', "%{$search}%")
                   ->orWhere('data->email', 'like', "%{$search}%");
         }
-
-        $tenants = $query->paginate($perPage);
-
-    // 格式化店铺数据
-    $tenants->getCollection()->transform(function ($shop) {
+        $shops = $query->paginate($perPage);
+        $shops->getCollection()->transform(function ($shop) {
             return [
-        'id' => $shop->id,
-        'name' => $shop->name ?? '未设置',
-        'email' => $shop->email ?? '未设置',
-        'plan' => $shop->plan ?? 'basic',
-        'domain' => $shop->domains->first()?->domain ?? '',
-        'domains' => $shop->domains->pluck('domain')->toArray(),
-                'is_active' => true, // 暂时都设为活跃状态
-        'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
-        'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
+                'id' => $shop->id,
+                'name' => $shop->name ?? '未设置',
+                'email' => $shop->email ?? '未设置',
+                'plan' => $shop->plan ?? 'basic',
+                'domain' => $shop->domains->first()?->domain ?? '',
+                'domains' => $shop->domains->pluck('domain')->toArray(),
+                'is_active' => true,
+                'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
             ];
         });
 
-        return response()->json([
-            'success' => true,
-            'data' => $tenants
-        ]);
+            return response()->json(['success' => true, 'data' => $shops]);
     }
 
     /** 创建店铺 */
@@ -81,10 +74,8 @@ class ShopController extends Controller
             $shop->put('plan', $request->plan);
             $shop->put('created_at', now());
             $shop->save();
-
             $domain = $shop->domains()->create(['domain' => $request->domain]);
-            Cache::forget('tenant_domain:'.$request->domain);
-
+            Cache::forget('shop_domain:'.$request->domain);
             return response()->json([
                 'success' => true,
                 'message' => '店铺创建成功',
@@ -107,15 +98,10 @@ class ShopController extends Controller
     /** 获取店铺详情 */
     public function show($id)
     {
-    $shop = Shop::with('domains')->find($id);
-
-    if (!$shop) {
-            return response()->json([
-                'success' => false,
-        'message' => '店铺不存在'
-            ], 404);
+        $shop = Shop::with('domains')->find($id);
+        if (!$shop) {
+            return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
         }
-
         return response()->json([
             'success' => true,
             'data' => [
@@ -139,28 +125,21 @@ class ShopController extends Controller
     /** 更新店铺 */
     public function update(Request $request, $id)
     {
-    $shop = Shop::find($id);
-
-    if (!$shop) {
-            return response()->json([
-                'success' => false,
-        'message' => '店铺不存在'
-            ], 404);
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
         }
-
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'plan' => 'required|in:basic,premium,enterprise',
         ]);
-
         try {
             $shop->put('name', $request->name);
             $shop->put('email', $request->email);
             $shop->put('plan', $request->plan);
             $shop->put('updated_at', now());
             $shop->save();
-
             return response()->json([
                 'success' => true,
                 'message' => "店铺 '{$request->name}' 更新成功！",
@@ -172,58 +151,40 @@ class ShopController extends Controller
                     'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
                 ]
             ]);
-
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => '更新租户失败：' . $e->getMessage()
-            ], 500);
+            return response()->json(['success' => false, 'message' => '更新店铺失败：' . $e->getMessage()], 500);
         }
     }
 
     /** 删除店铺 */
     public function destroy($id)
     {
-    $shop = Shop::find($id);
-    if (!$shop) {
-            return response()->json([
-                'success' => false,
-        'message' => '店铺不存在'
-            ], 404);
+        $shop = Shop::find($id);
+        if (!$shop) {
+            return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
         }
-
         try {
             $domains = $shop->domains()->pluck('domain')->all();
             $shopName = $shop->name ?? $shop->id;
             $shop->delete();
-            foreach ($domains as $d) { Cache::forget('tenant_domain:'.$d); }
-            return response()->json([
-                'success' => true,
-                'message' => "店铺 {$shopName} 已删除"
-            ]);
+            foreach ($domains as $d) { Cache::forget('shop_domain:'.$d); }
+            return response()->json(['success' => true, 'message' => "店铺 {$shopName} 已删除"]);
         } catch (\Throwable $e) {
-            return response()->json([
-                'success' => false,
-                'message' => '删除失败: '.$e->getMessage(),
-            ], 500);
+            return response()->json(['success' => false, 'message' => '删除失败: '.$e->getMessage()], 500);
         }
     }
 
     /** 获取统计数据 */
     public function stats()
     {
-    $totalTenants = Shop::on('central')->count();
-    $activeTenants = $totalTenants; // 暂时假设所有店铺都是活跃的
-        $inactiveTenants = 0; // 当前没有停用功能
-        $pendingTenants = 0; // 当前没有待审核功能
-
+        $total = Shop::on('central')->count();
         return response()->json([
             'success' => true,
             'data' => [
-                'total' => $totalTenants,
-                'active' => $activeTenants,
-                'inactive' => $inactiveTenants,
-                'pending' => $pendingTenants,
+                'total' => $total,
+                'active' => $total,
+                'inactive' => 0,
+                'pending' => 0,
             ]
         ]);
     }

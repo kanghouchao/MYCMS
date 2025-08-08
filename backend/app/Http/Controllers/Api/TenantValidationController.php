@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Cache;
 class TenantValidationController extends Controller
 {
     /**
-     * 语义化：解析域名 -> 返回租户信息 / 404
-     * GET /api/tenants/{domain}
+    * 解析域名 -> 返回店铺信息 / 404
+    * GET /api/shops/{domain}
      */
     public function show(Request $request, string $domain)
     {
@@ -23,7 +23,7 @@ class TenantValidationController extends Controller
             ], 422);
         }
 
-        $cacheKey = "tenant_domain:{$domain}";
+    $cacheKey = "shop_domain:{$domain}";
 
         try {
             if ($cached = Cache::get($cacheKey)) {
@@ -31,15 +31,15 @@ class TenantValidationController extends Controller
                 return response()->json($cached['payload'], $cached['status']);
             }
 
-            $tenantDomain = DB::connection('central')
+            $shopDomain = DB::connection('central')
                 ->table('domains')
                 ->where('domain', $domain)
                 ->first();
 
-            if (!$tenantDomain) {
+            if (!$shopDomain) {
                 $payload = [
                     'success' => false,
-                    'message' => '租户域名不存在',
+                    'message' => '店铺域名不存在',
                     'domain' => $domain,
                 ];
                 // 不存在缓存 5 分钟
@@ -47,16 +47,16 @@ class TenantValidationController extends Controller
                 return response()->json($payload, 404);
             }
 
-            $tenant = DB::connection('central')
-                ->table('tenants')
-                ->where('id', $tenantDomain->tenant_id)
+            $shop = DB::connection('central')
+                ->table('shops')
+                ->where('id', $shopDomain->shop_id)
                 ->first();
 
             $payload = [
                 'success' => true,
                 'domain' => $domain,
-                'tenant_id' => $tenant->id,
-                'tenant_name' => json_decode($tenant->data, true)['name'] ?? 'Unknown',
+                'shop_id' => $shop->id,
+                'shop_name' => json_decode($shop->data, true)['name'] ?? 'Unknown',
             ];
 
             // 存在缓存 1 小时

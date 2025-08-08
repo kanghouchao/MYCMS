@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
-use App\Http\Controllers\Api\Admin\TenantController as AdminTenantController;
+use App\Http\Controllers\Api\Admin\ShopController as AdminShopController;
 use App\Http\Controllers\Api\TenantValidationController;
 use App\Http\Controllers\HealthController;
 
@@ -20,8 +20,8 @@ use App\Http\Controllers\HealthController;
 // 健康检查（统一控制器实现）
 Route::get('health', [HealthController::class, 'check']);
 
-// 语义化：解析租户域名 -> 返回租户信息或 404
-Route::get('tenants/{domain}', [TenantValidationController::class, 'show'])
+// 解析店铺域名 -> 返回店铺信息或 404
+Route::get('shops/{domain}', [TenantValidationController::class, 'show'])
     ->where('domain', '.+');
 
 // 管理员 API 路由
@@ -35,12 +35,12 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // 租户 CRUD + 统计（统一控制器）
-    Route::get('tenants', [AdminTenantController::class, 'index'])->name('tenants.index');
-    Route::get('tenants/stats', [AdminTenantController::class, 'stats'])->name('tenants.stats');
-    Route::post('tenants', [AdminTenantController::class, 'store'])->name('tenants.store');
-    Route::get('tenants/{id}', [AdminTenantController::class, 'show'])->name('tenants.show');
-    Route::put('tenants/{id}', [AdminTenantController::class, 'update'])->name('tenants.update');
-    Route::delete('tenants/{id}', [AdminTenantController::class, 'destroy'])->name('tenants.destroy');
+    // 店铺 CRUD + 统计
+    Route::get('shops', [AdminShopController::class, 'index'])->name('shops.index');
+    Route::get('shops/stats', [AdminShopController::class, 'stats'])->name('shops.stats');
+    Route::post('shops', [AdminShopController::class, 'store'])->name('shops.store');
+    Route::get('shops/{id}', [AdminShopController::class, 'show'])->name('shops.show');
+    Route::put('shops/{id}', [AdminShopController::class, 'update'])->name('shops.update');
+    Route::delete('shops/{id}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
     });
 });

@@ -1,27 +1,26 @@
 import React from "react";
-import { useTenantInfo } from "@/hooks/useTenantInfo";
+import { useShopInfo } from "@/hooks/useShopInfo";
 
 // シンプルな店舗ホーム。最小限のフィールドのみ使用
-interface SimpleTenantInfo {
-  tenant_name: string;
+interface SimpleShopInfo {
+  shop_name: string;
   domain: string;
-  tenant_id: string;
+  shop_id: string;
 }
 
-interface TenantHomepageProps {
-  tenant: SimpleTenantInfo;
+interface ShopHomepageProps {
+  shop: SimpleShopInfo;
 }
 
-function TenantHomepage({ tenant }: TenantHomepageProps) {
+function ShopHomepage({ shop }: ShopHomepageProps) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
       <div className="container mx-auto px-4 py-20 max-w-3xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
-            ようこそ{" "}
-            <span className="text-indigo-600">{tenant.tenant_name}</span>
+            ようこそ <span className="text-indigo-600">{shop.shop_name}</span>
           </h1>
-          <p className="text-gray-600">ドメイン: {tenant.domain}</p>
+          <p className="text-gray-600">ドメイン: {shop.domain}</p>
         </div>
         <div className="bg-white rounded-xl shadow-md p-8 border border-gray-100 text-center">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">
@@ -30,9 +29,7 @@ function TenantHomepage({ tenant }: TenantHomepageProps) {
           <p className="text-gray-600 mb-6">
             この店舗サイトは現在構築中です。後ほどさらに多くのコンテンツと機能を提供します。
           </p>
-          <div className="text-sm text-gray-500">
-            Tenant ID: {tenant.tenant_id}
-          </div>
+          <div className="text-sm text-gray-500">Shop ID: {shop.shop_id}</div>
         </div>
       </div>
     </div>
@@ -40,7 +37,7 @@ function TenantHomepage({ tenant }: TenantHomepageProps) {
 }
 
 export default function TenantPageWrapper() {
-  const { tenant, loading, error } = useTenantInfo();
+  const { shop, loading, error } = useShopInfo();
 
   if (loading) {
     return (
@@ -72,16 +69,16 @@ export default function TenantPageWrapper() {
     );
   }
 
-  if (!tenant) {
+  if (!shop) {
     return null; // 让其它路由继续处理
   }
 
   return (
-    <TenantHomepage
-      tenant={{
-        tenant_name: tenant.tenant_name,
-        domain: tenant.domain,
-        tenant_id: tenant.tenant_id,
+    <ShopHomepage
+      shop={{
+        shop_name: shop.shop_name,
+        domain: shop.domain,
+        shop_id: shop.shop_id,
       }}
     />
   );

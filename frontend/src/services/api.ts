@@ -1,14 +1,14 @@
 import apiClient from '@/lib/api-client';
-import { 
-  ApiResponse, 
-  LoginRequest, 
-  AuthResponse, 
+import {
+  ApiResponse,
+  LoginRequest,
+  AuthResponse,
   Admin,
-  Tenant,
-  CreateTenantRequest,
-  UpdateTenantRequest,
+  Shop,
+  CreateShopRequest,
+  UpdateShopRequest,
   DashboardStats,
-  TenantStats,
+  ShopStats,
   PaginatedResponse
 } from '@/types/api';
 
@@ -33,45 +33,34 @@ export const authApi = {
   },
 };
 
-// 租户 API
-export const tenantApi = {
-  // 获取租户列表
-  getList: async (params?: { 
-    page?: number; 
-    per_page?: number; 
-    search?: string; 
-  }): Promise<ApiResponse<PaginatedResponse<Tenant>>> => {
-    const response = await apiClient.get('/admin/tenants', { params });
+// 店铺 API
+export const shopApi = {
+  getList: async (params?: {
+    page?: number;
+    per_page?: number;
+    search?: string;
+  }): Promise<ApiResponse<PaginatedResponse<Shop>>> => {
+    const response = await apiClient.get('/admin/shops', { params });
     return response.data;
   },
-
-  // 获取租户详情
-  getById: async (id: string): Promise<ApiResponse<Tenant>> => {
-    const response = await apiClient.get(`/admin/tenants/${id}`);
+  getById: async (id: string): Promise<ApiResponse<Shop>> => {
+    const response = await apiClient.get(`/admin/shops/${id}`);
     return response.data;
   },
-
-  // 创建租户
-  create: async (data: CreateTenantRequest): Promise<ApiResponse<Tenant>> => {
-    const response = await apiClient.post('/admin/tenants', data);
+  create: async (data: CreateShopRequest): Promise<ApiResponse<Shop>> => {
+    const response = await apiClient.post('/admin/shops', data);
     return response.data;
   },
-
-  // 更新租户
-  update: async (id: string, data: UpdateTenantRequest): Promise<ApiResponse<Tenant>> => {
-    const response = await apiClient.put(`/admin/tenants/${id}`, data);
+  update: async (id: string, data: UpdateShopRequest): Promise<ApiResponse<Shop>> => {
+    const response = await apiClient.put(`/admin/shops/${id}`, data);
     return response.data;
   },
-
-  // 删除租户
   delete: async (id: string): Promise<ApiResponse> => {
-    const response = await apiClient.delete(`/admin/tenants/${id}`);
+    const response = await apiClient.delete(`/admin/shops/${id}`);
     return response.data;
   },
-
-  // 获取统计数据
-  getStats: async (): Promise<ApiResponse<TenantStats>> => {
-    const response = await apiClient.get('/admin/tenants/stats');
+  getStats: async (): Promise<ApiResponse<ShopStats>> => {
+    const response = await apiClient.get('/admin/shops/stats');
     return response.data;
   },
 };
@@ -83,3 +72,7 @@ export const healthApi = {
     return response.data;
   },
 };
+
+// 兼容现有代码：Tenants 页面目前引用 tenantApi，其语义与 shopApi 相同
+// 若未来后端提供独立的租户（Tenant）端点，可在此替换为真实实现
+export const tenantApi = shopApi;

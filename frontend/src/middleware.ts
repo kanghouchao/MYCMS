@@ -32,7 +32,7 @@ export async function middleware(request: NextRequest) {
   const hostname = rawHost.split(':')[0].toLowerCase();
 
   const isAdminDomain = ADMIN_DOMAINS.has(hostname);
-  const isTenantDomain = !isAdminDomain; // 简化：不在管理域名列表的都视为租户域名
+  const isShopDomain = !isAdminDomain; // 简化：不在管理域名列表的都视为店铺域名
 
   // 调试日志
   console.log(`[Middleware] host=${hostname} path=${pathname} admin=${isAdminDomain} fwd=${forwardedHost}`);
@@ -54,9 +54,9 @@ export async function middleware(request: NextRequest) {
     return res;
   }
 
-  // 租户域名逻辑
+  // 店铺域名逻辑
   // 1. 根路径重写到 /tenant （先让前端页面自己再请求租户信息，降低 edge 外部依赖）
-  if (isTenantDomain && pathname === '/') {
+  if (isShopDomain && pathname === '/') {
     const res = NextResponse.rewrite(new URL('/tenant', request.url));
     res.headers.set('x-mw-role', 'tenant');
     res.headers.set('x-mw-tenant-check', 'lazy-client');
@@ -65,14 +65,14 @@ export async function middleware(request: NextRequest) {
 
   // 2. 可选：对非根路径做快速租户存在性校验（相对路径，交由 Traefik PathPrefix(`/api/`) 到后端）
   // 只在首次命中（不以 /admin 开头且不是静态）时校验一次
-  if (isTenantDomain && !pathname.startsWith('/tenant') && !pathname.startsWith('/admin')) {
+  if (isShopDomain && !pathname.startsWith('/tenant') && !pathname.startsWith('/admin')) {
     try {
-      const apiUrl = new URL(`/api/tenants/${hostname}`, request.url); // 相对同源
+  const apiUrl = new URL(`/api/shops/${hostname}`, request.url); // 相对同源
       const t0 = Date.now();
       const resp = await fetch(apiUrl, { headers: { 'Accept': 'application/json' }, method: 'GET' });
       const dt = Date.now() - t0;
       if (resp.status === 404) {
-        console.log(`[Middleware] 租户不存在 404 hostname=${hostname}`);
+  console.log(`[Middleware] 店铺不存在 404 hostname=${hostname}`);
         const notFound = NextResponse.rewrite(new URL('/404', request.url));
         notFound.headers.set('x-mw-role', 'tenant');
         notFound.headers.set('x-mw-tenant-check', '404');
@@ -85,7 +85,7 @@ export async function middleware(request: NextRequest) {
         err.headers.set('x-mw-tenant-check', 'error');
         return err;
       }
-      console.log(`[Middleware] 租户快速校验成功 ${hostname} (${dt}ms)`);
+  console.log(`[Middleware] 店铺快速校验成功 ${hostname} (${dt}ms)`);
       const res = NextResponse.next();
       res.headers.set('x-mw-role', 'tenant');
       res.headers.set('x-mw-tenant-check', 'ok');

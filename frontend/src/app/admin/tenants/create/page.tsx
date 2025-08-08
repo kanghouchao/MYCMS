@@ -3,25 +3,25 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { tenantApi } from "@/services/api";
-import { CreateTenantRequest } from "@/types/api";
+import { shopApi } from "@/services/api";
+import { CreateShopRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
-export default function CreateTenantPage() {
+export default function CreateShopPage() {
   const { admin, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateTenantRequest>({
+  const [formData, setFormData] = useState<CreateShopRequest>({
     name: "",
     domain: "",
     email: "",
     plan: "basic",
   });
 
-  const [errors, setErrors] = useState<Partial<CreateTenantRequest>>({});
+  const [errors, setErrors] = useState<Partial<CreateShopRequest>>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreateTenantRequest> = {};
+    const newErrors: Partial<CreateShopRequest> = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "店舗名は必須です";
@@ -64,7 +64,7 @@ export default function CreateTenantPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await tenantApi.create(formData);
+      const response = await shopApi.create(formData);
 
       if (response.success) {
         toast.success("店舗を作成しました");
@@ -82,10 +82,7 @@ export default function CreateTenantPage() {
     }
   };
 
-  const handleInputChange = (
-    field: keyof CreateTenantRequest,
-    value: string
-  ) => {
+  const handleInputChange = (field: keyof CreateShopRequest, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -258,7 +255,7 @@ export default function CreateTenantPage() {
                       onChange={(e) =>
                         handleInputChange(
                           "plan",
-                          e.target.value as CreateTenantRequest["plan"]
+                          e.target.value as CreateShopRequest["plan"]
                         )
                       }
                       className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"

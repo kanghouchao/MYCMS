@@ -3,26 +3,26 @@
 import { useEffect, useState } from "react";
 import TenantPageWrapper from "@/components/TenantHomepage";
 
-interface TenantInfo {
+interface ShopInfo {
   domain: string;
-  tenant_id: string;
-  tenant_name: string;
+  shop_id: string;
+  shop_name: string;
 }
 
 export default function TenantPage() {
-  const [tenantInfo, setTenantInfo] = useState<TenantInfo | null>(null);
+  const [shopInfo, setShopInfo] = useState<ShopInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTenantInfo = async () => {
+    const fetchShopInfo = async () => {
       try {
         const hostname = window.location.hostname;
         const apiBase = (process.env.NEXT_PUBLIC_API_URL || "").replace(
           /\/$/,
           ""
         );
-        const response = await fetch(`${apiBase}/tenants/${hostname}`, {
+        const response = await fetch(`${apiBase}/shops/${hostname}`, {
           headers: { Accept: "application/json" },
         });
 
@@ -37,12 +37,12 @@ export default function TenantPage() {
         }
 
         const data = await response.json();
-        // data: { success, domain, tenant_id, tenant_name }
+        // data: { success, domain, shop_id, shop_name }
         if (data.success) {
-          setTenantInfo({
+          setShopInfo({
             domain: data.domain,
-            tenant_id: data.tenant_id,
-            tenant_name: data.tenant_name,
+            shop_id: data.shop_id,
+            shop_name: data.shop_name,
           });
         } else {
           setError("店舗情報が無効です");
@@ -55,7 +55,7 @@ export default function TenantPage() {
       }
     };
 
-    fetchTenantInfo();
+    fetchShopInfo();
   }, []);
 
   if (loading) {
@@ -76,7 +76,7 @@ export default function TenantPage() {
     );
   }
 
-  if (!tenantInfo) {
+  if (!shopInfo) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center p-24">
         <div className="text-yellow-600 text-xl mb-4">店舗が見つかりません</div>

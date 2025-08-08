@@ -6,13 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use Stancl\Tenancy\Database\Models\Domain;
-use App\Models\Tenant;
+use App\Models\ShopDomain as Domain;
+use App\Models\Shop;
 
 class TenantProvisionController extends Controller
 {
     /**
-     * 创建租户
+     * 创建店铺
      */
     public function store(Request $request)
     {
@@ -41,25 +41,25 @@ class TenantProvisionController extends Controller
         }
 
         try {
-            $tenant = Tenant::create(['id' => Str::random(8)]);
-            $tenant->put('name', $request->name);
-            $tenant->put('email', $request->email);
-            $tenant->put('plan', $request->plan);
-            $tenant->put('created_at', now());
-            $tenant->save();
+            $shop = Shop::create(['id' => Str::random(8)]);
+            $shop->put('name', $request->name);
+            $shop->put('email', $request->email);
+            $shop->put('plan', $request->plan);
+            $shop->put('created_at', now());
+            $shop->save();
 
-            $domain = $tenant->domains()->create(['domain' => $request->domain]);
+            $domain = $shop->domains()->create(['domain' => $request->domain]);
 
             Cache::forget('tenant_domain:'.$request->domain);
 
             return response()->json([
                 'success' => true,
-                'message' => '租户创建成功',
+                'message' => '店铺创建成功',
                 'data' => [
-                    'id' => $tenant->id,
-                    'name' => $tenant->name,
-                    'email' => $tenant->email,
-                    'plan' => $tenant->plan,
+                    'id' => $shop->id,
+                    'name' => $shop->name,
+                    'email' => $shop->email,
+                    'plan' => $shop->plan,
                     'domains' => [$domain->domain],
                 ]
             ], 201);
@@ -72,28 +72,28 @@ class TenantProvisionController extends Controller
     }
 
     /**
-     * 删除租户
+     * 删除店铺
      */
     public function destroy(string $id)
     {
-        $tenant = Tenant::find($id);
-        if (!$tenant) {
+        $shop = Shop::find($id);
+        if (!$shop) {
             return response()->json([
                 'success' => false,
-                'message' => '租户不存在'
+                'message' => '店铺不存在'
             ], 404);
         }
 
         try {
-            $domains = $tenant->domains()->pluck('domain')->all();
-            $tenantName = $tenant->name ?? $tenant->id;
-            $tenant->delete();
+            $domains = $shop->domains()->pluck('domain')->all();
+            $shopName = $shop->name ?? $shop->id;
+            $shop->delete();
             foreach ($domains as $d) {
                 Cache::forget('tenant_domain:'.$d);
             }
             return response()->json([
                 'success' => true,
-                'message' => "租户 {$tenantName} 已删除"
+                'message' => "店铺 {$shopName} 已删除"
             ]);
         } catch (\Throwable $e) {
             return response()->json([
