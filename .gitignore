@@ -1,12 +1,10 @@
 # General
 .DS_Store
+Thumbs.db
 
 # environment variables
 .env*
 !.env.example
-
-# Certificates
-/traefik/acme.json
 
 # vscode settings
 .vscode/
