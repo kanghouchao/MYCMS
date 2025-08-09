@@ -14,3 +14,5 @@ package-lock.json
 
 # Local env files
 .env
+
+next-env.d.ts
