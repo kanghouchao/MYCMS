@@ -201,7 +201,7 @@ oli-CMS/
 
 5. **初期管理者アカウント（例）**
    - Super Admin: `admin@cms.com` / `admin123`
-   - General Admin: `user@cms.com` / `user123`
+   - [Removed] General Admin: `user@cms.com` / `user123` (disabled; only `admin@cms.com` exists by default now)
 
 ### ローカルドメイン設定
 

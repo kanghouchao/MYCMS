@@ -29,6 +29,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'guard' => \App\Http\Middleware\AdminGuard::class,
             'stateless_auth' => \App\Http\Middleware\StatelessAuth::class,
+            'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

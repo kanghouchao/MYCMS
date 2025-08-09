@@ -142,7 +142,6 @@ export default function AdminLogin() {
             <div className="text-sm text-gray-600">
               <p>テスト用アカウント:</p>
               <p className="font-mono text-xs">admin@cms.com / admin123</p>
-              <p className="font-mono text-xs">user@cms.com / user123</p>
             </div>
           </div>
         </form>

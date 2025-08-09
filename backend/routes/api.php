@@ -36,16 +36,19 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-    // 店铺 CRUD + 统计
-    Route::get('shops', [AdminShopController::class, 'index'])->name('shops.index');
-    Route::get('shops/stats', [AdminShopController::class, 'stats'])->name('shops.stats');
-    Route::post('shops', [AdminShopController::class, 'store'])->name('shops.store');
-    Route::get('shops/{id}', [AdminShopController::class, 'show'])->name('shops.show');
-    Route::put('shops/{id}', [AdminShopController::class, 'update'])->name('shops.update');
-    Route::delete('shops/{id}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
+        // 店铺 CRUD + 统计（仅超级管理员）
+        Route::middleware('role:super_admin')->group(function () {
+            Route::get('shops', [AdminShopController::class, 'index'])->name('shops.index');
+            Route::get('shops/stats', [AdminShopController::class, 'stats'])->name('shops.stats');
+            Route::post('shops', [AdminShopController::class, 'store'])->name('shops.store');
+            Route::get('shops/{id}', [AdminShopController::class, 'show'])->name('shops.show');
+            Route::put('shops/{id}', [AdminShopController::class, 'update'])->name('shops.update');
+            Route::delete('shops/{id}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
 
-    // 模板管理（最小接口）
-    Route::get('templates', [AdminTemplateController::class, 'index'])->name('templates.index');
-    Route::put('templates/{id}', [AdminTemplateController::class, 'update'])->name('templates.update');
+            // 模板管理（仅超级管理员）
+            Route::get('templates', [AdminTemplateController::class, 'index'])->name('templates.index');
+            Route::put('templates/{id}', [AdminTemplateController::class, 'update'])->name('templates.update');
+        });
+        // 其他认证接口可在此处添加，必要时再按角色区分
     });
 });
