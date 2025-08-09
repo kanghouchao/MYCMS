@@ -52,11 +52,14 @@ class TenantValidationController extends Controller
                 ->where('id', $shopDomain->shop_id)
                 ->first();
 
+            $shopData = json_decode($shop->data, true) ?: [];
+            $templateKey = $shopData['template_key'] ?? 'default';
             $payload = [
                 'success' => true,
                 'domain' => $domain,
                 'shop_id' => $shop->id,
-                'shop_name' => json_decode($shop->data, true)['name'] ?? 'Unknown',
+                'shop_name' => $shopData['name'] ?? 'Unknown',
+                'template_key' => $templateKey,
             ];
 
             // 存在缓存 1 小时

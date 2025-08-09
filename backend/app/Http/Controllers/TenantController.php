@@ -27,7 +27,7 @@ class TenantController extends Controller
             'id' => $tenant->id,
             'name' => $tenant->name ?? '未命名租户',
             'description' => $tenant->description ?? '',
-            'plan' => $tenant->plan ?? 'basic',
+            'template_key' => $tenant->template_key ?? 'default',
             'status' => $tenant->status ?? 'active',
             'domain' => $currentDomain,
             'created_at' => $tenant->created_at,

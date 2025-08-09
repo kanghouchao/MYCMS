@@ -242,7 +242,7 @@ export default function TenantsPage() {
                               <p className="text-sm text-gray-500">
                                 プラン:{" "}
                                 <span className="font-medium">
-                                  {tenant.plan}
+                                  {tenant.template_key}
                                 </span>
                               </p>
                             </div>

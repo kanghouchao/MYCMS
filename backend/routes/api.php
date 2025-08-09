@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\ShopController as AdminShopController;
+use App\Http\Controllers\Api\Admin\TemplateController as AdminTemplateController;
 use App\Http\Controllers\Api\TenantValidationController;
 use App\Http\Controllers\HealthController;
 
@@ -42,5 +43,9 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
     Route::get('shops/{id}', [AdminShopController::class, 'show'])->name('shops.show');
     Route::put('shops/{id}', [AdminShopController::class, 'update'])->name('shops.update');
     Route::delete('shops/{id}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
+
+    // 模板管理（最小接口）
+    Route::get('templates', [AdminTemplateController::class, 'index'])->name('templates.index');
+    Route::put('templates/{id}', [AdminTemplateController::class, 'update'])->name('templates.update');
     });
 });

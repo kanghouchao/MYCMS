@@ -15,7 +15,7 @@ export default function CreateShopPage() {
     name: "",
     domain: "",
     email: "",
-    plan: "basic",
+    template_key: "default",
   });
 
   const [errors, setErrors] = useState<Partial<CreateShopRequest>>({});
@@ -239,44 +239,21 @@ export default function CreateShopPage() {
                   </div>
                 </div>
 
-                {/* 套餐选择 */}
+                {/* 模板：当前仅默认模板，后续可扩展为下拉 */}
                 <div>
-                  <label
-                    htmlFor="plan"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    プラン種類 <span className="text-red-500">*</span>
+                  <label className="block text-sm font-medium text-gray-700">
+                    テンプレート
                   </label>
                   <div className="mt-1">
-                    <select
-                      id="plan"
-                      name="plan"
-                      value={formData.plan}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "plan",
-                          e.target.value as CreateShopRequest["plan"]
-                        )
-                      }
-                      className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
-                    >
-                      <option value="basic">ベーシック</option>
-                      <option value="premium">プレミアム</option>
-                      <option value="enterprise">エンタープライズ</option>
-                    </select>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500">
-                    <ul className="space-y-1">
-                      <li>
-                        <strong>ベーシック：</strong>小規模チーム向けの基本機能
-                      </li>
-                      <li>
-                        <strong>プレミアム：</strong>中規模チーム向けの拡張機能
-                      </li>
-                      <li>
-                        <strong>エンタープライズ：</strong>大規模向け全機能
-                      </li>
-                    </ul>
+                    <input
+                      type="text"
+                      value={formData.template_key}
+                      disabled
+                      className="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md bg-gray-100"
+                    />
+                    <p className="mt-2 text-sm text-gray-500">
+                      現在はシステム既定: default
+                    </p>
                   </div>
                 </div>
 
@@ -312,14 +289,10 @@ export default function CreateShopPage() {
                     </div>
                     <div>
                       <dt className="text-sm font-medium text-gray-500">
-                        プラン種類
+                        テンプレート
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
-                        {formData.plan === "basic"
-                          ? "ベーシック"
-                          : formData.plan === "premium"
-                          ? "プレミアム"
-                          : "エンタープライズ"}
+                        {formData.template_key}
                       </dd>
                     </div>
                   </dl>

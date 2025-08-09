@@ -28,7 +28,7 @@ class ShopController extends Controller
                 'id' => $shop->id,
                 'name' => $shop->name ?? '未设置',
                 'email' => $shop->email ?? '未设置',
-                'plan' => $shop->plan ?? 'basic',
+                'template_key' => $shop->template_key ?? 'default',
                 'domain' => $shop->domains->first()?->domain ?? '',
                 'domains' => $shop->domains->pluck('domain')->toArray(),
                 'is_active' => true,
@@ -57,7 +57,7 @@ class ShopController extends Controller
                 }
             ],
             'email' => 'required|email|max:255',
-            'plan' => 'required|in:basic,premium,enterprise',
+            'template_key' => 'nullable|string|max:64',
         ]);
 
         if (Domain::on('central')->where('domain', $request->domain)->exists()) {
@@ -71,7 +71,7 @@ class ShopController extends Controller
             $shop = Shop::create(['id' => Str::random(8)]);
             $shop->put('name', $request->name);
             $shop->put('email', $request->email);
-            $shop->put('plan', $request->plan);
+            $shop->put('template_key', $request->input('template_key', 'default'));
             $shop->put('created_at', now());
             $shop->save();
             $domain = $shop->domains()->create(['domain' => $request->domain]);
@@ -83,7 +83,7 @@ class ShopController extends Controller
                     'id' => $shop->id,
                     'name' => $shop->name,
                     'email' => $shop->email,
-                    'plan' => $shop->plan,
+                    'template_key' => $shop->template_key ?? 'default',
                     'domains' => [$domain->domain],
                 ]
             ], 201);
@@ -108,7 +108,7 @@ class ShopController extends Controller
                 'id' => $shop->id,
                 'name' => $shop->name ?? '未设置',
                 'email' => $shop->email ?? '未设置',
-                'plan' => $shop->plan ?? 'basic',
+                'template_key' => $shop->template_key ?? 'default',
                 'domains' => $shop->domains->map(function ($domain) {
                     return [
                         'id' => $domain->id,
@@ -132,12 +132,12 @@ class ShopController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'plan' => 'required|in:basic,premium,enterprise',
+            'template_key' => 'nullable|string|max:64',
         ]);
         try {
             $shop->put('name', $request->name);
             $shop->put('email', $request->email);
-            $shop->put('plan', $request->plan);
+            $shop->put('template_key', $request->input('template_key', 'default'));
             $shop->put('updated_at', now());
             $shop->save();
             return response()->json([
@@ -147,7 +147,7 @@ class ShopController extends Controller
                     'id' => $shop->id,
                     'name' => $shop->name,
                     'email' => $shop->email,
-                    'plan' => $shop->plan,
+                    'template_key' => $shop->template_key ?? 'default',
                     'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
                 ]
             ]);

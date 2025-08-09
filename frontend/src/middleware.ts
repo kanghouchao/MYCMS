@@ -71,7 +71,7 @@ export async function middleware(request: NextRequest) {
       const t0 = Date.now();
       const resp = await fetch(apiUrl, { headers: { 'Accept': 'application/json' }, method: 'GET' });
       const dt = Date.now() - t0;
-      if (resp.status === 404) {
+  if (resp.status === 404) {
   console.log(`[Middleware] 店铺不存在 404 hostname=${hostname}`);
         const notFound = NextResponse.rewrite(new URL('/404', request.url));
         notFound.headers.set('x-mw-role', 'tenant');
@@ -85,10 +85,13 @@ export async function middleware(request: NextRequest) {
         err.headers.set('x-mw-tenant-check', 'error');
         return err;
       }
-  console.log(`[Middleware] 店铺快速校验成功 ${hostname} (${dt}ms)`);
-      const res = NextResponse.next();
+  const data = await resp.json().catch(() => null);
+  const templateKey = data?.template_key || 'default';
+  console.log(`[Middleware] 店铺快速校验成功 ${hostname} (${dt}ms), template=${templateKey}`);
+  const res = NextResponse.next();
       res.headers.set('x-mw-role', 'tenant');
       res.headers.set('x-mw-tenant-check', 'ok');
+  res.headers.set('x-tenant-template', templateKey);
       return res;
     } catch (e) {
       console.error('[Middleware] 校验异常', e);

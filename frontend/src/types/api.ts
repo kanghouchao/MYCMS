@@ -43,7 +43,7 @@ export interface Shop {
   id: string;
   name: string;
   email: string;
-  plan: 'basic' | 'premium' | 'enterprise';
+  template_key?: string; // 店铺模板键（替代 plan）
   domain: string;
   domains: string[];
   is_active: boolean;
@@ -59,14 +59,14 @@ export interface CreateShopRequest {
   name: string;
   domain: string;
   email: string;
-  plan: 'basic' | 'premium' | 'enterprise';
+  template_key?: string;
 }
 
 // 更新店铺请求类型
 export interface UpdateShopRequest {
   name: string;
   email: string;
-  plan: 'basic' | 'premium' | 'enterprise';
+  template_key?: string;
 }
 
 // 统计数据类型
