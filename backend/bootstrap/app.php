@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'guard' => \App\Http\Middleware\AdminGuard::class,
             'stateless_auth' => \App\Http\Middleware\StatelessAuth::class,
             'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'tenant_stateless_auth' => \App\Http\Middleware\TenantStatelessAuth::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\User\AuthController as TenantAuthController;
 use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
 use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 
@@ -18,5 +19,14 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 |
 */
 
-// 非推奨: すべてのテナントドメイン解決は中央ルート GET /api/tenants/{domain} に統一
-// このファイルはプレースホルダとして保持。後で TenantRouteServiceProvider ごと削除予定。
+// Tenant API Routes (require tenant domain)
+Route::prefix('api')->group(function () {
+    // 用户登录（租户）
+    Route::post('user/login', [TenantAuthController::class, 'login']);
+
+    // 需要登录的接口
+    Route::middleware('tenant_stateless_auth')->group(function () {
+        Route::get('user/me', [TenantAuthController::class, 'me']);
+        Route::post('user/logout', [TenantAuthController::class, 'logout']);
+    });
+});

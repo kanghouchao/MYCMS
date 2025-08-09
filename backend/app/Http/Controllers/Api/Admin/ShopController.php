@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Shop;
 use App\Models\ShopDomain as Domain;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Mail;
+use App\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 class ShopController extends Controller
@@ -58,6 +60,9 @@ class ShopController extends Controller
             ],
             'email' => 'required|email|max:255',
             'template_key' => 'nullable|string|max:64',
+            // 店长用户
+            'manager_name' => 'required|string|max:255',
+            'manager_email' => 'required|email|max:255',
         ]);
 
         if (Domain::on('central')->where('domain', $request->domain)->exists()) {
@@ -76,15 +81,45 @@ class ShopController extends Controller
             $shop->save();
             $domain = $shop->domains()->create(['domain' => $request->domain]);
             Cache::forget('shop_domain:'.$request->domain);
+
+            // 在租户库中创建店长用户并发送初始密码邮件
+            $plainPassword = Str::random(10);
+            $managerEmail = $request->input('manager_email');
+            $managerName = $request->input('manager_name');
+
+            $shop->run(function () use ($managerName, $managerEmail, $plainPassword) {
+                User::updateOrCreate(
+                    ['email' => $managerEmail],
+                    [
+                        'name' => $managerName,
+                        'password' => $plainPassword, // will be auto-hashed by cast
+                    ]
+                );
+            });
+
+            try {
+                Mail::raw(
+                    "您好，{$managerName}：\n您的商店后台账号已创建。\n登录邮箱：{$managerEmail}\n初始密码：{$plainPassword}\n请登录后尽快修改密码。",
+                    function ($message) use ($managerEmail) {
+                        $message->to($managerEmail)->subject('您的商店后台账号已创建');
+                    }
+                );
+            } catch (\Throwable $e) {
+                // 邮件失败不影响主流程
+            }
             return response()->json([
                 'success' => true,
-                'message' => '店铺创建成功',
+                'message' => '店铺创建成功，店长账号已创建并发送邮件',
                 'data' => [
                     'id' => $shop->id,
                     'name' => $shop->name,
                     'email' => $shop->email,
                     'template_key' => $shop->template_key ?? 'default',
                     'domains' => [$domain->domain],
+                    'manager' => [
+                        'name' => $managerName,
+                        'email' => $managerEmail,
+                    ],
                 ]
             ], 201);
         } catch (\Throwable $e) {
@@ -109,13 +144,8 @@ class ShopController extends Controller
                 'name' => $shop->name ?? '未设置',
                 'email' => $shop->email ?? '未设置',
                 'template_key' => $shop->template_key ?? 'default',
-                'domains' => $shop->domains->map(function ($domain) {
-                    return [
-                        'id' => $domain->id,
-                        'domain' => $domain->domain,
-                        'created_at' => $domain->created_at?->format('Y-m-d H:i:s'),
-                    ];
-                }),
+                // 为了与列表接口保持一致，这里返回纯域名数组
+                'domains' => $shop->domains->pluck('domain')->toArray(),
                 'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
                 'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
             ]
