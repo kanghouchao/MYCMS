@@ -25,7 +25,7 @@ Route::prefix('api')->group(function () {
     Route::post('user/login', [TenantAuthController::class, 'login']);
 
     // 需要登录的接口
-    Route::middleware('tenant_stateless_auth')->group(function () {
+    Route::middleware('stateless_auth')->group(function () {
         Route::get('user/me', [TenantAuthController::class, 'me']);
         Route::post('user/logout', [TenantAuthController::class, 'logout']);
     });

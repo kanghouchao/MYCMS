@@ -1,5 +1,4 @@
 # docker-compose.yml
-# Orchestrates all services for the local HTTP development environment.
 name: oli-cms
 
 services:
@@ -33,15 +32,15 @@ services:
     image: postgres:16-alpine
     container_name: oli-cms-database
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-oli_cms}
-      POSTGRES_USER: ${DB_USERNAME:-oli_user}
+      POSTGRES_DB: ${DB_DATABASE:-cms}
+      POSTGRES_USER: ${DB_USERNAME:-cms_user}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - oli-cms-db-data:/var/lib/postgresql/data
     networks:
       - oli-cms-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-oli_user} -d ${DB_DATABASE:-oli_cms}"]
+      test: [ "CMD", "pg_isready" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -50,7 +49,7 @@ services:
   redis:
     image: redis:8.2.0-alpine3.22
     container_name: oli-cms-redis
-    command: redis-server --appendonly yes
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-password}
     volumes:
       - oli-cms-redis-data:/data
     networks:
@@ -67,6 +66,23 @@ services:
     container_name: oli-cms-backend
     networks:
       - oli-cms-network
+    environment:
+      APP_NAME: ${APP_NAME:-OliCMS}
+      APP_ENV: ${APP_ENV:-development}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_KEY: ${APP_KEY:-base64:SomeRandomKeyHere=}
+      APP_URL: ${APP_URL:-http://localhost}
+      LOG_STACK: ${LOG_STACK:-stderr}
+      SESSION_DRIVER: ${SESSION_DRIVER:-redis}
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_HOST: ${DB_HOST:-database}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_DATABASE: ${DB_DATABASE:-cms}
+      DB_USERNAME: ${DB_USERNAME:-cms_user}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      REDIS_HOST: ${REDIS_HOST:-redis}
+      REDIS_PORT: ${REDIS_PORT:-6379}
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-null}
     depends_on:
       database:
         condition: service_healthy
@@ -74,7 +90,6 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      # 所有 /api/* 路径都路由到后端
       - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
@@ -90,7 +105,6 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      # 所有非 /api/ 路径都路由到前端
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"

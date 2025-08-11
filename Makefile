@@ -19,7 +19,7 @@ help: ## 显示帮助信息
 # 服务管理
 # ======================
 build: ## 构建镜像
-	@echo "🛠️  构建$(ENV)环境..."
+	@echo "🛠️  构建$(service)服务镜像..."
 	@make -C $(service) build
 
 

@@ -5,7 +5,7 @@
 # =========================================================
 FROM phpswoole/swoole:php8.4-alpine AS base
 
-# Install system dependencies and PHP extensions (增加 sqlite 支持用于测试环境)
+# Install system dependencies and PHP extensions
 RUN apk add --no-cache postgresql-dev sqlite sqlite-dev \
     && docker-php-ext-install pgsql pdo_pgsql pdo_sqlite pcntl \
     && rm -rf /var/cache/apk/*
