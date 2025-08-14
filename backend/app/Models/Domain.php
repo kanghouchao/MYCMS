@@ -25,7 +25,7 @@ class Domain extends Model implements Contracts\Domain
 
     public function tenant()
     {
-        return $this->belongsTo(config('tenancy.tenant_model'), 'shop_id');
+        return $this->belongsTo(config('tenancy.tenant_model'), 'tenant_id');
     }
 
     protected $dispatchesEvents = [

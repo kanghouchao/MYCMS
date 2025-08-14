@@ -3,15 +3,15 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { shopApi } from "@/services/api";
-import { ShopStats as ShopStatsType, Shop } from "@/types/api";
+import { tenantApi } from "@/services/api";
+import { TenantStats, Tenant } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
   const { admin, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
-  const [stats, setStats] = useState<ShopStatsType | null>(null);
-  const [recentShops, setRecentShops] = useState<Shop[]>([]);
+  const [stats, setStats] = useState<TenantStats | null>(null);
+  const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
@@ -27,17 +27,17 @@ export default function AdminDashboard() {
 
   const loadDashboardData = async () => {
     try {
-      const [statsResponse, shopsResponse] = await Promise.all([
-        shopApi.getStats(),
-        shopApi.getList({ per_page: 5, page: 1 }),
+      const [statsResponse, tenantsResponse] = await Promise.all([
+        tenantApi.getStats(),
+        tenantApi.getList({ per_page: 5, page: 1 }),
       ]);
 
       if (statsResponse.success && statsResponse.data) {
         setStats(statsResponse.data);
       }
 
-      if (shopsResponse.success && shopsResponse.data) {
-        setRecentShops(shopsResponse.data.data);
+      if (tenantsResponse.success && tenantsResponse.data) {
+        setRecentTenants(tenantsResponse.data.data);
       }
     } catch (error) {
       toast.error("データの読み込みに失敗しました");
@@ -263,43 +263,43 @@ export default function AdminDashboard() {
               </button>
             </div>
             <ul className="divide-y divide-gray-200">
-              {recentShops.length === 0 ? (
+              {recentTenants.length === 0 ? (
                 <li className="px-4 py-4 text-center text-gray-500">
                   店舗データがありません
                 </li>
               ) : (
-                recentShops.map((shop) => (
-                  <li key={shop.id} className="px-4 py-4 hover:bg-gray-50">
+                recentTenants.map((tenant) => (
+                  <li key={tenant.id} className="px-4 py-4 hover:bg-gray-50">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
                             <span className="text-sm font-medium text-indigo-600">
-                              {shop.name.charAt(0).toUpperCase()}
+                              {tenant.name.charAt(0).toUpperCase()}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
-                            {shop.name}
+                            {tenant.name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {shop.domain}
+                            {tenant.domain}
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                            shop.is_active
+                            tenant.is_active
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"
                           }`}
                         >
-                          {shop.is_active ? "有効" : "無効"}
+                          {tenant.is_active ? "有効" : "無効"}
                         </span>
                         <span className="text-sm text-gray-500">
-                          {new Date(shop.created_at).toLocaleDateString(
+                          {new Date(tenant.created_at).toLocaleDateString(
                             "ja-JP"
                           )}
                         </span>
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
                 </div>
                 <div className="mt-4">
                   <button
-                    onClick={() => router.push("/admin/shops/create")}
+                    onClick={() => router.push("/admin/tenants/create")}
                     className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md text-sm font-medium"
                   >
                     今すぐ作成

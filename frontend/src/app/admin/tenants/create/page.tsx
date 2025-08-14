@@ -3,25 +3,25 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { shopApi } from "@/services/api";
-import { CreateShopRequest } from "@/types/api";
+import { tenantApi } from "@/services/api";
+import { CreateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
-export default function CreateShopPage() {
+export default function CreateTenantPage() {
   const { admin, isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formData, setFormData] = useState<CreateShopRequest>({
+  const [formData, setFormData] = useState<CreateTenantRequest>({
     name: "",
     domain: "",
     email: "",
     template_key: "default",
   });
 
-  const [errors, setErrors] = useState<Partial<CreateShopRequest>>({});
+  const [errors, setErrors] = useState<Partial<CreateTenantRequest>>({});
 
   const validateForm = (): boolean => {
-    const newErrors: Partial<CreateShopRequest> = {};
+    const newErrors: Partial<CreateTenantRequest> = {};
 
     if (!formData.name.trim()) {
       newErrors.name = "店舗名は必須です";
@@ -64,7 +64,7 @@ export default function CreateShopPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await shopApi.create(formData);
+      const response = await tenantApi.create(formData);
 
       if (response.success) {
         toast.success("店舗を作成しました");
@@ -82,7 +82,10 @@ export default function CreateShopPage() {
     }
   };
 
-  const handleInputChange = (field: keyof CreateShopRequest, value: string) => {
+  const handleInputChange = (
+    field: keyof CreateTenantRequest,
+    value: string
+  ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
@@ -205,11 +208,11 @@ export default function CreateShopPage() {
                     <p className="mt-2 text-sm text-red-600">{errors.domain}</p>
                   )}
                   <p className="mt-2 text-sm text-gray-500">
-                    完全なドメイン名を入力してください（例：company.com、shop.example.org）
+                    完全なドメイン名を入力してください（例：company.shop.example.org）
                   </p>
                 </div>
 
-                {/* 联系邮箱 */}
+                {/* 連絡用メール */}
                 <div>
                   <label
                     htmlFor="email"
