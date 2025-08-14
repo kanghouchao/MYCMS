@@ -50,7 +50,18 @@ class TenantValidationController extends Controller
             $shop = DB::connection('central')
                 ->table('shops')
                 ->where('id', $shopDomain->shop_id)
+                ->whereNull('deleted_at')
                 ->first();
+
+            if (!$shop) {
+                $payload = [
+                    'success' => false,
+                    'message' => '店铺已删除或不存在',
+                    'domain' => $domain,
+                ];
+                Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
+                return response()->json($payload, 404);
+            }
 
             $templateKey = $shop->template_key ?? 'default';
             $shopName = $shop->name ?? 'Unknown';

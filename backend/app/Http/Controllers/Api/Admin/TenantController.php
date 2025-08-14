@@ -4,45 +4,47 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Shop;
-use App\Models\ShopDomain as Domain;
+use App\Models\Tenant;
+use App\Models\Domain;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
-class ShopController extends Controller
+class TenantController extends Controller
 {
-    /** 获取店铺列表 */
+    /** 获取租户列表 */
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 15);
         $search = $request->get('search');
 
-        $query = Shop::on('central')->with('domains');
+        $query = Tenant::on('central')->with('domains')->whereNull('deleted_at');
         if ($search) {
-            $query->where('name', 'like', "%{$search}%")
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
+            });
         }
-        $shops = $query->paginate($perPage);
-        $shops->getCollection()->transform(function ($shop) {
+        $tenants = $query->paginate($perPage);
+        $tenants->getCollection()->transform(function ($tenant) {
             return [
-                'id' => $shop->id,
-                'name' => $shop->name ?? '未设置',
-                'email' => $shop->email ?? '未设置',
-                'template_key' => $shop->template_key ?? 'default',
-                'domain' => $shop->domains->first()?->domain ?? '',
-                'domains' => $shop->domains->pluck('domain')->toArray(),
+                'id' => $tenant->id,
+                'name' => $tenant->name ?? '未设置',
+                'email' => $tenant->email ?? '未设置',
+                'template_key' => $tenant->template_key ?? 'default',
+                'domain' => $tenant->domains->first()?->domain ?? '',
+                'domains' => $tenant->domains->pluck('domain')->toArray(),
                 'is_active' => true,
-                'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
+                'created_at' => $tenant->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $tenant->updated_at?->format('Y-m-d H:i:s'),
             ];
         });
 
-        return response()->json(['success' => true, 'data' => $shops]);
+        return response()->json(['success' => true, 'data' => $tenants]);
     }
 
-    /** 创建店铺 */
+    /** 创建租户 */
     public function store(Request $request)
     {
         $request->validate([
@@ -70,22 +72,22 @@ class ShopController extends Controller
         }
 
         try {
-            $shop = Shop::create([
+            $tenant = Tenant::create([
                 'name' => $request->name,
                 'email' => $request->email,
                 'template_key' => $request->input('template_key', 'default'),
             ]);
-            $domain = $shop->domains()->create(['domain' => $request->domain]);
-            $lowerDomainKey = 'shop_domain:'.strtolower($request->domain);
+            $domain = $tenant->domains()->create(['domain' => $request->domain]);
+            $lowerDomainKey = 'tenant_domain:'.strtolower($request->domain);
             Cache::forget($lowerDomainKey);
 
             try {
                 $token = Str::random(60);
                 Mail::raw(
-                    "您好：\n您的商店后台账号已创建。\n请尽快点击链接注册账号。\nhttp://"
-                        . env('APP_URL') ."/admin/register?shop={$shop->id}&token={$token}\n\n感谢您的使用！",
+                    "您好：\n您的租户后台账号已创建。\n请尽快点击链接注册账号。\nhttp://"
+                        . env('APP_URL') ."/admin/register?tenant={$tenant->id}&token={$token}\n\n感谢您的使用！",
                     function ($message) use ($request) {
-                        $message->to($request->email)->subject('您的商店后台账号已创建');
+                        $message->to($request->email)->subject('您的租户后台账号已创建');
                     }
                 );
             } catch (\Throwable $e) {
@@ -95,10 +97,10 @@ class ShopController extends Controller
                 'success' => true,
                 'message' => '店铺创建成功，店长账号已创建并发送邮件',
                 'data' => [
-                    'id' => $shop->id,
-                    'name' => $shop->name,
-                    'email' => $shop->email,
-                    'template_key' => $shop->template_key ?? 'default',
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'email' => $tenant->email,
+                    'template_key' => $tenant->template_key ?? 'default',
                     'domains' => [$domain->domain],
                 ]
             ], 201);
@@ -114,29 +116,29 @@ class ShopController extends Controller
     /** 获取店铺详情 */
     public function show($id)
     {
-        $shop = Shop::with('domains')->find($id);
-        if (!$shop) {
-            return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
+        $tenant = Tenant::with('domains')->whereNull('deleted_at')->find($id);
+        if (!$tenant) {
+            return response()->json(['success' => false, 'message' => '店铺不存在或已删除'], 404);
         }
         return response()->json([
             'success' => true,
             'data' => [
-                'id' => $shop->id,
-                'name' => $shop->name ?? '未设置',
-                'email' => $shop->email ?? '未设置',
-                'template_key' => $shop->template_key ?? 'default',
-                'domains' => $shop->domains->pluck('domain')->toArray(),
-                'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
+                'id' => $tenant->id,
+                'name' => $tenant->name ?? '未设置',
+                'email' => $tenant->email ?? '未设置',
+                'template_key' => $tenant->template_key ?? 'default',
+                'domains' => $tenant->domains->pluck('domain')->toArray(),
+                'created_at' => $tenant->created_at?->format('Y-m-d H:i:s'),
+                'updated_at' => $tenant->updated_at?->format('Y-m-d H:i:s'),
             ]
         ]);
     }
 
-    /** 更新店铺 */
+    /** 更新租户 */
     public function update(Request $request, $id)
     {
-        $shop = Shop::find($id);
-        if (!$shop) {
+        $tenant = Tenant::find($id);
+        if (!$tenant) {
             return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
         }
         $request->validate([
@@ -145,19 +147,19 @@ class ShopController extends Controller
             'template_key' => 'nullable|string|max:64',
         ]);
         try {
-            $shop->name = $request->name;
-            $shop->email = $request->email;
-            $shop->template_key = $request->input('template_key', 'default');
-            $shop->save();
+            $tenant->name = $request->name;
+            $tenant->email = $request->email;
+            $tenant->template_key = $request->input('template_key', 'default');
+            $tenant->save();
             return response()->json([
                 'success' => true,
                 'message' => "店铺 '{$request->name}' 更新成功！",
                 'data' => [
-                    'id' => $shop->id,
-                    'name' => $shop->name,
-                    'email' => $shop->email,
-                    'template_key' => $shop->template_key ?? 'default',
-                    'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
+                    'id' => $tenant->id,
+                    'name' => $tenant->name,
+                    'email' => $tenant->email,
+                    'template_key' => $tenant->template_key ?? 'default',
+                    'updated_at' => $tenant->updated_at?->format('Y-m-d H:i:s'),
                 ]
             ]);
         } catch (\Exception $e) {
@@ -166,19 +168,19 @@ class ShopController extends Controller
         }
     }
 
-    /** 删除店铺 */
+    /** 删除租户 */
     public function destroy($id)
     {
-        $shop = Shop::find($id);
-        if (!$shop) {
+        $tenant = Tenant::find($id);
+        if (!$tenant) {
             return response()->json(['success' => false, 'message' => '店铺不存在'], 404);
         }
         try {
-            $domains = $shop->domains()->pluck('domain')->all();
-            $shopName = $shop->name ?? $shop->id;
-            $shop->delete();
-            foreach ($domains as $d) { Cache::forget('shop_domain:'.$d); }
-            return response()->json(['success' => true, 'message' => "店铺 {$shopName} 已删除"]);
+            $domains = $tenant->domains()->pluck('domain')->all();
+            $tenantName = $tenant->name ?? $tenant->id;
+            $tenant->delete();
+            foreach ($domains as $d) { Cache::forget('tenant_domain:'.$d); }
+            return response()->json(['success' => true, 'message' => "店铺 {$tenantName} 已删除（已软删除）"]);
         } catch (\Throwable $e) {
             Log::error('删除店铺失败', ['exception' => $e]);
             return response()->json(['success' => false, 'message' => '删除失败: '.$e->getMessage()], 500);
@@ -188,7 +190,7 @@ class ShopController extends Controller
     /** 获取统计数据 */
     public function stats()
     {
-        $total = Shop::on('central')->count();
+        $total = Tenant::on('central')->whereNull('deleted_at')->count();
         return response()->json([
             'success' => true,
             'data' => [

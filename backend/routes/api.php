@@ -2,8 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
-use App\Http\Controllers\Api\Admin\ShopController as AdminShopController;
-use App\Http\Controllers\Api\Admin\TemplateController as AdminTemplateController;
+use App\Http\Controllers\Api\Admin\TenantController;
+use App\Http\Controllers\Api\Admin\TemplateController;
 use App\Http\Controllers\Api\TenantValidationController;
 use App\Http\Controllers\HealthController;
 
@@ -33,15 +33,15 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
         Route::middleware('role:super_admin')->group(function () {
-            Route::get('shops', [AdminShopController::class, 'index'])->name('shops.index');
-            Route::get('shops/stats', [AdminShopController::class, 'stats'])->name('shops.stats');
-            Route::post('shops', [AdminShopController::class, 'store'])->name('shops.store');
-            Route::get('shops/{id}', [AdminShopController::class, 'show'])->name('shops.show');
-            Route::put('shops/{id}', [AdminShopController::class, 'update'])->name('shops.update');
-            Route::delete('shops/{id}', [AdminShopController::class, 'destroy'])->name('shops.destroy');
+            Route::get('tenants', [TenantController::class, 'index'])->name('tenants.index');
+            Route::get('tenants/stats', [TenantController::class, 'stats'])->name('tenants.stats');
+            Route::post('tenants', [TenantController::class, 'store'])->name('tenants.store');
+            Route::get('tenants/{id}', [TenantController::class, 'show'])->name('tenants.show');
+            Route::put('tenants/{id}', [TenantController::class, 'update'])->name('tenants.update');
+            Route::delete('tenants/{id}', [TenantController::class, 'destroy'])->name('tenants.destroy');
 
-            Route::get('templates', [AdminTemplateController::class, 'index'])->name('templates.index');
-            Route::put('templates/{id}', [AdminTemplateController::class, 'update'])->name('templates.update');
+            Route::get('templates', [TemplateController::class, 'index'])->name('templates.index');
+            Route::put('templates/{id}', [TemplateController::class, 'update'])->name('templates.update');
         });
     });
 });

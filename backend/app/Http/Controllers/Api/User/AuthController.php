@@ -11,6 +11,13 @@ class AuthController extends Controller
     // 用户登录（租户）
     public function login(Request $request): JsonResponse
     {
+        $tenant = tenant();
+        if (!$tenant || !empty($tenant->deleted_at)) {
+            return response()->json([
+                'error' => '租户不存在或已被删除',
+                'message' => '无法登录已删除租户'
+            ], 403);
+        }
         // 这里只做示例，实际应校验账号密码并生成 token
         $user = [
             'id' => 1,
@@ -27,6 +34,13 @@ class AuthController extends Controller
     // 获取当前用户信息
     public function me(Request $request): JsonResponse
     {
+        $tenant = tenant();
+        if (!$tenant || !empty($tenant->deleted_at)) {
+            return response()->json([
+                'error' => '租户不存在或已被删除',
+                'message' => '无法获取已删除租户的用户信息'
+            ], 403);
+        }
         // 实际应通过 token 获取用户信息
         $user = [
             'id' => 1,
