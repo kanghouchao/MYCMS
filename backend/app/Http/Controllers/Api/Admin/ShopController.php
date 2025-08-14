@@ -8,7 +8,7 @@ use App\Models\Shop;
 use App\Models\ShopDomain as Domain;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
 class ShopController extends Controller
@@ -21,8 +21,8 @@ class ShopController extends Controller
 
         $query = Shop::on('central')->with('domains');
         if ($search) {
-            $query->where('data->name', 'like', "%{$search}%")
-                  ->orWhere('data->email', 'like', "%{$search}%");
+            $query->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
         }
         $shops = $query->paginate($perPage);
         $shops->getCollection()->transform(function ($shop) {
@@ -39,7 +39,7 @@ class ShopController extends Controller
             ];
         });
 
-            return response()->json(['success' => true, 'data' => $shops]);
+        return response()->json(['success' => true, 'data' => $shops]);
     }
 
     /** 创建店铺 */
@@ -60,9 +60,6 @@ class ShopController extends Controller
             ],
             'email' => 'required|email|max:255',
             'template_key' => 'nullable|string|max:64',
-            // 店长用户
-            'manager_name' => 'required|string|max:255',
-            'manager_email' => 'required|email|max:255',
         ]);
 
         if (Domain::on('central')->where('domain', $request->domain)->exists()) {
@@ -73,39 +70,26 @@ class ShopController extends Controller
         }
 
         try {
-            $shop = Shop::create(['id' => Str::random(8)]);
-            $shop->put('name', $request->name);
-            $shop->put('email', $request->email);
-            $shop->put('template_key', $request->input('template_key', 'default'));
-            $shop->put('created_at', now());
-            $shop->save();
+            $shop = Shop::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'template_key' => $request->input('template_key', 'default'),
+            ]);
             $domain = $shop->domains()->create(['domain' => $request->domain]);
-            Cache::forget('shop_domain:'.$request->domain);
-
-            // 在租户库中创建店长用户并发送初始密码邮件
-            $plainPassword = Str::random(10);
-            $managerEmail = $request->input('manager_email');
-            $managerName = $request->input('manager_name');
-
-            $shop->run(function () use ($managerName, $managerEmail, $plainPassword) {
-                User::updateOrCreate(
-                    ['email' => $managerEmail],
-                    [
-                        'name' => $managerName,
-                        'password' => $plainPassword, // will be auto-hashed by cast
-                    ]
-                );
-            });
+            $lowerDomainKey = 'shop_domain:'.strtolower($request->domain);
+            Cache::forget($lowerDomainKey);
 
             try {
+                $token = Str::random(60);
                 Mail::raw(
-                    "您好，{$managerName}：\n您的商店后台账号已创建。\n登录邮箱：{$managerEmail}\n初始密码：{$plainPassword}\n请登录后尽快修改密码。",
-                    function ($message) use ($managerEmail) {
-                        $message->to($managerEmail)->subject('您的商店后台账号已创建');
+                    "您好：\n您的商店后台账号已创建。\n请尽快点击链接注册账号。\nhttp://"
+                        . env('APP_URL') ."/admin/register?shop={$shop->id}&token={$token}\n\n感谢您的使用！",
+                    function ($message) use ($request) {
+                        $message->to($request->email)->subject('您的商店后台账号已创建');
                     }
                 );
             } catch (\Throwable $e) {
-                // 邮件失败不影响主流程
+                Log::error('发送邮件失败', ['exception' => $e]);
             }
             return response()->json([
                 'success' => true,
@@ -116,13 +100,10 @@ class ShopController extends Controller
                     'email' => $shop->email,
                     'template_key' => $shop->template_key ?? 'default',
                     'domains' => [$domain->domain],
-                    'manager' => [
-                        'name' => $managerName,
-                        'email' => $managerEmail,
-                    ],
                 ]
             ], 201);
         } catch (\Throwable $e) {
+            Log::error('创建店铺失败', ['exception' => $e]);
             return response()->json([
                 'success' => false,
                 'message' => '创建失败: '.$e->getMessage(),
@@ -144,7 +125,6 @@ class ShopController extends Controller
                 'name' => $shop->name ?? '未设置',
                 'email' => $shop->email ?? '未设置',
                 'template_key' => $shop->template_key ?? 'default',
-                // 为了与列表接口保持一致，这里返回纯域名数组
                 'domains' => $shop->domains->pluck('domain')->toArray(),
                 'created_at' => $shop->created_at?->format('Y-m-d H:i:s'),
                 'updated_at' => $shop->updated_at?->format('Y-m-d H:i:s'),
@@ -165,10 +145,9 @@ class ShopController extends Controller
             'template_key' => 'nullable|string|max:64',
         ]);
         try {
-            $shop->put('name', $request->name);
-            $shop->put('email', $request->email);
-            $shop->put('template_key', $request->input('template_key', 'default'));
-            $shop->put('updated_at', now());
+            $shop->name = $request->name;
+            $shop->email = $request->email;
+            $shop->template_key = $request->input('template_key', 'default');
             $shop->save();
             return response()->json([
                 'success' => true,
@@ -182,6 +161,7 @@ class ShopController extends Controller
                 ]
             ]);
         } catch (\Exception $e) {
+            Log::error('更新店铺失败', ['exception' => $e]);
             return response()->json(['success' => false, 'message' => '更新店铺失败：' . $e->getMessage()], 500);
         }
     }
@@ -200,6 +180,7 @@ class ShopController extends Controller
             foreach ($domains as $d) { Cache::forget('shop_domain:'.$d); }
             return response()->json(['success' => true, 'message' => "店铺 {$shopName} 已删除"]);
         } catch (\Throwable $e) {
+            Log::error('删除店铺失败', ['exception' => $e]);
             return response()->json(['success' => false, 'message' => '删除失败: '.$e->getMessage()], 500);
         }
     }

@@ -60,8 +60,6 @@ export interface CreateShopRequest {
   domain: string;
   email: string;
   template_key?: string;
-  manager_name: string;
-  manager_email: string;
 }
 
 // 更新店铺请求类型

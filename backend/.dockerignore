@@ -14,11 +14,11 @@ composer.lock
 /node_modules
 package*.json
 
-# Storage files (will be created at runtime)
-/storage/**
+# Storage files
+/storage/**.log
 
 # Cache files
-/bootstrap/cache/**
+/bootstrap/cache/**.php
 
 # Testing
 /tests/

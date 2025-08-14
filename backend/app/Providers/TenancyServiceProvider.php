@@ -28,27 +28,19 @@ class TenancyServiceProvider extends ServiceProvider
                     Jobs\CreateDatabase::class,
                     Jobs\MigrateDatabase::class,
                     // Jobs\SeedDatabase::class,
-
-                    // Your own jobs to prepare the tenant.
-                    // Provision API keys, create S3 buckets, anything you want!
-
                 ])->send(function (Events\TenantCreated $event) {
                     return $event->tenant;
-                })->shouldBeQueued(false), // `false` by default, but you probably want to make this `true` for production.
+                })->shouldBeQueued(false),
             ],
-            Events\SavingTenant::class => [],
-            Events\TenantSaved::class => [],
             Events\UpdatingTenant::class => [],
             Events\TenantUpdated::class => [],
             Events\DeletingTenant::class => [],
             Events\TenantDeleted::class => [
-                // 注意：为了安全考虑，我们不自动删除数据库
-                // 如需删除数据库，请手动操作或使用专门的命令
-                // JobPipeline::make([
-                //     Jobs\DeleteDatabase::class,
-                // ])->send(function (Events\TenantDeleted $event) {
-                //     return $event->tenant;
-                // })->shouldBeQueued(false),
+                JobPipeline::make([
+                    Jobs\DeleteDatabase::class,
+                ])->send(function (Events\TenantDeleted $event) {
+                    return $event->tenant;
+                })->shouldBeQueued(false),
             ],
 
             // Domain events
@@ -89,7 +81,6 @@ class TenancyServiceProvider extends ServiceProvider
                 Listeners\UpdateSyncedResource::class,
             ],
 
-            // Fired only when a synced resource is changed in a different DB than the origin DB (to avoid infinite loops)
             Events\SyncedResourceChangedInForeignDatabase::class => [],
         ];
     }

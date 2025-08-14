@@ -16,8 +16,6 @@ export default function CreateShopPage() {
     domain: "",
     email: "",
     template_key: "default",
-    manager_name: "",
-    manager_email: "",
   });
 
   const [errors, setErrors] = useState<Partial<CreateShopRequest>>({});
@@ -50,15 +48,6 @@ export default function CreateShopPage() {
       newErrors.email = "メールアドレスは必須です";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = "メールアドレスの形式が正しくありません";
-    }
-
-    if (!formData.manager_name.trim()) {
-      (newErrors as any).manager_name = "店長名は必須です";
-    }
-    if (!formData.manager_email.trim()) {
-      (newErrors as any).manager_email = "店長メールは必須です";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.manager_email)) {
-      (newErrors as any).manager_email = "店長メールの形式が正しくありません";
     }
 
     setErrors(newErrors);
@@ -248,44 +237,6 @@ export default function CreateShopPage() {
                       </p>
                     )}
                   </div>
-                </div>
-
-                {/* 店长信息 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    店長ユーザー <span className="text-red-500">*</span>
-                  </label>
-                  <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <input
-                        type="text"
-                        placeholder="店長名"
-                        value={formData.manager_name}
-                        onChange={(e) => handleInputChange("manager_name", e.target.value)}
-                        className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                          (errors as any).manager_name ? "border-red-300" : ""
-                        }`}
-                      />
-                      {(errors as any).manager_name && (
-                        <p className="mt-2 text-sm text-red-600">{(errors as any).manager_name}</p>
-                      )}
-                    </div>
-                    <div>
-                      <input
-                        type="email"
-                        placeholder="店長メール"
-                        value={formData.manager_email}
-                        onChange={(e) => handleInputChange("manager_email", e.target.value)}
-                        className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                          (errors as any).manager_email ? "border-red-300" : ""
-                        }`}
-                      />
-                      {(errors as any).manager_email && (
-                        <p className="mt-2 text-sm text-red-600">{(errors as any).manager_email}</p>
-                      )}
-                    </div>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-500">初期パスワードは自動生成され、メールで送信されます。</p>
                 </div>
 
                 {/* 模板：当前仅默认模板，后续可扩展为下拉 */}

@@ -20,7 +20,8 @@ export function useShopInfo() {
         const path = window.location.pathname;
         if (path.startsWith('/admin')) { setShop(null); return; }
         const hostname = window.location.hostname;
-        const apiBase = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/$/, '');
+        const configuredBase = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '') || '';
+        const apiBase = configuredBase || '/api';
         const res = await fetch(`${apiBase}/shops/${hostname}`, { headers: { 'Accept': 'application/json' }});
         if (res.status === 404) { setShop(null); setError('店铺不存在'); return; }
         if (!res.ok) { setShop(null); setError('获取店铺失败'); return; }

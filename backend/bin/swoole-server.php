@@ -6,13 +6,10 @@ use Swoole\Http\Server;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
 
-// 启动应用
 $app = require_once __DIR__ . '/../bootstrap/app.php';
 
-// 创建 Swoole HTTP 服务器
 $server = new Server('0.0.0.0', 8000);
 
-// 配置服务器
 $server->set([
     'worker_num' => 1,
     'daemonize' => false,
@@ -20,35 +17,52 @@ $server->set([
     'log_level' => SWOOLE_LOG_INFO,
 ]);
 
-// 处理 HTTP 请求
 $server->on('request', function (Request $request, Response $response) use ($app) {
     try {
-        // 设置 CORS 头
-        $response->header('Access-Control-Allow-Origin', 'http://oli-cms.test');
-        $response->header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-        $response->header('Access-Control-Allow-Headers', 'Origin, Content-Type, Cookie, X-CSRF-TOKEN, Accept, Authorization, X-XSRF-TOKEN, X-Requested-With');
-        $response->header('Access-Control-Allow-Credentials', 'true');
 
-        // 处理 OPTIONS 预检请求
-        if ($request->server['request_method'] === 'OPTIONS') {
+        if (($request->server['request_method'] ?? 'GET') === 'OPTIONS') {
             $response->status(200);
             $response->end();
             return;
         }
 
-        // 构建 Laravel 请求
+        // 组装 URI（带 query string）
+        $uri = $request->server['request_uri'] ?? '/';
+        $queryString = $request->server['query_string'] ?? '';
+        if ($queryString !== '') {
+            $uri .= '?' . $queryString;
+        }
+
+        // 方法与参数
+        $method = strtoupper($request->server['request_method'] ?? 'GET');
+        $getParams = $request->get ?? [];
+        $postParams = $request->post ?? [];
+        $parameters = $method === 'GET' ? $getParams : array_merge($getParams, $postParams);
+
+        // 服务器变量
+        $serverVars = array_change_key_case($request->server ?? [], CASE_UPPER);
+
+        // 创建 Laravel Request
         $laravelRequest = \Illuminate\Http\Request::create(
-            $request->server['request_uri'] ?? '/',
-            $request->server['request_method'] ?? 'GET',
-            $request->post ?? [],
+            $uri,
+            $method,
+            $parameters,
             $request->cookie ?? [],
             $request->files ?? [],
-            array_change_key_case($request->server ?? [], CASE_UPPER),
+            $serverVars,
             $request->rawContent()
         );
 
+        // 设置 query/request
+        if (!empty($getParams)) {
+            $laravelRequest->query->replace($getParams);
+        }
+        if (!empty($postParams)) {
+            $laravelRequest->request->replace(array_merge($laravelRequest->request->all(), $postParams));
+        }
+
         // 设置请求头
-        if (isset($request->header)) {
+        if (!empty($request->header)) {
             foreach ($request->header as $key => $value) {
                 $laravelRequest->headers->set($key, $value);
             }
@@ -57,22 +71,17 @@ $server->on('request', function (Request $request, Response $response) use ($app
         // 处理请求
         $laravelResponse = $app->handle($laravelRequest);
 
-        // 设置响应状态码
+        // 输出响应
         $response->status($laravelResponse->getStatusCode());
-
-        // 设置响应头
         foreach ($laravelResponse->headers->all() as $name => $values) {
             foreach ($values as $value) {
                 $response->header($name, $value);
             }
         }
-
-        // 发送响应内容
         $response->end($laravelResponse->getContent());
 
     } catch (\Throwable $e) {
-        error_log("Swoole server error: " . $e->getMessage() . "\n" . $e->getTraceAsString());
-
+        error_log("Swoole server error: " . $e->getMessage());
         $response->status(500);
         $response->header('Content-Type', 'application/json');
         $response->end(json_encode([

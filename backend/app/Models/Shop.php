@@ -8,18 +8,31 @@ use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 
 /**
- * 店铺模型（原 Tenant ）
+ * 店铺模型
  */
 class Shop extends BaseTenant implements TenantWithDatabase
 {
+
     use HasDatabase, HasDomains;
+
+    public $incrementing = false;
+
+    protected $keyType = 'string';
+
+    public static function getCustomColumns(): array
+    {
+        return ['id', 'name', 'email', 'template_key', 'is_active', 'created_at', 'updated_at'];
+    }
 
     protected $table = 'shops';
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'id',
+        'name',
+        'email',
+        'template_key',
         'data',
+        'is_active',
     ];
 
     protected $casts = [
@@ -51,7 +64,6 @@ class Shop extends BaseTenant implements TenantWithDatabase
         return $this->domains()->first()?->domain;
     }
 
-    // 覆盖 trait 默认的 tenant_id 外键，改为 shop_id
     public function domains()
     {
         return $this->hasMany(config('tenancy.domain_model'), 'shop_id');

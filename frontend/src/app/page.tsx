@@ -1,44 +1,24 @@
-"use client";
-
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
 export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const router = useRouter();
+  const role = headers().get("x-mw-role");
 
-  useEffect(() => {
-    if (isLoading) return;
+  if (role === "admin") {
+    redirect("/admin/dashboard");
+  }
 
-    const adminDomains = new Set([
-      "oli-cms.test",
-      "admin.oli-cms.test",
-      "localhost",
-      "127.0.0.1",
-    ]);
-
-    const host = typeof window !== "undefined" ? window.location.hostname : "";
-
-    // 管理者用ドメイン以外 => /tenant ページへ (middleware が処理しなかった場合のフォールバック)
-    if (!adminDomains.has(host)) {
-      router.replace("/tenant");
-      return;
+  if (role === "tenant") {
+    const templateKey = headers().get("x-mw-tenant-template") || "default";
+    try {
+      const TemplateComponent =
+        require(`@/app/tenant/templates/${templateKey}/page`).default;
+      return <TemplateComponent />;
+    } catch (e) {
+      console.error("Template not found:", e);
+      redirect("/404");
     }
+  }
 
-    // 管理ドメインの処理
-    if (isAuthenticated) {
-      router.replace("/admin/dashboard");
-    } else {
-      router.replace("/admin/login");
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  // ローディング表示
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      <p className="mt-4 text-lg text-gray-600">リダイレクト中...</p>
-    </main>
-  );
+  redirect("/404");
 }

@@ -13,18 +13,15 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        // Ensure super admin exists and is up-to-date
-        Admin::updateOrCreate(
-            ['email' => 'admin@cms.com'],
-            [
+        // Ensure super admin exists or create it
+        if (!Admin::where('email', env('ADMIN_EMAIL', 'admin@cms.com'))->exists()) {
+            Admin::create([
                 'name' => 'Super Admin',
-                'password' => Hash::make('admin123'),
+                'email' => env('ADMIN_EMAIL', 'admin@cms.com'),
+                'password' => Hash::make(env('ADMIN_PASSWORD', 'admin123')),
                 'role' => 'super_admin',
                 'is_active' => true,
-            ]
-        );
-
-        // Remove legacy default user account if present
-        Admin::where('email', 'user@cms.com')->delete();
+            ]);
+        }
     }
 }

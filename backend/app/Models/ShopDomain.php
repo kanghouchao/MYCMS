@@ -23,15 +23,9 @@ class ShopDomain extends Model implements Contracts\Domain
     protected $guarded = [];
     protected $table = 'domains';
 
-    public function shop()
-    {
-        return $this->belongsTo(config('tenancy.tenant_model'), 'shop_id');
-    }
-
-    // 兼容原调用 $domain->tenant
     public function tenant()
     {
-        return $this->shop();
+        return $this->belongsTo(config('tenancy.tenant_model'), 'shop_id');
     }
 
     protected $dispatchesEvents = [

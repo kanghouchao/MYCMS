@@ -19,6 +19,7 @@ return [
     'central_domains' => [
         '127.0.0.1',
         'localhost',
+        'oli-cms.test',
     ],
 
     /**
@@ -32,7 +33,7 @@ return [
         Stancl\Tenancy\Bootstrappers\CacheTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\FilesystemTenancyBootstrapper::class,
         Stancl\Tenancy\Bootstrappers\QueueTenancyBootstrapper::class,
-        // Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class, // Note: phpredis is needed
+        Stancl\Tenancy\Bootstrappers\RedisTenancyBootstrapper::class,
     ],
 
     /**
@@ -51,8 +52,8 @@ return [
          * Tenant database names are created like this:
          * prefix + tenant_id + suffix.
          */
-        'prefix' => 'tenant',
-        'suffix' => '',
+        'prefix' => 'tenant_',
+        'suffix' => '_db',
 
         /**
          * TenantDatabaseManagers are classes that handle the creation & deletion of tenant databases.

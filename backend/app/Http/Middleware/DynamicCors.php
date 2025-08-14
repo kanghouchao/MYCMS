@@ -57,6 +57,16 @@ class DynamicCors
         $response->headers->set('Access-Control-Expose-Headers', '');
         $response->headers->set('Access-Control-Max-Age', '86400'); // 24小时
 
+        // 为 CORS 响应增加缓存区分，防止不同 Origin 之间的响应被复用
+        $existingVary = $response->headers->get('Vary');
+        if ($existingVary) {
+            if (stripos($existingVary, 'origin') === false) {
+                $response->headers->set('Vary', $existingVary . ', Origin');
+            }
+        } else {
+            $response->headers->set('Vary', 'Origin');
+        }
+
         return $response;
     }
 
