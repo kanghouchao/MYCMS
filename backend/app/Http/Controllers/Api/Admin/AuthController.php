@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Admin;
 
-class AuthController extends Controller
+class AuthController
 {
     /**
      * 管理员登录

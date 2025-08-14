@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\Api\Admin;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Template;
 
-class TemplateController extends Controller
+class TemplateController
 {
     public function index()
     {

@@ -20,6 +20,8 @@ use App\Http\Controllers\Api\Admin\TemplateController;
 Route::prefix('admin')->name('api.admin.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
 
+    Route::get('tenant', [TenantController::class, 'showByDomain']);
+
     Route::middleware(['stateless_auth'])->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');

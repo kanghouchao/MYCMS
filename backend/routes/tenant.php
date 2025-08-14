@@ -3,9 +3,7 @@
 declare(strict_types=1);
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\User\AuthController as TenantAuthController;
-use Stancl\Tenancy\Middleware\InitializeTenancyByDomain;
-use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
+use App\Http\Controllers\Api\User\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,11 +20,11 @@ use Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains;
 // Tenant API Routes (require tenant domain)
 Route::prefix('api')->group(function () {
     // 用户登录（租户）
-    Route::post('user/login', [TenantAuthController::class, 'login']);
+    Route::post('user/login', [AuthController::class, 'login']);
 
     // 需要登录的接口
     Route::middleware('stateless_auth')->group(function () {
-        Route::get('user/me', [TenantAuthController::class, 'me']);
-        Route::post('user/logout', [TenantAuthController::class, 'logout']);
+        Route::get('user/me', [AuthController::class, 'me']);
+        Route::post('user/logout', [AuthController::class, 'logout']);
     });
 });

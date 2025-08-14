@@ -4,11 +4,9 @@ namespace App\Http\Controllers\Api\User;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Controllers\Controller;
 
-class AuthController extends Controller
+class AuthController
 {
-    // 用户登录（租户）
     public function login(Request $request): JsonResponse
     {
         $tenant = tenant();
@@ -18,7 +16,6 @@ class AuthController extends Controller
                 'message' => '无法登录已删除租户'
             ], 403);
         }
-        // 这里只做示例，实际应校验账号密码并生成 token
         $user = [
             'id' => 1,
             'name' => 'Tenant User',
@@ -31,7 +28,6 @@ class AuthController extends Controller
         ]);
     }
 
-    // 获取当前用户信息
     public function me(Request $request): JsonResponse
     {
         $tenant = tenant();
@@ -41,7 +37,6 @@ class AuthController extends Controller
                 'message' => '无法获取已删除租户的用户信息'
             ], 403);
         }
-        // 实际应通过 token 获取用户信息
         $user = [
             'id' => 1,
             'name' => 'Tenant User',
@@ -50,10 +45,9 @@ class AuthController extends Controller
         return response()->json(['user' => $user]);
     }
 
-    // 用户退出登录
+
     public function logout(Request $request): JsonResponse
     {
-        // 实际应清除 token 或做相关处理
         return response()->json(['message' => 'Logged out successfully.']);
     }
 }
