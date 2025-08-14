@@ -7,7 +7,7 @@
 ## 文件夹结构
 
 - `frontend`：前端代码，标准的Next.js项目结构，管理后台页面在`frontend/src/app/admin`目录下，租户页面在`frontend/src/app/tenant`目录下
-- `backend`：后端代码，使用Laravel框架，启动脚本在`bin`目录下，其他都是标准的Laravel项目结构
+- `backend`：后端代码，使用Laravel框架，启动脚本在`bin`目录下，管理界面的控制器在`backend/app/Http/Controllers/Api/Admin`，而租户界面的控制在`backend/app/Http/Controllers/Api/Tenant`
 - `traefik`：Traefik配置文件，分了开发环境和生产环境
 - `docker-compose.yml`：Docker Compose配置文件
 - `Makefile`：Makefile配置文件
