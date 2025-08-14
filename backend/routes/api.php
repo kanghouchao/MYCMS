@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\Admin\AuthController;
 use App\Http\Controllers\Api\Admin\TenantController;
 use App\Http\Controllers\Api\Admin\TemplateController;
-use App\Http\Controllers\Api\TenantValidationController;
-use App\Http\Controllers\HealthController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -18,13 +17,6 @@ use App\Http\Controllers\HealthController;
 |
 */
 
-// 健康检查（统一控制器实现）
-Route::get('health', [HealthController::class, 'check']);
-
-// 获取店铺信息
-Route::get('tenant', [TenantValidationController::class, 'show']);
-
-// 管理员 API 路由
 Route::prefix('admin')->name('api.admin.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
 

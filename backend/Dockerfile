@@ -53,7 +53,7 @@ EXPOSE 8000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD curl -f http://localhost:8000/api/health || exit 1
+    CMD curl -f http://localhost:8000/up || exit 1
 
 # Start the application
 CMD ["sh", "/var/www/html/bin/start.sh"]
