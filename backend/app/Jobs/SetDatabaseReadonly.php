@@ -2,21 +2,35 @@
 
 namespace App\Jobs;
 
-use Stancl\Tenancy\Events\TenantDeleted;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
+use Stancl\Tenancy\Contracts\TenantWithDatabase;
+use Stancl\Tenancy\Events\DatabaseDeleted;
+use Stancl\Tenancy\Events\DeletingDatabase;
 
-class SetDatabaseReadonly
+class SetDatabaseReadonly implements ShouldQueue
 {
+
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $tenant;
+
+    public function __construct(TenantWithDatabase $tenant)
+    {
+        $this->tenant = $tenant;
+    }
+
     /**
      * Handle the event.
-     * @param TenantDeleted $event
      */
-    public function handle(TenantDeleted $event)
+    public function handle()
     {
-    $tenant = $event->tenant;
-    // PostgreSQL 设置数据库为只读模式
-    $dbName = $tenant->database()->getName();
-    // 需用超级用户连接 central 数据库执行
-    DB::connection('central')->statement("ALTER DATABASE \"{$dbName}\" SET default_transaction_read_only = true;");
+        event(new DeletingDatabase($this->tenant));
+        DB::connection('central')->statement("ALTER DATABASE \"{$this->tenant->database()->getName()}\" SET default_transaction_read_only = true;");
+        event(new DatabaseDeleted($this->tenant));
     }
 }
