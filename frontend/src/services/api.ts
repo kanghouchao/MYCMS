@@ -4,11 +4,10 @@ import {
   LoginRequest,
   AuthResponse,
   Admin,
-  Shop,
-  CreateShopRequest,
-  UpdateShopRequest,
-  DashboardStats,
-  ShopStats,
+  Tenant,
+  CreateTenantRequest,
+  UpdateTenantRequest,
+  TenantStats,
   PaginatedResponse
 } from '@/types/api';
 
@@ -33,34 +32,34 @@ export const authApi = {
   },
 };
 
-// 店铺 API
-export const shopApi = {
+// 租户 API
+export const tenantApi = {
   getList: async (params?: {
     page?: number;
     per_page?: number;
     search?: string;
-  }): Promise<ApiResponse<PaginatedResponse<Shop>>> => {
-    const response = await apiClient.get('/admin/shops', { params });
+  }): Promise<ApiResponse<PaginatedResponse<Tenant>>> => {
+    const response = await apiClient.get('/admin/tenants', { params });
     return response.data;
   },
-  getById: async (id: string): Promise<ApiResponse<Shop>> => {
-    const response = await apiClient.get(`/admin/shops/${id}`);
+  getById: async (id: string): Promise<ApiResponse<Tenant>> => {
+    const response = await apiClient.get(`/admin/tenants/${id}`);
     return response.data;
   },
-  create: async (data: CreateShopRequest): Promise<ApiResponse<Shop>> => {
-    const response = await apiClient.post('/admin/shops', data);
+  create: async (data: CreateTenantRequest): Promise<ApiResponse<Tenant>> => {
+    const response = await apiClient.post('/admin/tenants', data);
     return response.data;
   },
-  update: async (id: string, data: UpdateShopRequest): Promise<ApiResponse<Shop>> => {
-    const response = await apiClient.put(`/admin/shops/${id}`, data);
+  update: async (id: string, data: UpdateTenantRequest): Promise<ApiResponse<Tenant>> => {
+    const response = await apiClient.put(`/admin/tenants/${id}`, data);
     return response.data;
   },
   delete: async (id: string): Promise<ApiResponse> => {
-    const response = await apiClient.delete(`/admin/shops/${id}`);
+    const response = await apiClient.delete(`/admin/tenants/${id}`);
     return response.data;
   },
-  getStats: async (): Promise<ApiResponse<ShopStats>> => {
-    const response = await apiClient.get('/admin/shops/stats');
+  getStats: async (): Promise<ApiResponse<TenantStats>> => {
+    const response = await apiClient.get('/admin/tenants/stats');
     return response.data;
   },
 };
@@ -72,7 +71,3 @@ export const healthApi = {
     return response.data;
   },
 };
-
-// 兼容现有代码：Tenants 页面目前引用 tenantApi，其语义与 shopApi 相同
-// 若未来后端提供独立的租户（Tenant）端点，可在此替换为真实实现
-export const tenantApi = shopApi;

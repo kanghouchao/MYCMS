@@ -11,9 +11,9 @@ use Stancl\Tenancy\Database\Concerns\InvalidatesTenantsResolverCache;
 use Stancl\Tenancy\Events;
 
 /**
- * 店铺域名模型（替换包默认 Domain）
+ * 店铺域名模型
  */
-class ShopDomain extends Model implements Contracts\Domain
+class Domain extends Model implements Contracts\Domain
 {
     use CentralConnection,
         EnsuresDomainIsNotOccupied,
@@ -25,7 +25,7 @@ class ShopDomain extends Model implements Contracts\Domain
 
     public function tenant()
     {
-        return $this->belongsTo(config('tenancy.tenant_model'), 'shop_id');
+        return $this->belongsTo(config('tenancy.tenant_model'), 'tenant_id');
     }
 
     protected $dispatchesEvents = [

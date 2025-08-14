@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class TenantController extends Controller
@@ -15,11 +14,10 @@ class TenantController extends Controller
         $currentDomain = request()->getHost();
         $tenant = tenant();
 
-        // 如果没有找到租户，说明这个域名没有对应的租户
-        if (!$tenant) {
+        if (!$tenant || !empty($tenant->deleted_at)) {
             return response()->json([
                 'error' => 'No tenant found for domain: ' . $currentDomain,
-                'message' => '该域名未配置租户信息'
+                'message' => '该域名未配置租户信息或租户已被删除'
             ], 404);
         }
 

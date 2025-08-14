@@ -42,8 +42,8 @@ export async function middleware(request: NextRequest) {
             const nextRes = NextResponse.next();
             nextRes.headers.set("x-mw-role", "tenant");
             nextRes.headers.set('x-mw-tenant-template', String(data.template_key));
-            nextRes.headers.set('x-mw-shop-id', String(data.shop_id));
-            nextRes.headers.set('x-mw-shop-name', String(data.shop_name));
+            nextRes.headers.set('x-mw-tenant-id', String(data.tenant_id));
+            nextRes.headers.set('x-mw-tenant-name', String(data.tenant_name));
             return nextRes;
     }
 

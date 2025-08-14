@@ -38,12 +38,12 @@ export interface AuthResponse {
   token: string;
 }
 
-// 店铺类型
-export interface Shop {
+// 租户类型
+export interface Tenant {
   id: string;
   name: string;
   email: string;
-  template_key?: string; // 店铺模板键（替代 plan）
+  template_key?: string;
   domain: string;
   domains: string[];
   is_active: boolean;
@@ -51,19 +51,16 @@ export interface Shop {
   updated_at?: string;
 }
 
-// 兼容旧代码：之前使用 Tenant 命名，现在统一为 Shop；提供别名避免导入错误
-export type Tenant = Shop;
-
-// 创建店铺请求类型
-export interface CreateShopRequest {
+// 创建租户请求类型
+export interface CreateTenantRequest {
   name: string;
   domain: string;
   email: string;
   template_key?: string;
 }
 
-// 更新店铺请求类型
-export interface UpdateShopRequest {
+// 更新租户请求类型
+export interface UpdateTenantRequest {
   name: string;
   email: string;
   template_key?: string;
@@ -71,14 +68,14 @@ export interface UpdateShopRequest {
 
 // 统计数据类型
 export interface DashboardStats {
-  total_shops: number;
+  total_tenants: number;
   total_domains: number;
-  monthly_shops: number;
+  monthly_tenants: number;
   active_domains: number;
 }
 
-// 店铺统计数据类型
-export interface ShopStats {
+// 租户统计数据类型
+export interface TenantStats {
   total: number;
   active: number;
   inactive: number;

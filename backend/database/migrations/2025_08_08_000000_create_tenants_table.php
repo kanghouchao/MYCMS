@@ -11,7 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('shops', function (Blueprint $table) {
+        Schema::create('tenants', function (Blueprint $table) {
             $table->string('id')->primary();
             $table->string('name')->notNullable();
             $table->string('email')->notNullable();
@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->integer('is_active')->default(1);
             $table->json('data')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('shops');
+        Schema::dropIfExists('tenants');
     }
 };

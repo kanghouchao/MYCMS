@@ -3,24 +3,24 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { shopApi } from "@/services/api";
-import type { Shop, UpdateShopRequest } from "@/types/api";
+import { tenantApi } from "@/services/api";
+import type { Tenant, UpdateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
-export default function EditShopPage() {
+export default function EditTenantPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { admin, isAuthenticated, isLoading, logout } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [shop, setShop] = useState<Shop | null>(null);
-  const [formData, setFormData] = useState<UpdateShopRequest>({
+  const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [formData, setFormData] = useState<UpdateTenantRequest>({
     name: "",
     email: "",
     template_key: "default",
   });
-  const [errors, setErrors] = useState<Partial<UpdateShopRequest>>({});
+  const [errors, setErrors] = useState<Partial<UpdateTenantRequest>>({});
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -28,21 +28,21 @@ export default function EditShopPage() {
       return;
     }
     if (isAuthenticated && id) {
-      loadShop(id);
+      loadTenant(id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isLoading, id]);
 
-  const loadShop = async (shopId: string) => {
+  const loadTenant = async (tenantId: string) => {
     try {
-      const res = await shopApi.getById(shopId);
+      const res = await tenantApi.getById(tenantId);
       if (res.success && res.data) {
-        const s = res.data as unknown as Shop; // API wraps inside data
-        setShop(s);
+        const t = res.data as unknown as Tenant;
+        setTenant(t);
         setFormData({
-          name: s.name,
-          email: s.email,
-          template_key: s.template_key ?? "default",
+          name: t.name,
+          email: t.email,
+          template_key: t.template_key ?? "default",
         });
       } else {
         toast.error(res.message || "店舗情報の取得に失敗しました");
@@ -55,21 +55,22 @@ export default function EditShopPage() {
   };
 
   const validate = (): boolean => {
-    const next: Partial<UpdateShopRequest> = {};
+    const next: Partial<UpdateTenantRequest> = {};
     if (!formData.name.trim()) next.name = "店舗名は必須です";
     if (!formData.email.trim()) next.email = "メールアドレスは必須です";
-    else if (!/^([^\s@])+@([^\s@])+\.[^\s@]+$/.test(formData.email)) next.email = "メールアドレスの形式が正しくありません";
+    else if (!/^([^\s@])+@([^\s@])+\.[^\s@]+$/.test(formData.email))
+      next.email = "メールアドレスの形式が正しくありません";
     setErrors(next);
     return Object.keys(next).length === 0;
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!shop) return;
+    if (!tenant) return;
     if (!validate()) return;
     setSaving(true);
     try {
-      const res = await shopApi.update(shop.id, formData);
+      const res = await tenantApi.update(tenant.id, formData);
       if (res.success) {
         toast.success("店舗情報を更新しました");
         router.push("/admin/tenants");
@@ -113,7 +114,9 @@ export default function EditShopPage() {
               <h1 className="text-xl font-semibold text-gray-900">店舗編集</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">ようこそ、{admin?.name} さん</span>
+              <span className="text-sm text-gray-700">
+                ようこそ、{admin?.name} さん
+              </span>
               <button
                 onClick={handleLogout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -131,14 +134,21 @@ export default function EditShopPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="mb-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">店舗情報</h3>
-                <p className="mt-1 text-sm text-gray-500">店舗の基本情報を編集します。ドメインは現在変更できません。</p>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  店舗情報
+                </h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  店舗の基本情報を編集します。ドメインは現在変更できません。
+                </p>
               </div>
 
               <form onSubmit={handleSave} className="space-y-6">
                 {/* 店舗名 */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     店舗名 <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-1">
@@ -146,16 +156,25 @@ export default function EditShopPage() {
                       id="name"
                       type="text"
                       value={formData.name}
-                      onChange={(e) => setFormData((p) => ({ ...p, name: e.target.value }))}
-                      className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${errors.name ? "border-red-300" : ""}`}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, name: e.target.value }))
+                      }
+                      className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                        errors.name ? "border-red-300" : ""
+                      }`}
                     />
-                    {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
+                    {errors.name && (
+                      <p className="mt-2 text-sm text-red-600">{errors.name}</p>
+                    )}
                   </div>
                 </div>
 
                 {/* 連絡用メール */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     連絡用メール <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-1">
@@ -163,39 +182,62 @@ export default function EditShopPage() {
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={(e) => setFormData((p) => ({ ...p, email: e.target.value }))}
-                      className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${errors.email ? "border-red-300" : ""}`}
+                      onChange={(e) =>
+                        setFormData((p) => ({ ...p, email: e.target.value }))
+                      }
+                      className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
+                        errors.email ? "border-red-300" : ""
+                      }`}
                     />
-                    {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
+                    {errors.email && (
+                      <p className="mt-2 text-sm text-red-600">
+                        {errors.email}
+                      </p>
+                    )}
                   </div>
                 </div>
 
                 {/* テンプレート（暫定） */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">テンプレート</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    テンプレート
+                  </label>
                   <div className="mt-1">
                     <input
                       type="text"
                       value={formData.template_key || "default"}
-                      onChange={(e) => setFormData((p) => ({ ...p, template_key: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((p) => ({
+                          ...p,
+                          template_key: e.target.value,
+                        }))
+                      }
                       className="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md"
                     />
-                    <p className="mt-2 text-sm text-gray-500">現在はシステム既定: default</p>
+                    <p className="mt-2 text-sm text-gray-500">
+                      現在はシステム既定: default
+                    </p>
                   </div>
                 </div>
 
                 {/* ドメイン（読み取り専用） */}
-                {shop && (
+                {tenant && (
                   <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-900 mb-2">関連ドメイン</h4>
-                    {shop.domains && shop.domains.length > 0 ? (
+                    <h4 className="text-sm font-medium text-gray-900 mb-2">
+                      関連ドメイン
+                    </h4>
+                    {tenant.domains && tenant.domains.length > 0 ? (
                       <ul className="list-disc ml-6 text-sm text-gray-700">
-                        {shop.domains.map((d) => (
-                          <li key={d} className="break-all">{d}</li>
+                        {tenant.domains.map((d) => (
+                          <li key={d} className="break-all">
+                            {d}
+                          </li>
                         ))}
                       </ul>
                     ) : (
-                      <p className="text-sm text-gray-500">ドメインは設定されていません</p>
+                      <p className="text-sm text-gray-500">
+                        ドメインは設定されていません
+                      </p>
                     )}
                   </div>
                 )}

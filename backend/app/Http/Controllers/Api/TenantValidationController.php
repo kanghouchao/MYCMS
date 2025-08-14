@@ -25,19 +25,19 @@ class TenantValidationController extends Controller
                 'message' => '域名不能为空'
             ], 422);
         }
-        $cacheKey = "shop_domain:{$domain}";
+        $cacheKey = "domain:{$domain}";
 
         try {
             if ($cached = Cache::get($cacheKey)) {
                 return response()->json($cached['payload'], $cached['status']);
             }
 
-            $shopDomain = DB::connection('central')
+            $domain = DB::connection('central')
                 ->table('domains')
                 ->where('domain', $domain)
                 ->first();
 
-            if (!$shopDomain) {
+            if (!$domain) {
                 $payload = [
                     'success' => false,
                     'message' => '店铺域名不存在',
@@ -47,18 +47,29 @@ class TenantValidationController extends Controller
                 return response()->json($payload, 404);
             }
 
-            $shop = DB::connection('central')
-                ->table('shops')
-                ->where('id', $shopDomain->shop_id)
+            $tenant = DB::connection('central')
+                ->table('tenants')
+                ->where('id', $domain->tenant_id)
+                ->whereNull('deleted_at')
                 ->first();
 
-            $templateKey = $shop->template_key ?? 'default';
-            $shopName = $shop->name ?? 'Unknown';
+            if (!$tenant) {
+                $payload = [
+                    'success' => false,
+                    'message' => '店舗が削除されたか、存在しません',
+                    'domain' => $domain,
+                ];
+                Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
+                return response()->json($payload, 404);
+            }
+
+            $templateKey = $tenant->template_key ?? 'default';
+            $tenantName = $tenant->name ?? 'Unknown';
             $payload = [
                 'success' => true,
                 'domain' => $domain,
-                'shop_id' => $shop->id,
-                'shop_name' => $shopName,
+                'tenant_id' => $tenant->id,
+                'tenant_name' => $tenantName,
                 'template_key' => $templateKey,
             ];
 

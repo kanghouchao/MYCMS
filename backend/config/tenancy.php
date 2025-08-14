@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Models\Shop;
-use App\Models\ShopDomain;
+use App\Models\Tenant;
+use App\Models\Domain;
 
 return [
-    'tenant_model' => Shop::class,
+    'tenant_model' => Tenant::class,
     'id_generator' => Stancl\Tenancy\UUIDGenerator::class,
 
-    'domain_model' => ShopDomain::class,
+    'domain_model' => Domain::class,
 
     /**
      * The list of domains hosting your central app.

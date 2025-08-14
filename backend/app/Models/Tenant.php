@@ -3,17 +3,15 @@
 namespace App\Models;
 
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Stancl\Tenancy\Contracts\TenantWithDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDatabase;
 use Stancl\Tenancy\Database\Concerns\HasDomains;
 
-/**
- * 店铺模型
- */
-class Shop extends BaseTenant implements TenantWithDatabase
+class Tenant extends BaseTenant implements TenantWithDatabase
 {
 
-    use HasDatabase, HasDomains;
+    use HasDatabase, HasDomains, SoftDeletes;
 
     public $incrementing = false;
 
@@ -21,10 +19,10 @@ class Shop extends BaseTenant implements TenantWithDatabase
 
     public static function getCustomColumns(): array
     {
-        return ['id', 'name', 'email', 'template_key', 'is_active', 'created_at', 'updated_at'];
+    return ['id', 'name', 'email', 'template_key', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
     }
 
-    protected $table = 'shops';
+    protected $table = 'tenants';
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -66,6 +64,6 @@ class Shop extends BaseTenant implements TenantWithDatabase
 
     public function domains()
     {
-        return $this->hasMany(config('tenancy.domain_model'), 'shop_id');
+    return $this->hasMany(config('tenancy.domain_model'), 'tenant_id');
     }
 }

@@ -1,8 +1,8 @@
 import { headers } from "next/headers";
 
 export default function Page() {
-  const shopId = headers().get("x-mw-shop-id");
-  const shopName = headers().get("x-mw-shop-name");
+  const tenantId = headers().get("x-mw-tenant-id");
+  const tenantName = headers().get("x-mw-tenant-name");
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
@@ -13,8 +13,8 @@ export default function Page() {
         これはデフォルトのテンプレートページです。
       </p>
       <div className="mt-8 text-gray-800">
-        <div>店铺ID: {shopId}</div>
-        <div>店铺名称: {shopName}</div>
+        <div>租户ID: {tenantId}</div>
+        <div>租户名称: {tenantName}</div>
       </div>
     </main>
   );

@@ -334,10 +334,10 @@ terraform apply
 3. **マルチ店舗（テナント）開発**
 
    ```bash
-   # 创建店铺（租户）迁移（仍使用 tenants 命令空间）
-   docker-compose exec backend php artisan make:migration create_shop_posts_table
-   
-   # 为所有店铺运行迁移（包内命令名仍为 tenants:migrate）
+   # 创建租户（店铺）迁移（仍使用 tenants 命令空间）
+   docker-compose exec backend php artisan make:migration create_tenant_posts_table
+
+   # 为所有租户运行迁移（包内命令名仍为 tenants:migrate）
    docker-compose exec backend php artisan tenants:migrate
    ```
 

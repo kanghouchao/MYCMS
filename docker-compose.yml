@@ -40,7 +40,7 @@ services:
     networks:
       - oli-cms-network
     healthcheck:
-      test: [ "CMD", "pg_isready" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cms_user} -d ${DB_DATABASE:-cms}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -88,6 +88,8 @@ services:
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
       MAIL_ENCRYPTION: ${MAIL_ENCRYPTION:-tls}
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-test@oli-cms.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-"OliCMS"}
     depends_on:
       database:
         condition: service_healthy
