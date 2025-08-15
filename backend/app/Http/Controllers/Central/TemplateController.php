@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Central;
 
 use Illuminate\Http\Request;
 use App\Models\Template;

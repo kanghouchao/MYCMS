@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Admin } from "@/types/api";
-import { authApi } from "@/services/api";
+import { authApi } from "@/services/central/api";
 import Cookies from "js-cookie";
 
 interface AuthContextType {

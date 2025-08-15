@@ -1,26 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\Admin\AuthController;
-use App\Http\Controllers\Api\Admin\TenantController;
-use App\Http\Controllers\Api\Admin\TemplateController;
+use App\Http\Controllers\Central\AuthController;
+use App\Http\Controllers\Central\TenantController;
+use App\Http\Controllers\Central\TemplateController;
 
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
+Route::get('tenant', [TenantController::class, 'showByDomain']);
 
 Route::prefix('admin')->name('api.admin.')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->name('login');
-
-    Route::get('tenant', [TenantController::class, 'showByDomain']);
 
     Route::middleware(['stateless_auth'])->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');

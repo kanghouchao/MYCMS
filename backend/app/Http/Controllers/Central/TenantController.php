@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Central;
 
 use Illuminate\Http\Request;
 use App\Models\Tenant;
@@ -19,9 +19,9 @@ class TenantController
 
         $query = Tenant::on('central')->with('domains')->whereNull('deleted_at');
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
         $tenants = $query->paginate($perPage);
@@ -47,7 +47,9 @@ class TenantController
         $request->validate([
             'name' => 'required|string|max:255',
             'domain' => [
-                'required','string','max:255',
+                'required',
+                'string',
+                'max:255',
                 function ($attribute, $value, $fail) {
                     if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/', $value)) {
                         $fail('域名格式不正确');
@@ -75,20 +77,26 @@ class TenantController
                 'template_key' => $request->input('template_key', 'default'),
             ]);
             $domain = $tenant->domains()->create(['domain' => $request->domain]);
-            $lowerDomainKey = 'tenant_domain:'.strtolower($request->domain);
-            Cache::forget($lowerDomainKey);
 
             try {
                 $token = Str::random(60);
+                $url = "http://" . $domain->domain . "/tenant/register?token={$token}";
+                $mailText = "【Oli-CMS】管理者登録のご案内\n\n" .
+                    "貴社のOli-CMSテナントが正常に作成されました。\n" .
+                    "下記のリンクより管理者アカウントの登録を完了してください。\n\n" .
+                    "登録用リンク: {$url}\n\n" .
+                    "※本リンクは1時間後に無効となりますので、お早めにご登録ください。\n" .
+                    "ご不明点がございましたら、サポートまでご連絡ください。\n\n" .
+                    "Oli-CMS運営事務局";
                 Mail::raw(
-                    "您好：\n您的租户后台账号已创建。\n请尽快点击链接注册账号。\nhttp://"
-                        . env('APP_URL') ."/admin/register?tenant={$tenant->id}&token={$token}\n\n感谢您的使用！",
+                    $mailText,
                     function ($message) use ($request) {
-                        $message->to($request->email)->subject('您的租户后台账号已创建');
+                        $message->to($request->email)->subject('【Oli-CMS】管理者登録のご案内');
                     }
                 );
+                Cache::store('redis')->put("tenant_register_token:{$tenant->id}:{$request->email}", $token, 3600);
             } catch (\Throwable $e) {
-                Log::error('发送邮件失败', ['exception' => $e]);
+                Log::error('メール送信失敗', ['exception' => $e]);
             }
             return response()->json([
                 'success' => true,
@@ -105,7 +113,7 @@ class TenantController
             Log::error('创建店铺失败', ['exception' => $e]);
             return response()->json([
                 'success' => false,
-                'message' => '创建失败: '.$e->getMessage(),
+                'message' => '创建失败: ' . $e->getMessage(),
             ], 500);
         }
     }
@@ -132,58 +140,49 @@ class TenantController
 
     public function showByDomain(Request $request)
     {
-        $domain = strtolower(trim($request->query('domain', '')));
+        $domainStr = strtolower(trim($request->query('domain', '')));
 
-        if ($domain === '') {
+        if ($domainStr === '') {
             return response()->json([
                 'success' => false,
                 'message' => '域名不能为空'
             ], 422);
         }
-        $cacheKey = "domain:{$domain}";
+        $cacheKey = "domain:{$domainStr}";
 
         try {
             if ($cached = Cache::get($cacheKey)) {
                 return response()->json($cached['payload'], $cached['status']);
             }
 
-            $domain = Tenant::with('domains')
-                ->where('domain', $domain)
-                ->first();
+            $domainModel = Domain::where('domain', $domainStr)->first();
 
-            if (!$domain) {
+            if (!$domainModel) {
                 $payload = [
-                    'success' => false,
-                    'message' => '店铺域名不存在',
-                    'domain' => $domain,
+                    'success' => false
                 ];
                 Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
                 return response()->json($payload, 404);
             }
 
-            $tenant = Tenant::with('tenants')
-                ->where('id', $domain->tenant_id)
+            $tenant = Tenant::with('domains')
+                ->where('id', $domainModel->tenant_id)
                 ->whereNull('deleted_at')
                 ->first();
 
             if (!$tenant) {
                 $payload = [
-                    'success' => false,
-                    'message' => '店舗が削除されたか、存在しません',
-                    'domain' => $domain,
+                    'success' => false
                 ];
                 Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
                 return response()->json($payload, 404);
             }
 
-            $templateKey = $tenant->template_key ?? 'default';
-            $tenantName = $tenant->name ?? 'Unknown';
             $payload = [
                 'success' => true,
-                'domain' => $domain,
                 'tenant_id' => $tenant->id,
-                'tenant_name' => $tenantName,
-                'template_key' => $templateKey,
+                'tenant_name' => $tenant->name,
+                'template_key' => $tenant->template_key,
             ];
 
             Cache::put($cacheKey, ['payload' => $payload, 'status' => 200], 3600);
@@ -242,15 +241,16 @@ class TenantController
             $domains = $tenant->domains()->pluck('domain')->all();
             $tenantName = $tenant->name ?? $tenant->id;
             $tenant->delete();
-            foreach ($domains as $d) { Cache::forget('tenant_domain:'.$d); }
+            foreach ($domains as $d) {
+                Cache::forget('tenant_domain:' . $d);
+            }
             return response()->json(['success' => true, 'message' => "店铺 {$tenantName} 已删除（已软删除）"]);
         } catch (\Throwable $e) {
             Log::error('删除店铺失败', ['exception' => $e]);
-            return response()->json(['success' => false, 'message' => '删除失败: '.$e->getMessage()], 500);
+            return response()->json(['success' => false, 'message' => '删除失败: ' . $e->getMessage()], 500);
         }
     }
 
-    /** 获取统计数据 */
     public function stats()
     {
         $total = Tenant::on('central')->whereNull('deleted_at')->count();
