@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { tenantApi } from "@/services/api";
+import { centralApi } from "@/services/central/api";
 import { Tenant, PaginatedResponse } from "@/types/api";
 import toast from "react-hot-toast";
 
@@ -31,7 +31,7 @@ export default function TenantsPage() {
   const loadTenants = async () => {
     setLoadingTenants(true);
     try {
-      const response = await tenantApi.getList({
+      const response = await centralApi.getList({
         page: currentPage,
         per_page: 10,
         search: searchTerm || undefined,
@@ -59,7 +59,7 @@ export default function TenantsPage() {
     }
 
     try {
-      const response = await tenantApi.delete(id);
+      const response = await centralApi.delete(id);
       if (response.success) {
         toast.success("店舗を削除しました");
         loadTenants();

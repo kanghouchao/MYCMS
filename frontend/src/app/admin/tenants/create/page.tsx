@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { tenantApi } from "@/services/api";
+import { centralApi } from "@/services/central/api";
 import { CreateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
@@ -64,7 +64,7 @@ export default function CreateTenantPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await tenantApi.create(formData);
+      const response = await centralApi.create(formData);
 
       if (response.success) {
         toast.success("店舗を作成しました");

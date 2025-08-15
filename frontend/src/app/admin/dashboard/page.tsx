@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { tenantApi } from "@/services/api";
+import { centralApi } from "@/services/central/api";
 import { TenantStats, Tenant } from "@/types/api";
 import toast from "react-hot-toast";
 
@@ -28,8 +28,8 @@ export default function AdminDashboard() {
   const loadDashboardData = async () => {
     try {
       const [statsResponse, tenantsResponse] = await Promise.all([
-        tenantApi.getStats(),
-        tenantApi.getList({ per_page: 5, page: 1 }),
+        centralApi.getStats(),
+        centralApi.getList({ per_page: 5, page: 1 }),
       ]);
 
       if (statsResponse.success && statsResponse.data) {
