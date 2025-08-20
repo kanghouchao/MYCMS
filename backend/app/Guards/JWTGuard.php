@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Guards;
+namespace App\Guards;
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Auth\GuardHelpers;

@@ -4,7 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Guards\JWTGuard;
+use App\Guards\JWTGuard;
 
 class AuthServiceProvider extends ServiceProvider
 {
