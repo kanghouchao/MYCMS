@@ -1,4 +1,4 @@
-// API 响应基础类型
+// APIレスポンス
 export interface ApiResponse<T = any> {
   success: boolean;
   message?: string;
@@ -6,7 +6,7 @@ export interface ApiResponse<T = any> {
   errors?: any;
 }
 
-// 分页响应类型
+// ページネーションレスポンス
 export interface PaginatedResponse<T> {
   data: T[];
   current_page: number;
@@ -21,7 +21,7 @@ export interface PaginatedResponse<T> {
   prev_page_url: string | null;
 }
 
-// 管理员类型
+// 管理者
 export interface Admin {
   id: number;
   name: string;
@@ -32,13 +32,13 @@ export interface Admin {
   updated_at?: string;
 }
 
-// 认证响应类型
+// 認証レスポンス
 export interface AuthResponse {
   admin: Admin;
   token: string;
 }
 
-// 租户类型
+// テナント
 export interface Tenant {
   id: string;
   name: string;
@@ -51,7 +51,7 @@ export interface Tenant {
   updated_at?: string;
 }
 
-// 创建租户请求类型
+// テナント作成リクエスト
 export interface CreateTenantRequest {
   name: string;
   domain: string;
@@ -59,14 +59,14 @@ export interface CreateTenantRequest {
   template_key?: string;
 }
 
-// 更新租户请求类型
+// テナント更新リクエスト
 export interface UpdateTenantRequest {
   name: string;
   email: string;
   template_key?: string;
 }
 
-// 统计数据类型
+// ダッシュボード統計データ
 export interface DashboardStats {
   total_tenants: number;
   total_domains: number;
@@ -74,7 +74,7 @@ export interface DashboardStats {
   active_domains: number;
 }
 
-// 租户统计数据类型
+// テナント統計データ
 export interface TenantStats {
   total: number;
   active: number;
@@ -82,12 +82,13 @@ export interface TenantStats {
   pending: number;
 }
 
-// 登录请求类型
+// ログインリクエスト
 export interface LoginRequest {
   email: string;
   password: string;
 }
 
+// 登録リクエスト
 export interface RegisterRequest {
     token: string;
     email: string;

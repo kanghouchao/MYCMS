@@ -1,14 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Central;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Foundation\Auth\User as BaseUser;
 use Illuminate\Notifications\Notifiable;
 
-class Admin extends Authenticatable
+class User extends BaseUser
 {
     use HasFactory, Notifiable;
+
+    protected $connection = 'central';
 
     /**
      * The attributes that are mass assignable.

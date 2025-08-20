@@ -3,13 +3,13 @@
 namespace App\Http\Controllers\Central;
 
 use Illuminate\Http\Request;
-use App\Models\Template;
+use App\Models\Central\Template;
 
 class TemplateController
 {
     public function index()
     {
-        $items = Template::query()->orderBy('id')->get(['id','key','name','version','enabled']);
+        $items = Template::query()->orderBy('id')->get(['id', 'key', 'name', 'version', 'enabled']);
         return response()->json(['success' => true, 'data' => $items]);
     }
 

@@ -1,12 +1,12 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { Admin } from "@/types/api";
-import { authApi } from "@/services/central/api";
+import { authApi as centralAuthApi } from "@/services/central/api";
+import { authApi as tenantAuthApi } from "@/services/tenant/api";
 import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 interface AuthContextType {
-  admin: Admin | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -27,64 +27,66 @@ interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [admin, setAdmin] = useState<Admin | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+function isTenantDomain(): boolean {
+  if (typeof window === "undefined") return false;
+  const hostname = window.location.hostname;
+  const centralDomain =
+    process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
+  return hostname !== centralDomain;
+}
 
-  // 检查认证状态
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  const getAuthApi = () => (isTenantDomain() ? tenantAuthApi : centralAuthApi);
+  const tokenKey = "token";
+
   useEffect(() => {
     const checkAuth = async () => {
-      const token = Cookies.get("admin_token");
-      if (token) {
-        try {
-          const response = await authApi.me();
-          if (response.success && response.data) {
-            setAdmin(response.data);
-          } else {
-            Cookies.remove("admin_token");
-          }
-        } catch (error) {
-          Cookies.remove("admin_token");
-        }
-      }
+      const token = Cookies.get(tokenKey);
       setIsLoading(false);
     };
-
     checkAuth();
   }, []);
 
+  const redirectAfterLogin = () => {
+    const centralDomain =
+      process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
+    const isTenant =
+      typeof window !== "undefined" &&
+      window.location.hostname !== centralDomain;
+    router.push(isTenant ? "/tenant/dashboard" : "/admin/dashboard");
+  };
+
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const response = await authApi.login({ email, password });
-      if (response.success && response.data) {
-        const { admin: adminData, token } = response.data;
-        setAdmin(adminData);
-        Cookies.set("admin_token", token, { expires: 7 }); // 7天过期
+      const response = await getAuthApi().login({ email, password });
+      if (response.token && response.expires_at) {
+        Cookies.set(tokenKey, response.token, { expires: response.expires_at });
+        redirectAfterLogin();
         return true;
       }
       return false;
     } catch (error) {
+      console.error("Login failed:", error);
       return false;
     }
   };
 
   const logout = async () => {
     try {
-      await authApi.logout();
-    } catch (error) {
-      // 即使API调用失败，也要清除本地状态
+      await getAuthApi().logout();
     } finally {
-      setAdmin(null);
-      Cookies.remove("admin_token");
+      Cookies.remove(tokenKey);
     }
   };
 
   const value: AuthContextType = {
-    admin,
     isLoading,
     login,
     logout,
-    isAuthenticated: !!admin,
+    isAuthenticated: !!Cookies.get(tokenKey),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

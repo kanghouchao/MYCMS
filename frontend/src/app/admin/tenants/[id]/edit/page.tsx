@@ -8,9 +8,9 @@ import type { Tenant, UpdateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function EditTenantPage() {
-  const { id } = useParams<{ id: string }>();
+  const id = useParams<{ id: string }>()?.id;
   const router = useRouter();
-  const { admin, isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -24,13 +24,12 @@ export default function EditTenantPage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/admin/login");
+      router.push("/login");
       return;
     }
     if (isAuthenticated && id) {
       loadTenant(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, isLoading, id]);
 
   const loadTenant = async (tenantId: string) => {
@@ -70,13 +69,9 @@ export default function EditTenantPage() {
     if (!validate()) return;
     setSaving(true);
     try {
-      const res = await centralApi.update(tenant.id, formData);
-      if (res.success) {
-        toast.success("店舗情報を更新しました");
-        router.push("/admin/tenants");
-      } else {
-        toast.error(res.message || "更新に失敗しました");
-      }
+      await centralApi.update(tenant.id, formData);
+      toast.success("店舗情報を更新しました");
+      router.push("/admin/tenants");
     } catch (err: any) {
       if (err.response?.data?.errors) setErrors(err.response.data.errors);
       toast.error("更新に失敗しました。入力内容をご確認ください");
@@ -87,7 +82,7 @@ export default function EditTenantPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/admin/login");
+    router.push("/login");
   };
 
   if (isLoading || !isAuthenticated || loading) {
@@ -115,7 +110,7 @@ export default function EditTenantPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">
-                ようこそ、{admin?.name} さん
+                ようこそ、someone さん
               </span>
               <button
                 onClick={handleLogout}

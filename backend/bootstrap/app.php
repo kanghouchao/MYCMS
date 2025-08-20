@@ -23,17 +23,15 @@ return Application::configure(basePath: dirname(__DIR__))
             Stancl\Tenancy\Middleware\PreventAccessFromCentralDomains::class,
         ]);
 
+        //TODO should delete
         $middleware->api(prepend: [
             \App\Http\Middleware\DynamicCors::class,
         ]);
 
         $middleware->alias([
-            'guard'          => \App\Http\Middleware\AdminGuard::class,
-            'stateless_auth' => \App\Http\Middleware\StatelessAuth::class,
-            'role'           => \App\Http\Middleware\RoleMiddleware::class,
+            'role'                   => \App\Http\Middleware\RoleMiddleware::class,
+            'stateless_auth'         => \App\Http\Middleware\StatelessAuth::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        // set up exception handling
-    })
+    ->withExceptions(function (Exceptions $exceptions): void {})
     ->create();

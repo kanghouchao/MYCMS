@@ -7,7 +7,6 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
 
   const rawHost = (
     request.headers.get("x-forwarded-host") ||

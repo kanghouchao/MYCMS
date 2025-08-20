@@ -8,7 +8,7 @@ import { TenantStats, Tenant } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
-  const { admin, isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
@@ -16,7 +16,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/admin/login");
+      router.push("/login");
       return;
     }
 
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/admin/login");
+    router.push("/login");
   };
 
   if (isLoading || !isAuthenticated) {
@@ -71,9 +71,7 @@ export default function AdminDashboard() {
               </h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                ようこそ、{admin?.name} さん
-              </span>
+              <span className="text-sm text-gray-700">ようこそ、adminさん</span>
               <button
                 onClick={() => router.push("/admin/tenants")}
                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium"

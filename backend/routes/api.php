@@ -14,7 +14,7 @@ Route::prefix('admin')->name('api.admin.')->group(function () {
         Route::get('me', [AuthController::class, 'me'])->name('me');
         Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
-        Route::middleware('role:super_admin')->group(function () {
+        Route::middleware('role:admin')->group(function () {
             Route::get('tenants', [TenantController::class, 'index'])->name('tenants.index');
             Route::get('tenants/stats', [TenantController::class, 'stats'])->name('tenants.stats');
             Route::post('tenants', [TenantController::class, 'store'])->name('tenants.store');

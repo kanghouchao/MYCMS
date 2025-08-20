@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Central;
 
 use Stancl\Tenancy\Database\Models\Tenant as BaseTenant;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -19,7 +19,7 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public static function getCustomColumns(): array
     {
-    return ['id', 'name', 'email', 'template_key', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
+        return ['id', 'name', 'email', 'template_key', 'is_active', 'created_at', 'updated_at', 'deleted_at'];
     }
 
     protected $table = 'tenants';
@@ -64,6 +64,11 @@ class Tenant extends BaseTenant implements TenantWithDatabase
 
     public function domains()
     {
-    return $this->hasMany(config('tenancy.domain_model'), 'tenant_id');
+        return $this->hasMany(config('tenancy.domain_model'), 'tenant_id');
+    }
+
+    public function template()
+    {
+        return $this->belongsTo(Template::class, 'template_key', 'key');
     }
 }

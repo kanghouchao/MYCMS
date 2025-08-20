@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Template;
+use App\Models\Central\Template;
 
 class TemplateSeeder extends Seeder
 {

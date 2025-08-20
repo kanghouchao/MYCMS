@@ -8,7 +8,7 @@ import { Tenant, PaginatedResponse } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function TenantsPage() {
-  const { admin, isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState<PaginatedResponse<Tenant> | null>(
     null
@@ -19,7 +19,7 @@ export default function TenantsPage() {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.push("/admin/login");
+      router.push("/login");
       return;
     }
 
@@ -59,11 +59,9 @@ export default function TenantsPage() {
     }
 
     try {
-      const response = await centralApi.delete(id);
-      if (response.success) {
-        toast.success("店舗を削除しました");
-        loadTenants();
-      }
+      await centralApi.delete(id);
+      toast.success("店舗を削除しました");
+      loadTenants();
     } catch (error) {
       toast.error("店舗の削除に失敗しました");
     }
@@ -71,7 +69,7 @@ export default function TenantsPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/admin/login");
+    router.push("/login");
   };
 
   if (isLoading || !isAuthenticated) {
@@ -99,7 +97,7 @@ export default function TenantsPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">
-                ようこそ、{admin?.name} さん
+                ようこそ、someone さん
               </span>
               <button
                 onClick={handleLogout}

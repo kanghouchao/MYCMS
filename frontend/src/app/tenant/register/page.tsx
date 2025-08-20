@@ -2,7 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { tenantApi } from "@/services/tenant/api";
+import { authApi } from "@/services/tenant/api";
 
 export default function RegisterPage() {
   return (
@@ -16,13 +16,14 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [token, setToken] = useState<string>("");
   const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
-    setToken(searchParams.get("token") || "");
+    setToken(searchParams?.get("token") || "");
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -39,11 +40,15 @@ function RegisterForm() {
       setError("パスワードは8文字以上で入力してください。");
       return;
     }
+    if (password !== confirmPassword) {
+      setError("パスワードが一致しません。もう一度ご確認ください。");
+      return;
+    }
     try {
-      const data = await tenantApi.register({ token, email, password });
+      const data = await authApi.register({ token, email, password });
       if (data.success) {
         setSuccess("登録が完了しました。管理画面にログインしてください。");
-        setTimeout(() => router.push("/admin/login"), 2000);
+        setTimeout(() => router.push("/login"), 2000);
       } else {
         setError(data.message || "登録に失敗しました");
       }
@@ -111,6 +116,8 @@ function RegisterForm() {
               name="confirm-password"
               id="confirm-password"
               placeholder="パスワード（確認用）"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
               minLength={8}

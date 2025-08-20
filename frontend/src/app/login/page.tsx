@@ -19,13 +19,7 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const success = await login(email, password);
-      if (success) {
-        toast.success("ログインに成功しました");
-        router.push("/admin/dashboard");
-      } else {
-        toast.error("メールアドレスまたはパスワードが正しくありません");
-      }
+      await login(email, password);
     } catch (error) {
       toast.error("ログインに失敗しました。しばらくしてから再度お試しください");
     } finally {
