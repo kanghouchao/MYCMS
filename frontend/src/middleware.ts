@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// 管理域名列表（所有这些域名/子域名用于后台）
 const ADMIN_DOMAINS = new Set(["oli-cms.test"]);
 
 export const config = {
@@ -8,7 +7,6 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
 
   const rawHost = (
     request.headers.get("x-forwarded-host") ||
@@ -18,8 +16,6 @@ export async function middleware(request: NextRequest) {
     .split(",")[0]
     .trim();
   const hostname = rawHost.split(":")[0].toLowerCase();
-
-  console.debug(`[Middleware] host=${hostname} path=${pathname}`);
 
   if (ADMIN_DOMAINS.has(hostname)) {
     const res = NextResponse.next();

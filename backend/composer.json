@@ -12,11 +12,10 @@
         "php": "^8.4.8",
         "laravel/framework": "^12.22.1",
         "laravel/tinker": "^2.10.1",
-        "stancl/tenancy": "^3.9.1"
+        "stancl/tenancy": "^3.9.1",
+        "firebase/php-jwt": "^6.11"
     },
-    "require-dev": {
-        "ext-swoole": "*"
-    },
+    "require-dev": {},
     "autoload": {
         "psr-4": {
             "App\\": "app/",

@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
-import { tenantApi } from "@/services/api";
+import { centralApi } from "@/services/central/api";
 import { CreateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function CreateTenantPage() {
-  const { admin, isAuthenticated, isLoading, logout } = useAuth();
+  const { isAuthenticated, isLoading, logout } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateTenantRequest>({
@@ -30,14 +30,12 @@ export default function CreateTenantPage() {
     if (!formData.domain.trim()) {
       newErrors.domain = "ドメインは必須です";
     } else {
-      // 检查域名格式（允许完整域名）
       const domainRegex =
         /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/;
       if (!domainRegex.test(formData.domain)) {
         newErrors.domain = "ドメイン形式が正しくありません";
       }
 
-      // 检查是否是保留域名
       const domain = formData.domain.toLowerCase();
       if (domain.startsWith("api.") || domain === "api") {
         newErrors.domain = "api 関連のドメインは使用できません";
@@ -64,14 +62,9 @@ export default function CreateTenantPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await tenantApi.create(formData);
-
-      if (response.success) {
-        toast.success("店舗を作成しました");
-        router.push("/admin/tenants");
-      } else {
-        toast.error(response.message || "作成に失敗しました");
-      }
+      await centralApi.create(formData);
+      toast.success("店舗を作成しました");
+      router.push("/admin/tenants");
     } catch (error: any) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
@@ -94,7 +87,7 @@ export default function CreateTenantPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/admin/login");
+    router.push("/login");
   };
 
   if (isLoading || !isAuthenticated) {
@@ -122,7 +115,7 @@ export default function CreateTenantPage() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-700">
-                ようこそ、{admin?.name} さん
+                ようこそ、someone さん
               </span>
               <button
                 onClick={handleLogout}

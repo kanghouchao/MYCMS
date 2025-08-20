@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Admin;
+use App\Models\Central\User;
 use Illuminate\Support\Facades\Hash;
 
 class AdminSeeder extends Seeder
@@ -14,8 +14,8 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Ensure super admin exists or create it
-        if (!Admin::where('email', env('ADMIN_EMAIL', 'admin@cms.com'))->exists()) {
-            Admin::create([
+        if (!User::where('email', env('ADMIN_EMAIL', 'admin@cms.com'))->exists()) {
+            User::create([
                 'name' => 'Super Admin',
                 'email' => env('ADMIN_EMAIL', 'admin@cms.com'),
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'admin123')),
