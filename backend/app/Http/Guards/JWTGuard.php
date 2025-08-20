@@ -11,7 +11,7 @@ use App\Utils\JWTUtil;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Log;
 
-class JwtGuard implements Guard
+class JWTGuard implements Guard
 {
     use GuardHelpers;
 
