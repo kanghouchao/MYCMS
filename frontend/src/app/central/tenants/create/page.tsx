@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { centralApi } from "@/services/central/api";
@@ -8,7 +8,7 @@ import { CreateTenantRequest } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function CreateTenantPage() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { logout } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateTenantRequest>({
@@ -85,19 +85,6 @@ export default function CreateTenantPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ナビゲーションバー */}
@@ -118,7 +105,7 @@ export default function CreateTenantPage() {
                 ようこそ、someone さん
               </span>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 ログアウト

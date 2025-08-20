@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { centralApi } from "@/services/central/api";
@@ -8,7 +8,7 @@ import { Tenant, PaginatedResponse } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function TenantsPage() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { logout } = useAuth();
   const router = useRouter();
   const [tenants, setTenants] = useState<PaginatedResponse<Tenant> | null>(
     null
@@ -17,18 +17,7 @@ export default function TenantsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
-    if (isAuthenticated) {
-      loadTenants();
-    }
-  }, [isAuthenticated, isLoading, router, currentPage, searchTerm]);
-
-  const loadTenants = async () => {
+  const loadTenants = useCallback(async () => {
     setLoadingTenants(true);
     try {
       const response = await centralApi.getList({
@@ -45,7 +34,11 @@ export default function TenantsPage() {
     } finally {
       setLoadingTenants(false);
     }
-  };
+  }, [currentPage, searchTerm]);
+
+  useEffect(() => {
+    loadTenants();
+  }, [loadTenants, router]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,19 +60,6 @@ export default function TenantsPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ナビゲーションバー */}
@@ -100,7 +80,7 @@ export default function TenantsPage() {
                 ようこそ、someone さん
               </span>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 ログアウト

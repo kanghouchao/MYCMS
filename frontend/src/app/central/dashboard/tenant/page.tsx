@@ -1,7 +1,5 @@
 "use client";
 
-import { useAuth } from "@/contexts/AuthContext";
-
 export default function TenantDashboard() {
   return (
     <div className="min-h-screen bg-white flex flex-col items-center justify-center">

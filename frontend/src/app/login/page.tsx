@@ -2,25 +2,48 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
+import Cookies from "js-cookie";
+import { authApi as centralAuthApi } from "@/services/central/api";
+import { authApi as tenantAuthApi } from "@/services/tenant/api";
 import toast from "react-hot-toast";
+
+function isTenantDomain(): boolean {
+  if (typeof window === "undefined") return false;
+  const hostname = window.location.hostname;
+  const centralDomain =
+    process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
+  return hostname !== centralDomain;
+}
+
+function getAuthApi() {
+  return isTenantDomain() ? tenantAuthApi : centralAuthApi;
+}
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
-  const { login } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
     try {
-      await login(email, password);
+      const response = await getAuthApi().login({ email, password });
+      if (response.token && response.expires_at) {
+        Cookies.set("token", response.token, { expires: response.expires_at });
+        const centralDomain =
+          process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
+        const isTenant =
+          typeof window !== "undefined" &&
+          window.location.hostname !== centralDomain;
+        router.push(
+          isTenant ? "/central/dashboard/tenant" : "/central/dashboard/admin"
+        );
+      }
     } catch (error) {
+      console.error("Login failed:", error);
       toast.error("ログインに失敗しました。しばらくしてから再度お試しください");
     } finally {
       setIsLoading(false);

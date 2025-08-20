@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { centralApi } from "@/services/central/api";
@@ -10,11 +10,11 @@ import toast from "react-hot-toast";
 export default function EditTenantPage() {
   const id = useParams<{ id: string }>()?.id;
   const router = useRouter();
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { logout } = useAuth();
 
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState<UpdateTenantRequest>({
     name: "",
     email: "",
@@ -22,36 +22,41 @@ export default function EditTenantPage() {
   });
   const [errors, setErrors] = useState<Partial<UpdateTenantRequest>>({});
 
+  const loadTenant = useCallback(
+    async (tenantId: string) => {
+      if (!id) {
+        toast.error("店舗情報の取得できませんでした");
+        return;
+      }
+      try {
+        setLoading(true);
+        const res = await centralApi.getById(tenantId);
+        if (res.data) {
+          const t = res.data as unknown as Tenant;
+          setTenant(t);
+          setFormData({
+            name: t.name,
+            email: t.email,
+            template_key: t.template_key ?? "default",
+          });
+        } else {
+          toast.error(res.message || "店舗情報の取得に失敗しました");
+        }
+      } catch (e) {
+        console.error("Error loading tenant:", e);
+        toast.error("店舗情報の取得に失敗しました");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [id]
+  );
+
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-    if (isAuthenticated && id) {
+    if (id) {
       loadTenant(id);
     }
-  }, [isAuthenticated, isLoading, id]);
-
-  const loadTenant = async (tenantId: string) => {
-    try {
-      const res = await centralApi.getById(tenantId);
-      if (res.success && res.data) {
-        const t = res.data as unknown as Tenant;
-        setTenant(t);
-        setFormData({
-          name: t.name,
-          email: t.email,
-          template_key: t.template_key ?? "default",
-        });
-      } else {
-        toast.error(res.message || "店舗情報の取得に失敗しました");
-      }
-    } catch {
-      toast.error("店舗情報の取得に失敗しました");
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [id, loadTenant]);
 
   const validate = (): boolean => {
     const next: Partial<UpdateTenantRequest> = {};
@@ -80,19 +85,6 @@ export default function EditTenantPage() {
     }
   };
 
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (isLoading || !isAuthenticated || loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* ナビゲーションバー */}
@@ -113,7 +105,7 @@ export default function EditTenantPage() {
                 ようこそ、someone さん
               </span>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 ログアウト

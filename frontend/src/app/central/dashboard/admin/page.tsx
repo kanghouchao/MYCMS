@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useRouter } from "next/navigation";
 import { centralApi } from "@/services/central/api";
@@ -8,24 +8,13 @@ import { TenantStats, Tenant } from "@/types/api";
 import toast from "react-hot-toast";
 
 export default function AdminDashboard() {
-  const { isAuthenticated, isLoading, logout } = useAuth();
+  const { logout } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState<TenantStats | null>(null);
   const [recentTenants, setRecentTenants] = useState<Tenant[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push("/login");
-      return;
-    }
-
-    if (isAuthenticated) {
-      loadDashboardData();
-    }
-  }, [isAuthenticated, isLoading, router]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const [statsResponse, tenantsResponse] = await Promise.all([
         centralApi.getStats(),
@@ -44,20 +33,11 @@ export default function AdminDashboard() {
     } finally {
       setLoadingStats(false);
     }
-  };
+  }, []);
 
-  const handleLogout = async () => {
-    await logout();
-    router.push("/login");
-  };
-
-  if (isLoading || !isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -79,7 +59,7 @@ export default function AdminDashboard() {
                 店舗管理
               </button>
               <button
-                onClick={handleLogout}
+                onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
               >
                 ログアウト

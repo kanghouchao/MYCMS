@@ -25,6 +25,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AuthProvider>
           {children}
+          {/* TODO: Toaster should be a file */}
           <Toaster
             position="top-right"
             toastOptions={{

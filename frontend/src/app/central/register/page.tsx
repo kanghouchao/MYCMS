@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { authApi } from "@/services/tenant/api";
 
@@ -61,7 +62,14 @@ function RegisterForm() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-200">
       <div className="w-full max-w-md p-8 bg-white rounded-xl shadow-lg border border-blue-100">
         <div className="flex items-center mb-6">
-          <img src="/images/logos/32.svg" alt="Oli-CMS" className="h-10 mr-3" />
+          {/* Next.js Image 优化图片加载 */}
+          <Image
+            src="/images/logos/32.svg"
+            alt="Oli-CMS"
+            width={40}
+            height={40}
+            className="h-10 mr-3"
+          />
           <h2 className="text-2xl font-bold text-blue-700">
             Oli-CMS 管理者登録
           </h2>
