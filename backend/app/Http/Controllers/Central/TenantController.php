@@ -3,11 +3,7 @@
 namespace App\Http\Controllers\Central;
 
 use Illuminate\Http\Request;
-use App\Models\Central\Tenant;
-use App\Models\Central\Domain;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
-use App\Services\TenantService;
+use App\Services\Tenant\TenantService;
 
 class TenantController
 {
@@ -23,6 +19,9 @@ class TenantController
         $request->validate([
             'search' => 'nullable|string|max:64',
             'per_page' => 'nullable|integer|min:1',
+        ], [
+            'search.max' => '搜索内容不能超过64个字符',
+            'per_page.min' => '每页数量必须大于0',
         ]);
         return $this->tenantService->getAllTenants($request->get('search'), $request->get('per_page'));
     }
@@ -35,12 +34,13 @@ class TenantController
                 'required',
                 'string',
                 'max:255',
+                'unique:domains,domain',
                 function ($attribute, $value, $fail) {
                     if (!preg_match('/^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/', $value)) {
                         $fail('域名格式不正确');
                     }
                     if (str_starts_with($value, 'api.') || $value === 'api') {
-                        $fail('不能使用保留域名');
+                        $fail('域名不能使用保留值');
                     }
                 }
             ],
@@ -48,13 +48,23 @@ class TenantController
                 'required',
                 'email',
                 'max:255',
+                'unique:tenants,email,NULL,deleted_at',
                 function ($attribute, $value, $fail) {
                     if (!preg_match('/^[\w\.-]+@[\w\.-]+\.\w+$/', $value)) {
                         $fail('邮箱格式不正确');
                     }
                 }
             ],
-            'template_key' => 'required|string|max:128',
+            'template_key' => 'required|string',
+        ], [
+            'name.required' => '店铺名称不能为空',
+            'name.max' => '店铺名称不能超过255个字符',
+            'domain.required' => '域名不能为空',
+            'domain.unique' => '域名已被占用，请更换其他域名',
+            'email.required' => '邮箱不能为空',
+            'email.max' => '邮箱不能超过255个字符',
+            'email.unique' => '邮箱已被占用，请更换其他邮箱',
+            'template_key.required' => '模板不能为空',
         ]);
 
         $this->tenantService->createTenant([
@@ -66,92 +76,53 @@ class TenantController
         return response()->noContent(201);
     }
 
-    public function show($id)
+    public function show(Request $request)
     {
-        return $this->tenantService->getTenant($id);
+        $request->validate([
+            'id' => 'required|string|exists:tenants,id',
+        ]);
+        return $this->tenantService->getTenant($request->id);
     }
 
     public function showByDomain(Request $request)
     {
-        $domainStr = strtolower(trim($request->query('domain', '')));
+        $request->validate([
+            'domain' => 'required|string',
+        ], [
+            'domain.required' => '域名不能为空',
+        ]);
 
-        if ($domainStr === '') {
-            return response()->json([
-                'success' => false,
-                'message' => '域名不能为空'
-            ], 422);
-        }
-        $cacheKey = "domain:{$domainStr}";
-
-        try {
-            if ($cached = Cache::get($cacheKey)) {
-                return response()->json($cached['payload'], $cached['status']);
-            }
-
-            $domainModel = Domain::where('domain', $domainStr)->first();
-
-            if (!$domainModel) {
-                $payload = [
-                    'success' => false
-                ];
-                Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
-                return response()->json($payload, 404);
-            }
-
-            $tenant = Tenant::with('domains')
-                ->where('id', $domainModel->tenant_id)
-                ->whereNull('deleted_at')
-                ->first();
-
-            if (!$tenant) {
-                $payload = [
-                    'success' => false
-                ];
-                Cache::put($cacheKey, ['payload' => $payload, 'status' => 404], 300);
-                return response()->json($payload, 404);
-            }
-
-            $payload = [
-                'success' => true,
-                'tenant_id' => $tenant->id,
-                'tenant_name' => $tenant->name,
-                'template_key' => $tenant->template_key,
-            ];
-
-            Cache::put($cacheKey, ['payload' => $payload, 'status' => 200], 3600);
-
-            return response()->json($payload);
-        } catch (\Throwable $e) {
-            Log::error('租户校验失败', ['exception' => $e]);
-            return response()->json([
-                'success' => false,
-                'message' => '内部错误',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return $this->tenantService->getTenantByDomain($request->domain);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $tenant = Tenant::find($id);
         $request->validate([
-            'template_key' => 'nullable|string|max:64',
+            'id' => 'required|string|exists:tenants,id,deleted_at,NULL',
+            'template_key' => 'required|string',
+        ], [
+            'id.required' => '店铺ID不能为空',
+            'id.exists' => '该店铺不存在',
+            'template_key.required' => '模板键名不能为空',
         ]);
-        $this->tenantService->updateTenant($id, $request->only(['template_key']));
+        $this->tenantService->updateTenant($request->id, $request->template_key);
         return response()->noContent(204);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $this->tenantService->deleteTenant($id);
+        $request->validate([
+            'id' => 'required|string|exists:tenants,id,deleted_at,NULL',
+        ], [
+            'id.required' => '店铺ID不能为空',
+            'id.exists' => '该店铺不存在',
+        ]);
+        $this->tenantService->deleteTenant($request->id);
         return response()->noContent(204);
     }
 
     public function stats()
     {
-        return response()->json([
-            'success' => true,
-            'data' => $this->tenantService->count()
-        ]);
+        return $this->tenantService->count();
     }
 }

@@ -14,7 +14,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton('jwt.secret', function () {
             $key = config('jwt.secret', env('JWT_SECRET'));
-            Log::debug('JWT secret key retrieved', ['key' => $key]);
             return str_starts_with($key, 'base64:') ? base64_decode(substr($key, 7)) : $key;
         });
     }

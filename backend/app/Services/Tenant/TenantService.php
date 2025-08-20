@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Tenant;
 
 use App\Exceptions\ServiceException;
 use App\Models\Central\Tenant;
 use App\Models\Central\Domain;
-use App\Models\Central\Template;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class TenantService
 {
@@ -14,15 +14,6 @@ class TenantService
     public function createTenant(array $tenant)
     {
         DB::transaction(function () use ($tenant) {
-            if (Domain::where('domain', $tenant['domain'])->exists()) {
-                throw new ServiceException('422', '域名已被占用，请更换其他域名');
-            }
-            if (Tenant::where('email', $tenant['email'])->whereNull('deleted_at')->exists()) {
-                throw new ServiceException('422', '邮箱已被占用，请更换其他邮箱');
-            }
-            if (!Template::where('key', $tenant['template_key'])->where('enabled', true)->exists()) {
-                throw new ServiceException('422', '模板不存在或未启用');
-            }
             Tenant::create([
                 'name' => $tenant['name'],
                 'email' => $tenant['email'],
@@ -37,12 +28,7 @@ class TenantService
     {
         DB::transaction(function () use ($id, $data) {
             $tenant = Tenant::find($id);
-            if (!$tenant) {
-                throw new ServiceException('404', '店铺不存在');
-            }
-            if (!Template::where('key', $tenant['template_key'])->where('enabled', true)->exists()) {
-                throw new ServiceException('422', '模板不存在或未启用');
-            }
+            $tenant->template_key = $data['template_key'];
             $tenant->update($data);
         });
     }
@@ -51,9 +37,6 @@ class TenantService
     {
         DB::transaction(function () use ($id) {
             $tenant = Tenant::find($id);
-            if (!$tenant) {
-                throw new ServiceException('404', '店铺不存在');
-            }
             foreach ($tenant->domains as $domain) {
                 $domain->delete();
             }
@@ -65,18 +48,58 @@ class TenantService
     {
         $tenant = Tenant::with(['domains', 'template'])->whereNull('deleted_at')->find($id);
         if (!$tenant) {
-            return response()->json(['success' => false, 'message' => '店铺不存在或已删除'], 404);
+            throw new ServiceException('店铺不存在', 404);
         }
-        return response()->json([
+        return [
+            'id' => $tenant->id,
+            'name' => $tenant->name,
+            'email' => $tenant->email,
+            'template' => $tenant->template,
+            'domains' => $tenant->domains->pluck('domain')->toArray()
+        ];
+    }
+
+    public function getTenantByDomain(string $domain)
+    {
+        $cacheKey = "domain:{$domain}";
+
+        if ($cached = Cache::get($cacheKey)) {
+            return $cached;
+        }
+
+        $domainModel = Domain::where('domain', $domain)->first();
+
+        if (!$domainModel) {
+            $payload = [
+                'success' => false
+            ];
+            Cache::put($cacheKey, $payload, 300);
+            throw new ServiceException('域名不存在', 404);
+        }
+
+        $tenant = Tenant::with('domains')
+            ->where('id', $domainModel->tenant_id)
+            ->whereNull('deleted_at')
+            ->first();
+
+        if (!$tenant) {
+            $payload = [
+                'success' => false
+            ];
+            Cache::put($cacheKey, $payload, 300);
+            throw new ServiceException('店铺不存在', 404);
+        }
+
+        $payload = [
             'success' => true,
-            'data' => [
-                'id' => $tenant->id,
-                'name' => $tenant->name,
-                'email' => $tenant->email,
-                'template' => $tenant->template,
-                'domains' => $tenant->domains->pluck('domain')->toArray()
-            ]
-        ]);
+            'tenant_id' => $tenant->id,
+            'tenant_name' => $tenant->name,
+            'template_key' => $tenant->template_key,
+        ];
+
+        Cache::put($cacheKey, $payload, 3600);
+
+        return $payload;
     }
 
     public function getAllTenants($search = null, int $perPage = 15)
@@ -89,7 +112,7 @@ class TenantService
             });
         }
         $tenants = $query->paginate($perPage);
-        $tenants->getCollection()->transform(function ($tenant) {
+        return $tenants->getCollection()->transform(function ($tenant) {
             return [
                 'id' => $tenant->id,
                 'name' => $tenant->name,
@@ -100,12 +123,8 @@ class TenantService
                 'is_active' => $tenant->is_active,
             ];
         });
-        return response()->json(['success' => true, 'data' => $tenants]);
     }
 
-    /**
-     * 返回租户状态统计
-     */
     public function count()
     {
         $stats = Tenant::selectRaw('

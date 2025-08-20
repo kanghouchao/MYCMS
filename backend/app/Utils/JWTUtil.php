@@ -2,11 +2,8 @@
 
 namespace App\Utils;
 
-use Exception;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
-use Illuminate\Auth\AuthenticationException;
-use Illuminate\Support\Facades\Log;
 
 class JWTUtil
 {
@@ -26,10 +23,6 @@ class JWTUtil
 
     public static function decodeToken($token)
     {
-        try {
-            return (array)JWT::decode($token, new Key(app('jwt.secret'), 'HS256'));
-        } catch (Exception $e) {
-            throw new AuthenticationException('Token validation failed: ' . $e->getMessage());
-        }
+        return (array)JWT::decode($token, new Key(app('jwt.secret'), 'HS256'));
     }
 }

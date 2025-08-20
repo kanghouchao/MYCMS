@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\AuthenticationException;
 use App\Models\Central\User;
 use App\Utils\JWTUtil;
+use App\Services\User\CentralUserService;
 
 /**
  * AuthController for managing admin authentication
@@ -48,7 +49,10 @@ class AuthController
 
     public function me(Request $request)
     {
-        return response()->json(224);
+        return response()->json(
+            [$request->user('central')],
+            224
+        );
     }
 
     public function logout(Request $request)
