@@ -1,8 +1,5 @@
-# Oli CMS Project Makefile
+# CMS Project Makefile
 # ======================
-
-# 默认环境
-ENV ?= local
 
 # ======================
 # 帮助信息
@@ -19,9 +16,14 @@ help: ## 显示帮助信息
 # 服务管理
 # ======================
 build: ## 构建镜像
-	@echo "🛠️  构建$(service)服务镜像..."
+ifndef service
+	@echo "🔄 构建所有服务的镜像..."
+	@make -C backend build
+	@make -C frontend build
+else
+	@echo "🔄 重启 $(service) 服务..."
 	@make -C $(service) build
-
+endif
 
 up: ## 启动服务
 	@echo "🚀 启动$(ENV)环境..."
@@ -35,15 +37,35 @@ ps: ## 查看服务状态
 	@docker-compose ps
 
 logs: ## 查看所有服务日志
-	@if [ -z "$(service)" ]; then \
-		echo "Usage: make logs service=<service>"; \
-		exit 1; \
-	fi
-	@docker-compose logs -f $(service)
+ifndef service
+	@docker-compose logs -f;
+else
+	echo "📜 查看$(service)服务日志...";
+	@docker-compose logs -f $(service);
+endif
 
 exec: ## 进入服务容器
-	@if [ -z "$(service)" ]; then \
-		echo "Usage: make exec service=<service>"; \
-		exit 1; \
-	fi
+ifdef service
 	@docker-compose exec $(service) sh
+endif
+
+clean: ## 清理未使用的镜像和容器
+ifndef service
+	@echo "🧹 清理未使用的镜像和容器..."
+	@docker rmi cms-frontend:latest
+	@docker rmi cms-backend:latest
+	@docker system prune -f
+else
+	@echo "🧹 清理未使用的镜像和容器..."
+	@docker rmi cms-$(service):latest
+	@docker system prune -f
+endif
+
+restart: ## 重启服务
+ifndef service
+	@echo "🔄 重启所有服务..."
+	@docker-compose restart;
+else
+	@echo "🔄 重启$(service)服务..."
+	@docker-compose restart $(service)
+endif
