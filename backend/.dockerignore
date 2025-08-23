@@ -23,8 +23,7 @@ package*.json
 /bootstrap/cache/**.php
 
 # Testing
-/tests/
-phpunit.xml
+.phpunit.result.*
 
 # Documentation
 *.md
