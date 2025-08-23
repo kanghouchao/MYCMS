@@ -46,13 +46,9 @@ function RegisterForm() {
       return;
     }
     try {
-      const data = await authApi.register({ token, email, password });
-      if (data.success) {
-        setSuccess("登録が完了しました。管理画面にログインしてください。");
-        setTimeout(() => router.push("/login"), 2000);
-      } else {
-        setError(data.message || "登録に失敗しました");
-      }
+      await authApi.register({ token, email, password });
+      setSuccess("登録が完了しました。管理画面にログインしてください。");
+      setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
       setError("ネットワークエラーが発生しました");
     }

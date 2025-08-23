@@ -1,11 +1,3 @@
-// APIレスポンス
-export interface ApiResponse<T = any> {
-  success: boolean;
-  message?: string;
-  data?: T;
-  errors?: any;
-}
-
 // ページネーションレスポンス
 export interface PaginatedResponse<T> {
   data: T[];
@@ -26,16 +18,16 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
-  role: 'super_admin' | 'admin';
+  role: "super_admin" | "admin";
   is_active: boolean;
   created_at: string;
   updated_at?: string;
 }
 
 // 認証レスポンス
-export interface AuthResponse {
-  admin: Admin;
+export interface LoginResponse {
   token: string;
+  expires_at: number;
 }
 
 // テナント
@@ -43,7 +35,6 @@ export interface Tenant {
   id: string;
   name: string;
   email: string;
-  template_key?: string;
   domain: string;
   domains: string[];
   is_active: boolean;
@@ -56,14 +47,12 @@ export interface CreateTenantRequest {
   name: string;
   domain: string;
   email: string;
-  template_key?: string;
 }
 
 // テナント更新リクエスト
 export interface UpdateTenantRequest {
   name: string;
   email: string;
-  template_key?: string;
 }
 
 // ダッシュボード統計データ
@@ -90,7 +79,7 @@ export interface LoginRequest {
 
 // 登録リクエスト
 export interface RegisterRequest {
-    token: string;
-    email: string;
-    password: string;
+  token: string;
+  email: string;
+  password: string;
 }

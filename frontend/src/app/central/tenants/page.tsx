@@ -20,15 +20,13 @@ export default function TenantsPage() {
   const loadTenants = useCallback(async () => {
     setLoadingTenants(true);
     try {
-      const response = await centralApi.getList({
+      const tenants = await centralApi.getList({
         page: currentPage,
         per_page: 10,
         search: searchTerm || undefined,
       });
 
-      if (response.success && response.data) {
-        setTenants(response.data);
-      }
+      setTenants(tenants);
     } catch (error) {
       toast.error("店舗一覧の読み込みに失敗しました");
     } finally {
@@ -201,28 +199,6 @@ export default function TenantsPage() {
                               >
                                 {tenant.is_active ? "有効" : "無効"}
                               </span>
-                            </div>
-                            <div className="mt-1">
-                              <p className="text-sm text-gray-500">
-                                {tenant.email}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                ドメイン:{" "}
-                                <a
-                                  href={`//${tenant.domain}`}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-indigo-600 hover:underline break-all"
-                                >
-                                  {tenant.domain}
-                                </a>
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                プラン:{" "}
-                                <span className="font-medium">
-                                  {tenant.template_key}
-                                </span>
-                              </p>
                             </div>
                           </div>
                         </div>

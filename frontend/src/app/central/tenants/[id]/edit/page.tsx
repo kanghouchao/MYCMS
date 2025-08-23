@@ -18,7 +18,6 @@ export default function EditTenantPage() {
   const [formData, setFormData] = useState<UpdateTenantRequest>({
     name: "",
     email: "",
-    template_key: "default",
   });
   const [errors, setErrors] = useState<Partial<UpdateTenantRequest>>({});
 
@@ -31,17 +30,12 @@ export default function EditTenantPage() {
       try {
         setLoading(true);
         const res = await centralApi.getById(tenantId);
-        if (res.data) {
-          const t = res.data as unknown as Tenant;
-          setTenant(t);
-          setFormData({
-            name: t.name,
-            email: t.email,
-            template_key: t.template_key ?? "default",
-          });
-        } else {
-          toast.error(res.message || "店舗情報の取得に失敗しました");
-        }
+        const t = res as unknown as Tenant;
+        setTenant(t);
+        setFormData({
+          name: t.name,
+          email: t.email,
+        });
       } catch (e) {
         console.error("Error loading tenant:", e);
         toast.error("店舗情報の取得に失敗しました");
@@ -181,29 +175,6 @@ export default function EditTenantPage() {
                         {errors.email}
                       </p>
                     )}
-                  </div>
-                </div>
-
-                {/* テンプレート（暫定） */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    テンプレート
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      value={formData.template_key || "default"}
-                      onChange={(e) =>
-                        setFormData((p) => ({
-                          ...p,
-                          template_key: e.target.value,
-                        }))
-                      }
-                      className="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md"
-                    />
-                    <p className="mt-2 text-sm text-gray-500">
-                      現在はシステム既定: default
-                    </p>
                   </div>
                 </div>
 

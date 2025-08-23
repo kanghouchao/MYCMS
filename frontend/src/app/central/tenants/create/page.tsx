@@ -15,7 +15,6 @@ export default function CreateTenantPage() {
     name: "",
     domain: "",
     email: "",
-    template_key: "default",
   });
 
   const [errors, setErrors] = useState<Partial<CreateTenantRequest>>({});
@@ -222,24 +221,6 @@ export default function CreateTenantPage() {
                   </div>
                 </div>
 
-                {/* 模板：当前仅默认模板，后续可扩展为下拉 */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    テンプレート
-                  </label>
-                  <div className="mt-1">
-                    <input
-                      type="text"
-                      value={formData.template_key}
-                      disabled
-                      className="shadow-sm block w-full sm:text-sm border-gray-300 rounded-md bg-gray-100"
-                    />
-                    <p className="mt-2 text-sm text-gray-500">
-                      現在はシステム既定: default
-                    </p>
-                  </div>
-                </div>
-
                 {/* 预览信息 */}
                 <div className="bg-gray-50 rounded-lg p-4">
                   <h4 className="text-sm font-medium text-gray-900 mb-2">
@@ -268,14 +249,6 @@ export default function CreateTenantPage() {
                       </dt>
                       <dd className="mt-1 text-sm text-gray-900">
                         {formData.email || "未入力"}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        テンプレート
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {formData.template_key}
                       </dd>
                     </div>
                   </dl>

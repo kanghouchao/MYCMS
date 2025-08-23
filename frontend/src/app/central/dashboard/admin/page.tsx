@@ -21,13 +21,8 @@ export default function AdminDashboard() {
         centralApi.getList({ per_page: 5, page: 1 }),
       ]);
 
-      if (statsResponse.success && statsResponse.data) {
-        setStats(statsResponse.data);
-      }
-
-      if (tenantsResponse.success && tenantsResponse.data) {
-        setRecentTenants(tenantsResponse.data.data);
-      }
+      setStats(statsResponse);
+      setRecentTenants(tenantsResponse.data);
     } catch (error) {
       toast.error("データの読み込みに失敗しました");
     } finally {
