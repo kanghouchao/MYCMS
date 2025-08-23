@@ -15,11 +15,11 @@ help: ## ヘルプ情報を表示
 
 test: ## バックエンドの全テストを実行
 	@echo "🧪  バックエンドのテストを実行中..."
-	@docker build --target test .
+	@docker buildx build --target test .
 
 build: ## バックエンドDockerイメージをビルド
 	@echo "🏗️  バックエンドDockerイメージをビルド中..."
-	@docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 clean: ## Dockerイメージを削除
 	@echo "🗑️  バックエンドDockerイメージを削除中..."

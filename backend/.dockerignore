@@ -1,42 +1,21 @@
+
+build/
+out/
+.gradle/
+*.log
+*.jar
+*.war
+*.iml
+*.class
+.idea/
+*.swp
+*.swo
+*.tmp
+*.bak
+*.pid
+*.lock
+.env
 .DS_Store
-
-# Git
-.git
-.gitignore
-.gitattributes
-
-# Environment files
-.env.example
-
-# Dependencies (managed by multi-stage build)
-/vendor
-composer.lock
-
-# Node.js (not needed for backend)
-/node_modules
-package*.json
-
-# Storage files
-/storage/**.log
-
-# Cache files
-/bootstrap/cache/**.php
-
-# Testing
-.phpunit.result.*
-
-# Documentation
-*.md
-
-# Docker files (avoid recursion)
-Dockerfile
-.dockerignore
-
-Makefile
-
-# IDE / Editor settings
-.vscode/
-.editorconfig
 
 # Temporary files
 *.tmp
