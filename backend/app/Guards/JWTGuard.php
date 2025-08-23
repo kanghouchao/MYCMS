@@ -4,33 +4,33 @@ namespace App\Guards;
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Auth\GuardHelpers;
-use App\Models\Tenant\User as TenantUser;
-use App\Models\Central\User as CentralUser;
 
 use App\Utils\JWTUtil;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * JWTGuard 用于鉴权和反序列化用户，这是一个全局对象
+ */
 class JWTGuard implements Guard
 {
     use GuardHelpers;
+
+    protected $userProvider;
+
+    public function __construct($userProvider)
+    {
+        $this->userProvider = $userProvider;
+    }
 
     public function user()
     {
         $payload = $this->parseToken();
         $is_tenant = $payload['tenant'] ?? false;
         if ($is_tenant) {
-            return new TenantUser([
-                'id' => $payload['id'],
-                'name' => $payload['name'],
-                'email' => $payload['email'],
-            ]);
+            return $this->userProvider->retrieveById($payload['id']);
         } else {
-            return new CentralUser([
-                'id' => $payload['id'],
-                'name' => $payload['name'],
-                'email' => $payload['email'],
-            ]);
+            return $this->userProvider->retrieveById($payload['id']);
         }
     }
 
@@ -40,15 +40,12 @@ class JWTGuard implements Guard
         if ($header && strpos($header, 'Bearer ') === 0) {
             return substr($header, 7);
         }
-        return null;
+        throw new AuthenticationException('No token provided in request header');
     }
 
     protected function parseToken()
     {
         $token = $this->getTokenForRequest();
-        if (!$token) {
-            throw new AuthenticationException('No token provided');
-        }
 
         try {
             return JWTUtil::decodeToken($token);
@@ -66,7 +63,7 @@ class JWTGuard implements Guard
 
     public function check()
     {
-        return !is_null($this->user());
+        return !is_null($this->getTokenForRequest());
     }
 
     public function guest()
@@ -76,6 +73,6 @@ class JWTGuard implements Guard
 
     public function id()
     {
-        return $this->user() ? $this->user()->getAuthIdentifier() : null;
+        return $this->user() ? $this->user()->id : null;
     }
 }

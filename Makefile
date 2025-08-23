@@ -1,71 +1,71 @@
+
 # CMS Project Makefile
 # ======================
 
-# ======================
-# 帮助信息
-# ======================
-help: ## 显示帮助信息
-	@echo "Oli CMS 项目管理命令:"
+help: ## ヘルプ情報を表示
+	@echo "Oli CMS プロジェクト管理コマンド:"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
 
 .PHONY: help up down restart ps backend frontend build logs exec
 
-# ======================
-# 服务管理
-# ======================
-build: ## 构建镜像
-ifndef service
-	@echo "🔄 构建所有服务的镜像..."
+build: ## Dockerイメージをビルド
+ifdef service
+	@make -C $(service) build
+else
 	@make -C backend build
 	@make -C frontend build
-else
-	@echo "🔄 重启 $(service) 服务..."
-	@make -C $(service) build
 endif
 
-up: ## 启动服务
-	@echo "🚀 启动$(ENV)环境..."
-	ENVIRONMENT=$(ENV) docker-compose up -d --timestamps  --wait
+test: ## バックエンドのテストを実行
+ifdef service
+	@echo "🔍 $(service)サービスのテストを実行中..."
+	@make -C $(service) test
+else
+	@echo "🔍 すべてのサービスのテストを実行中..."
+	@make -C backend test
+	@make -C frontend test
+endif
 
-down: ## 停止服务
-	@echo "🛑 停止服务..."
+up: ## サービスを起動
+	@echo "🚀 サービスを起動中..."
+	@docker-compose up -d --timestamps --wait
+
+down: ## サービスを停止
+	@echo "🛑 サービスを停止中..."
 	@docker-compose down
 
-ps: ## 查看服务状态
+ps: ## サービスの状態を表示
 	@docker-compose ps
 
-logs: ## 查看所有服务日志
+logs: ## すべてのサービスのログを表示
 ifndef service
 	@docker-compose logs -f;
 else
-	echo "📜 查看$(service)服务日志...";
+	echo "📜 $(service)サービスのログを表示中...";
 	@docker-compose logs -f $(service);
 endif
 
-exec: ## 进入服务容器
+exec: ## サービスコンテナに入る
 ifdef service
 	@docker-compose exec $(service) sh
 endif
 
-clean: ## 清理未使用的镜像和容器
+clean: ## 未使用のイメージとコンテナをクリーンアップ
 ifndef service
-	@echo "🧹 清理未使用的镜像和容器..."
-	@docker rmi cms-frontend:latest
-	@docker rmi cms-backend:latest
+	@make -C backend clean
+	@make -C frontend clean
 	@docker system prune -f
 else
-	@echo "🧹 清理未使用的镜像和容器..."
-	@docker rmi cms-$(service):latest
-	@docker system prune -f
+	@make -C $(service) clean
 endif
 
-restart: ## 重启服务
+restart: ## サービスを再起動
 ifndef service
-	@echo "🔄 重启所有服务..."
+	@echo "🔄 すべてのサービスを再起動中..."
 	@docker-compose restart;
 else
-	@echo "🔄 重启$(service)服务..."
+	@echo "🔄 $(service)サービスを再起動中..."
 	@docker-compose restart $(service)
 endif

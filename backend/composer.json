@@ -15,7 +15,10 @@
         "stancl/tenancy": "^3.9.1",
         "firebase/php-jwt": "^6.11"
     },
-    "require-dev": {},
+    "require-dev": {
+        "mockery/mockery": "^1.6",
+        "phpunit/phpunit": "^9.5"
+    },
     "autoload": {
         "psr-4": {
             "App\\": "app/",
