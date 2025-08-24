@@ -96,26 +96,6 @@ services:
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
 
-  worker:
-    image: cms-backend:latest
-    container_name: oli-cms-worker
-    networks:
-      - oli-cms-network
-    env_file:
-      - .env
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: ["php", "artisan", "queue:work", "${QUEUE_CONNECTION:-database}", "--sleep=3", "--tries=3"]
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "php", "artisan", "queue:work", "${QUEUE_CONNECTION:-database}", "--once"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
 networks:
   oli-cms-network:
     driver: bridge
