@@ -16,10 +16,14 @@ help: ## ヘルプ情報を表示
 
 build: ## フロントエンドDockerイメージをビルド
 	@echo "🏗️  フロントエンドDockerイメージをビルド中..."
-	@docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+
+test: ## Docker コンテナ内でフロントエンドのユニットテストを実行（Dockerfile の test ステージを使用）
+	@echo "Docker 上でテストを実行しています..."
+	@docker buildx build --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 
 clean: ## Dockerイメージを削除
 	@echo "🗑️  フロントエンドDockerイメージを削除中..."
 	@docker rmi $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null || echo "イメージが存在しないか、既に削除されています"
 
-.PHONY: help build clean
+.PHONY: help build test clean
