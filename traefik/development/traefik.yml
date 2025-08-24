@@ -1,6 +1,5 @@
-
-# traefik/local/traefik.yml
-# Configuration for LOCAL DEVELOPMENT (HTTP ONLY).
+# traefik/development/traefik.yml
+# Configuration for DEVELOPMENT (HTTP ONLY).
 
 global:
   checkNewVersion: false
