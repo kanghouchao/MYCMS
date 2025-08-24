@@ -15,7 +15,7 @@ help: ## ヘルプ情報を表示
 
 test: ## バックエンドの全テストを実行
 	@echo "🧪  バックエンドのテストを実行中..."
-	@docker buildx build --target test .
+	@docker buildx build --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 
 build: ## バックエンドDockerイメージをビルド
 	@echo "🏗️  バックエンドDockerイメージをビルド中..."
