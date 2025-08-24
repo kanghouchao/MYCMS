@@ -31,16 +31,14 @@ services:
   database:
     image: postgres:16-alpine
     container_name: oli-cms-database
-    environment:
-      POSTGRES_DB: ${DB_DATABASE:-cms}
-      POSTGRES_USER: ${DB_USERNAME:-cms_user}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    env_file:
+      - .env
     volumes:
       - oli-cms-db-data:/var/lib/postgresql/data
     networks:
       - oli-cms-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-cms_user} -d ${DB_DATABASE:-cms}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cms} -d ${POSTGRES_DB:-cms}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,7 +58,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend: PHP Laravel
+  # Backend: Java Spring Boot
   backend:
     image: cms-backend:latest
     container_name: oli-cms-backend
