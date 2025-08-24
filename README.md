@@ -125,8 +125,8 @@ oli-CMS/
 │   ├── public/             # 静的リソース
 │   └── package.json        # 依存管理
 ├── traefik/                # Traefik 設定
-│   ├── local/              # 開発用
-│   └── prod/               # 本番用
+│   ├── development/        # 開発用
+│   └── production/         # 本番用
 ├── docker-compose.yml      # コンテナ定義
 └── Makefile                # 管理コマンド
 ```
