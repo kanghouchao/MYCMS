@@ -31,14 +31,16 @@ services:
   database:
     image: postgres:16-alpine
     container_name: oli-cms-database
-    env_file:
-      - .env
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cms}
+      POSTGRES_USER: ${DB_USERNAME:-cms}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - oli-cms-db-data:/var/lib/postgresql/data
     networks:
       - oli-cms-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cms} -d ${POSTGRES_DB:-cms}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-cms} -d ${DB_NAME:-cms}" ]
       interval: 10s
       timeout: 5s
       retries: 5
