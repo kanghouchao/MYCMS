@@ -26,6 +26,19 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 # 4. ランタイムイメージを作成します
 FROM eclipse-temurin:21-jre-alpine-3.22
 WORKDIR /app
+
+# ビルド時にデフォルトJVMオプションを上書き可能にします（例: -Xms256m -Xmx512m）
+ARG APP_JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseContainerSupport"
+ENV JAVA_OPTS=${APP_JAVA_OPTS}
+
+# ヘルスチェックで使用する curl をインストールします
+RUN apk add --no-cache curl
+
 COPY --from=build /app/build/libs/cms-*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+# ヘルスチェック: Spring Boot Actuator の /actuator/health を確認します
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:8080/actuator/health || exit 1
+
+ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]
