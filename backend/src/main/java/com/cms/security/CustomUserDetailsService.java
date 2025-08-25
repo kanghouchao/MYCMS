@@ -10,13 +10,6 @@ import org.springframework.stereotype.Service;
 public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // TODO: 从数据库加载用户信息
-        if ("admin".equals(username)) {
-            return User.withUsername("admin")
-                    .password("{noop}admin")
-                    .roles("ADMIN")
-                    .build();
-        }
         throw new UsernameNotFoundException("User not found");
     }
 }
