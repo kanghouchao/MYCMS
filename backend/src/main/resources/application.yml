@@ -1,23 +1,71 @@
 spring:
+  application:
+    name: ${APP_NAME:OliCMS}
+    profile: ${APP_ENV:development}
   datasource:
-    url: jdbc:postgresql://localhost:5432/oli_cms
-    username: postgres
-    password: postgres
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:oli_cms}?sslmode=${DB_SSLMODE:disable}
+    username: ${DB_USERNAME:oli_user}
+    password: ${DB_PASSWORD:change_me}
     driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: ${DB_HIKARI_MINIMUM_IDLE:2}
+      maximum-pool-size: ${DB_HIKARI_MAXIMUM_POOL_SIZE:10}
+      idle-timeout: ${DB_HIKARI_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_HIKARI_MAX_LIFETIME:1800000}
+      connection-timeout: ${DB_HIKARI_CONNECTION_TIMEOUT:30000}
+      leak-detection-threshold: ${DB_HIKARI_LEAK_DETECTION_THRESHOLD:2000}
+      validation-timeout: ${DB_HIKARI_VALIDATION_TIMEOUT:5000}
+      initialization-fail-timeout: ${DB_HIKARI_INITIALIZATION_FAIL_TIMEOUT:-1}
+      connection-test-query: SELECT 1
+      data-source-properties:
+        ssl: ${DB_SSL:false}
+        sslmode: ${DB_SSLMODE:require}
+        sslrootcert: ${DB_SSLROOTCERT:}
   jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+    show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: true
-  redis:
-    host: localhost
-    port: 6379
-    password:
-    database: 0
-server:
-  port: 8080
-jwt:
-  secret: "your_jwt_secret_key"
-  expiration: 86400
+        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:false}
+  cache:
+    type: redis
+    redis:
+      time-to-live: ${REDIS_CACHE_TTL_MS:600000}
+      cache-null-values: ${REDIS_CACHE_NULL_VALUES:false}
+      use-key-prefix: ${REDIS_CACHE_USE_KEY_PREFIX:true}
+      key-prefix: ${REDIS_CACHE_KEY_PREFIX:oli:cache:}
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+      ssl:
+        enabled: ${REDIS_SSL:false}
+      timeout: ${REDIS_TIMEOUT:2000}ms
+      client-type: ${REDIS_CLIENT_TYPE:lettuce}
+      lettuce:
+        pool:
+          max-active: ${REDIS_LETTUCE_POOL_MAX_ACTIVE:8}
+          max-idle: ${REDIS_LETTUCE_POOL_MAX_IDLE:8}
+          min-idle: ${REDIS_LETTUCE_POOL_MIN_IDLE:0}
+          max-wait: ${REDIS_LETTUCE_POOL_MAX_WAIT:2000}ms
+  task:
+    execution:
+      pool:
+        size: 2
+        max-size: 10
+        keep-alive: 60s
+        queue-capacity: 20
+      thread-name-prefix: task-cms-
+  logging:
+    level:
+      root: ${SPRING_LOGGING_LEVEL_ROOT:INFO}
+      org.springframework.web: ${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:DEBUG}
+      com.olivine.cms: ${SPRING_LOGGING_LEVEL_COM_OLIVINE_CMS:DEBUG}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
