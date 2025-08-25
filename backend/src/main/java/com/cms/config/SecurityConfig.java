@@ -20,4 +20,14 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
         return http.build();
     }
+
+    @Bean
+    public com.cms.security.PasswordGenerator passwordGenerator() {
+        return new com.cms.security.PasswordGenerator(16);
+    }
+
+    @Bean
+    public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
 }
