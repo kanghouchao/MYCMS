@@ -5,15 +5,16 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.cms.tenant.TenantInterceptor;
-
-
-
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
+    private final com.cms.config.TenantInterceptor tenantInterceptor;
+
+    public WebMvcConfig(com.cms.config.TenantInterceptor tenantInterceptor) {
+        this.tenantInterceptor = tenantInterceptor;
+    }
 
     @Override
     public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(new TenantInterceptor());
+        registry.addInterceptor(tenantInterceptor);
     }
 }

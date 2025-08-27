@@ -4,6 +4,8 @@ import com.cms.model.tenant.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -14,7 +16,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "TenantRole")
 @Table(name = "t_roles", uniqueConstraints = {
         @UniqueConstraint(name = "uq_t_roles_tenant_name", columnNames = { "tenant_id", "name" })
 })
@@ -31,5 +33,6 @@ public class Role extends BaseEntity {
     private Set<User> users = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "t_role_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
     private Set<Permission> permissions = new HashSet<>();
 }

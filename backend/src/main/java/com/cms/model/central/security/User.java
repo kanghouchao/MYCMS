@@ -15,7 +15,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "CentralUser")
 @Table(name = "central_users")
 @Getter
 @Setter

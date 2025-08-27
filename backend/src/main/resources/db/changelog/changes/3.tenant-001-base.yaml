@@ -1,39 +1,43 @@
 databaseChangeLog:
   - changeSet:
-      id: central-002-create-tenants-table
+      id: tenant-001-create-pages
       author: copilot
       changes:
         - createTable:
-            tableName: central_tenants
+            tableName: t_pages
             columns:
               - column:
                   name: id
-                  type: BIGINT
-                  autoIncrement: true
+                  type: VARCHAR(64)
                   constraints:
                     primaryKey: true
                     nullable: false
-                    primaryKeyName: pk_central_tenants
+                    primaryKeyName: pk_t_pages
               - column:
-                  name: name
-                  type: VARCHAR(200)
+                  name: tenant_id
+                  type: VARCHAR(64)
                   constraints:
                     nullable: false
               - column:
-                  name: domain
+                  name: title
                   type: VARCHAR(255)
                   constraints:
-                    nullable: true
+                    nullable: false
               - column:
-                  name: template
-                  type: VARCHAR(100)
+                  name: slug
+                  type: VARCHAR(255)
                   constraints:
-                    nullable: true
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
+              - addUniqueConstraint:
+                  tableName: t_pages
+                  columnNames: tenant_id,slug
+                  constraintName: uq_t_pages_tenant_slug

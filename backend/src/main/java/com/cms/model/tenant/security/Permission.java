@@ -14,7 +14,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "TenantPermission")
 @Table(name = "t_permissions", uniqueConstraints = {
         @UniqueConstraint(name = "uq_t_permissions_tenant_name", columnNames = { "tenant_id", "name" })
 })

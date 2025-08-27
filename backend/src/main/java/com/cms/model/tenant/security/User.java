@@ -15,7 +15,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "TenantUser")
 @Table(name = "t_users")
 @Getter
 @Setter
@@ -23,7 +23,10 @@ import java.util.Set;
 @AllArgsConstructor
 public class User extends BaseEntity {
     @Column(nullable = false, length = 150)
-    private String username;
+    private String nickname;
+
+    @Column(nullable = false, length = 255)
+    private String email;
 
     @Column(nullable = false)
     private String password;

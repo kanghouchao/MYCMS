@@ -20,8 +20,9 @@ function getAuthApi() {
 }
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  //TODO default values should clear
+  const [username, setUsername] = useState("admin");
+  const [password, setPassword] = useState("admin1234");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
@@ -30,7 +31,7 @@ export default function AdminLogin() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await getAuthApi().login({ email, password });
+      const response = await getAuthApi().login({ username, password });
       if (response.token && response.expires_at) {
         Cookies.set("token", response.token, { expires: response.expires_at });
         const centralDomain =
@@ -80,19 +81,19 @@ export default function AdminLogin() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
-              <label htmlFor="email" className="sr-only">
-                メールアドレス
+              <label htmlFor="username" className="sr-only">
+                ログイン名
               </label>
               <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
+                id="username"
+                name="username"
+                type="text"
+                autoComplete="username"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="メールアドレス"
+                placeholder="ログイン名"
               />
             </div>
             <div>
@@ -155,12 +156,7 @@ export default function AdminLogin() {
             </button>
           </div>
 
-          <div className="mt-4 text-center">
-            <div className="text-sm text-gray-600">
-              <p>テスト用アカウント:</p>
-              <p className="font-mono text-xs">admin@cms.com / admin123</p>
-            </div>
-          </div>
+          {/* 默认账号已填入输入框，移除页面下方的测试账号显示 */}
         </form>
       </div>
     </div>

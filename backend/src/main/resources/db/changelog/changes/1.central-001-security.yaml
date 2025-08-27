@@ -33,11 +33,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: central_roles
             columns:
@@ -59,11 +57,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: central_permissions
             columns:
@@ -85,11 +81,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: central_role_permissions
             columns:
@@ -103,10 +97,10 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            tableName: central_role_permissions
-            columnNames: role_id,permission_id
-            constraintName: uq_central_role_permissions
+              - addUniqueConstraint:
+                  tableName: central_role_permissions
+                  columnNames: role_id,permission_id
+                  constraintName: uq_central_role_permissions
         - createTable:
             tableName: central_user_roles
             columns:
@@ -120,7 +114,7 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            tableName: central_user_roles
-            columnNames: user_id,role_id
-            constraintName: uq_central_user_roles
+              - addUniqueConstraint:
+                  tableName: central_user_roles
+                  columnNames: user_id,role_id
+                  constraintName: uq_central_user_roles

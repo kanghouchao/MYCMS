@@ -13,7 +13,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity
+@Entity(name = "CentralPermission")
 @Table(name = "central_permissions")
 @Getter
 @Setter

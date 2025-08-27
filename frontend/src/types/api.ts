@@ -73,7 +73,7 @@ export interface TenantStats {
 
 // ログインリクエスト
 export interface LoginRequest {
-  email: string;
+  username: string;
   password: string;
 }
 

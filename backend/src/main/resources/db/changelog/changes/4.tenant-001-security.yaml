@@ -19,8 +19,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: username
+                  name: nickname
                   type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
                   constraints:
                     nullable: false
               - column:
@@ -35,11 +40,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
   - changeSet:
       id: tenant-003-create-authorities
       author: copilot
@@ -67,11 +70,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: t_permissions
             columns:
@@ -95,11 +96,9 @@ databaseChangeLog:
               - column:
                   name: created_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
               - column:
                   name: updated_at
                   type: TIMESTAMP
-                  defaultValueComputed: CURRENT_TIMESTAMP
         - createTable:
             tableName: t_role_permissions
             columns:
@@ -113,10 +112,10 @@ databaseChangeLog:
                   type: VARCHAR(64)
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            tableName: t_role_permissions
-            columnNames: role_id,permission_id
-            constraintName: uq_t_role_permissions
+              - addUniqueConstraint:
+                  tableName: t_role_permissions
+                  columnNames: role_id,permission_id
+                  constraintName: uq_t_role_permissions
         - createTable:
             tableName: t_user_roles
             columns:
@@ -135,7 +134,7 @@ databaseChangeLog:
                   type: VARCHAR(64)
                   constraints:
                     nullable: false
-        - addUniqueConstraint:
-            tableName: t_user_roles
-            columnNames: tenant_id,user_id,role_id
-            constraintName: uq_t_user_roles
+              - addUniqueConstraint:
+                  tableName: t_user_roles
+                  columnNames: tenant_id,user_id,role_id
+                  constraintName: uq_t_user_roles

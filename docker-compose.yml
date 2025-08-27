@@ -75,9 +75,12 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.middlewares=backend-strip@docker"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      # Define a StripPrefix middleware so Traefik removes the /api prefix before forwarding
+      - "traefik.http.middlewares.backend-strip.stripPrefix.prefixes=/api"
 
   # Frontend: next.js
   frontend:
