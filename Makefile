@@ -54,6 +54,7 @@ endif
 
 clean: ## 未使用のイメージとコンテナをクリーンアップ
 ifndef service
+	@docker compose down --volumes --remove-orphans
 	@make -C backend clean
 	@make -C frontend clean
 	@docker system prune -f
