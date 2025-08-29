@@ -42,7 +42,7 @@ public class CentralAuthController {
     }
 
     @GetMapping("/me")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<AdminDto> me(Principal principal) {
         if (principal == null || principal.getName() == null) {
             return ResponseEntity.status(401).build();
@@ -54,7 +54,7 @@ public class CentralAuthController {
     }
 
     @PostMapping("/logout")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<?> logout(@RequestHeader(name = "Authorization", required = false) String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

@@ -11,7 +11,7 @@ databaseChangeLog:
                   valueNumeric: 1
               - column:
                   name: name
-                  value: ROLE_ADMIN
+                  value: ADMIN
         - insert:
             tableName: central_users
             columns:

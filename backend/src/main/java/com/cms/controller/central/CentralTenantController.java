@@ -18,7 +18,7 @@ public class CentralTenantController {
     private final CentralTenantService tenantService;
 
     @GetMapping
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<PaginatedResponse<TenantDto>> list(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(name = "per_page", defaultValue = "10") int perPage,
@@ -27,33 +27,33 @@ public class CentralTenantController {
     }
 
     @GetMapping("/{id}")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<TenantDto> getById(@PathVariable String id) {
         Optional<TenantDto> t = tenantService.getById(id);
         return t.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<TenantDto> create(@Valid @RequestBody CreateTenantRequest req) {
         return ResponseEntity.ok(tenantService.create(req));
     }
 
     @PutMapping("/{id}")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<TenantDto> update(@PathVariable String id, @RequestBody UpdateTenantRequest req) {
         return ResponseEntity.ok(tenantService.update(id, req));
     }
 
     @DeleteMapping("/{id}")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<?> delete(@PathVariable String id) {
         tenantService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/stats")
-    @RolesAllowed({ "ROLE_ADMIN" })
+    @RolesAllowed("ADMIN")
     public ResponseEntity<TenantStats> stats() {
         return ResponseEntity.ok(tenantService.stats());
     }
