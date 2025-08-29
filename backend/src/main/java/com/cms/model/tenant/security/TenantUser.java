@@ -15,13 +15,13 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "TenantUser")
+@Entity
 @Table(name = "t_users")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseEntity {
+public class TenantUser extends BaseEntity {
     @Column(nullable = false, length = 150)
     private String nickname;
 
@@ -35,5 +35,5 @@ public class User extends BaseEntity {
     private Boolean enabled = true;
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "t_user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+    private Set<TenantRole> roles = new HashSet<>();
 }

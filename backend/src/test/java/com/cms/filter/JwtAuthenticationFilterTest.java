@@ -1,4 +1,4 @@
-package com.cms.security;
+package com.cms.filter;
 
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -7,8 +7,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
@@ -16,25 +17,24 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import com.cms.utils.JwtUtil;
 
 import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
 
-    @Autowired
+    @InjectMocks
     private JwtAuthenticationFilter filter;
 
-    @MockitoBean
+    @Mock
     private JwtUtil jwtUtil;
 
-    @MockitoBean
+    @Mock
     private UserDetailsService userDetailsService;
 
     @BeforeEach
@@ -62,11 +62,13 @@ class JwtAuthenticationFilterTest {
         UserDetails user = User.withUsername("alice").password("pass").roles("USER").build();
         when(userDetailsService.loadUserByUsername("alice")).thenReturn(user);
 
-        FilterChain chain = (req, res) -> {
+        FilterChain chain = mock(FilterChain.class);
+        doAnswer(invocation -> {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             assertNotNull(auth, "Authentication should be set before reaching the filter chain");
             assertEquals(user.getUsername(), auth.getName());
-        };
+            return null;
+        }).when(chain).doFilter(any(), any());
 
         filter.doFilterInternal(request, response, chain);
 
@@ -87,12 +89,15 @@ class JwtAuthenticationFilterTest {
         when(jwtUtil.getClaims(token)).thenReturn(claims);
         when(jwtUtil.validateToken(token, "bob")).thenReturn(false);
 
-        when(userDetailsService.loadUserByUsername("bob")).thenReturn(User.withUsername("bob").password("p").roles("USER").build());
+        when(userDetailsService.loadUserByUsername("bob"))
+                .thenReturn(User.withUsername("bob").password("p").roles("USER").build());
 
-        FilterChain chain = (req, res) -> {
+        FilterChain chain = mock(FilterChain.class);
+        doAnswer(invocation -> {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             assertNull(auth, "Authentication should NOT be set for invalid token");
-        };
+            return null;
+        }).when(chain).doFilter(any(), any());
 
         filter.doFilterInternal(request, response, chain);
 
@@ -104,10 +109,12 @@ class JwtAuthenticationFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
 
-        FilterChain chain = (req, res) -> {
+        FilterChain chain = mock(FilterChain.class);
+        doAnswer(invocation -> {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             assertNull(auth, "Authentication should be null when no Authorization header");
-        };
+            return null;
+        }).when(chain).doFilter(any(), any());
 
         filter.doFilterInternal(request, response, chain);
 

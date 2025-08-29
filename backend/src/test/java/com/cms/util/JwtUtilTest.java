@@ -1,6 +1,9 @@
-package com.cms.security;
+package com.cms.util;
 
 import com.cms.config.AppProperties;
+import com.cms.dto.auth.Token;
+import com.cms.utils.JwtUtil;
+
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,19 +40,19 @@ class JwtUtilTest {
     @Test
     void generateToken_and_validateToken_success() {
         String username = "alice";
-        String token = jwtUtil.generateToken(username);
+        Token token = jwtUtil.generateToken(username);
 
         assertNotNull(token, "generated token should not be null");
 
-        boolean valid = jwtUtil.validateToken(token, username);
+        boolean valid = jwtUtil.validateToken(token.token(), username);
         assertTrue(valid, "token should validate for correct username");
     }
 
     @Test
     void validateToken_returnsFalse_forIncorrectUsername() {
-        String token = jwtUtil.generateToken("alice");
+        Token token = jwtUtil.generateToken("alice");
         // same token but different username should not validate
-        assertFalse(jwtUtil.validateToken(token, "bob"));
+        assertFalse(jwtUtil.validateToken(token.token(), "bob"));
     }
 
     @Test
@@ -58,15 +61,15 @@ class JwtUtilTest {
         when(props.getJwtExpiration()).thenReturn(-10L);
         JwtUtil utilWithShortExpiry = new JwtUtil(props);
 
-        String token = utilWithShortExpiry.generateToken("alice");
+        Token token = utilWithShortExpiry.generateToken("alice");
 
         // parsing an expired token will throw ExpiredJwtException from the parser
-        assertThrows(ExpiredJwtException.class, () -> utilWithShortExpiry.validateToken(token, "alice"));
+        assertThrows(ExpiredJwtException.class, () -> utilWithShortExpiry.validateToken(token.token(), "alice"));
     }
 
     @Test
     void getClaims_or_validateToken_throws_forInvalidSignature() {
-        String token = jwtUtil.generateToken("alice");
+        Token token = jwtUtil.generateToken("alice");
 
         // create a JwtUtil with a different secret -> signature verification should
         // fail
@@ -76,8 +79,8 @@ class JwtUtilTest {
         JwtUtil otherUtil = new JwtUtil(otherProps);
 
         // parsing / validation should throw a JwtException (signature / format error)
-        assertThrows(JwtException.class, () -> otherUtil.getClaims(token));
-        assertThrows(JwtException.class, () -> otherUtil.validateToken(token, "alice"));
+        assertThrows(JwtException.class, () -> otherUtil.getClaims(token.token()));
+        assertThrows(JwtException.class, () -> otherUtil.validateToken(token.token(), "alice"));
     }
 
 }

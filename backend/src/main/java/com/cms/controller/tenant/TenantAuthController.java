@@ -1,7 +1,6 @@
 package com.cms.controller.tenant;
 
 import com.cms.dto.auth.LoginRequest;
-import com.cms.dto.auth.LoginResponse;
 import com.cms.service.tenant.TenantAuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +22,6 @@ public class TenantAuthController {
     @PostMapping("/login")
     @PermitAll
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
-        LoginResponse body = authService.login(req.getUsername(), req.getPassword());
-        return ResponseEntity.ok(body);
+        return ResponseEntity.ok(authService.login(req.getUsername(), req.getPassword()));
     }
 }

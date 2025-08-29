@@ -1,14 +1,14 @@
-package com.cms.service.tenant;
+package com.cms.service.central.auth;
 
 import com.cms.dto.auth.Token;
 
 /**
  * Authentication service interface.
  */
-public interface TenantAuthService {
+public interface CentralAuthService {
 
     /**
-     * Login a user and generate a JWT token.
+     * Logs in a user for Central Authentication.
      *
      * @param username the username
      * @param password the password

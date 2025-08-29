@@ -14,7 +14,7 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "TenantPermission")
+@Entity
 @Table(name = "t_permissions", uniqueConstraints = {
         @UniqueConstraint(name = "uq_t_permissions_tenant_name", columnNames = { "tenant_id", "name" })
 })
@@ -22,11 +22,11 @@ import java.util.Set;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Permission extends BaseEntity {
+public class TenantPermission extends BaseEntity {
 
     @Column(nullable = false, length = 150)
     private String name;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
-    private Set<Role> roles = new HashSet<>();
+    private Set<TenantRole> roles = new HashSet<>();
 }

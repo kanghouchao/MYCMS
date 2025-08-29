@@ -14,4 +14,5 @@ public class AppProperties {
 
     private String jwtSecret;
     private long jwtExpiration;
+
 }

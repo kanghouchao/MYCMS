@@ -1,4 +1,4 @@
-package com.cms.security;
+package com.cms.service;
 
 import com.cms.config.TenantContext;
 import com.cms.repository.central.CentralUserRepository;

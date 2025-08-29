@@ -13,17 +13,17 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "CentralPermission")
+@Entity
 @Table(name = "central_permissions")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Permission extends BaseEntity {
+public class CentralPermission extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 150)
     private String name;
 
     @ManyToMany(mappedBy = "permissions", fetch = FetchType.LAZY)
-    private Set<Role> roles = new HashSet<>();
+    private Set<CentralRole> roles = new HashSet<>();
 }

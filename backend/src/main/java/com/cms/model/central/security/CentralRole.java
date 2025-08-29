@@ -15,21 +15,21 @@ import lombok.Setter;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "CentralRole")
+@Entity
 @Table(name = "central_roles")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Role extends BaseEntity {
+public class CentralRole extends BaseEntity {
 
     @Column(nullable = false, unique = true, length = 100)
     private String name;
 
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
-    private Set<User> users = new HashSet<>();
+    private Set<CentralUser> users = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "central_role_permissions", joinColumns = @JoinColumn(name = "role_id"), inverseJoinColumns = @JoinColumn(name = "permission_id"))
-    private Set<Permission> permissions = new HashSet<>();
+    private Set<CentralPermission> permissions = new HashSet<>();
 }

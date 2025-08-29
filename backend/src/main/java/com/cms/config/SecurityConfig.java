@@ -11,7 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.web.SecurityFilterChain;
-import com.cms.security.PasswordGenerator;
 
 @Configuration
 @EnableWebSecurity
@@ -24,11 +23,6 @@ public class SecurityConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());
         return http.build();
-    }
-
-    @Bean
-    public PasswordGenerator passwordGenerator() {
-        return new PasswordGenerator(16);
     }
 
     @Bean
