@@ -10,7 +10,6 @@ import {
   PaginatedResponse,
 } from "@/types/api";
 
-// 认证 API
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
     const response = await apiClient.post("/admin/login", credentials);

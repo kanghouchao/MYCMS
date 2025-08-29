@@ -1,7 +1,9 @@
 spring:
+  profiles:
+    active:
+    - ${SPRING_PROFILE:dev}
   application:
     name: ${APP_NAME:OliCMS}
-    profile: ${APP_ENV:development}
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:oli_cms}?sslmode=${DB_SSLMODE:disable}
     username: ${DB_USERNAME:oli_user}
@@ -25,7 +27,7 @@ spring:
     show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: ${SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL:false}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   cache:
     type: redis
     redis:
@@ -53,16 +55,11 @@ spring:
   task:
     execution:
       pool:
-        size: 2
+        core-size: 4
         max-size: 10
         keep-alive: 60s
         queue-capacity: 20
       thread-name-prefix: task-cms-
-  logging:
-    level:
-      root: ${SPRING_LOGGING_LEVEL_ROOT:INFO}
-      org.springframework.web: ${SPRING_LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_WEB:DEBUG}
-      com.olivine.cms: ${SPRING_LOGGING_LEVEL_COM_OLIVINE_CMS:DEBUG}
 
 management:
   endpoints:
