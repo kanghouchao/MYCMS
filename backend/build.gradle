@@ -36,6 +36,8 @@ configurations.all {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    // Add mail starter so JavaMailSender and related types are available
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'

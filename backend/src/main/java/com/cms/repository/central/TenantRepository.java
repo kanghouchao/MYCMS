@@ -11,6 +11,7 @@ import java.util.Optional;
 
 @Repository
 public interface TenantRepository extends PagingAndSortingRepository<Tenant, Long>, CrudRepository<Tenant, Long> {
+
     Page<Tenant> findByNameContainingIgnoreCaseOrDomainContainingIgnoreCase(String name, String domain,
             Pageable pageable);
 

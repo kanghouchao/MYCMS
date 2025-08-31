@@ -24,5 +24,5 @@ public class Tenant extends BaseEntity {
     private String domain;
 
     @Column
-    private String template;
+    private String email;
 }

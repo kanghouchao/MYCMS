@@ -13,7 +13,7 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/tenant")
 @RequiredArgsConstructor
 public class TenantAuthController {
 

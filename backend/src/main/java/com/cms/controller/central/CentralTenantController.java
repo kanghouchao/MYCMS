@@ -4,14 +4,22 @@ import com.cms.dto.central.tenant.*;
 import com.cms.service.central.tenant.CentralTenantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/admin/tenants")
+@RequestMapping("/central/tenants")
 @RequiredArgsConstructor
 public class CentralTenantController {
 
@@ -35,19 +43,21 @@ public class CentralTenantController {
 
     @PostMapping
     @RolesAllowed("ADMIN")
-    public ResponseEntity<TenantDto> create(@Valid @RequestBody CreateTenantRequest req) {
-        return ResponseEntity.ok(tenantService.create(req));
+    public ResponseEntity<Void> create(@Valid @RequestBody CreateTenantRequest req) {
+        tenantService.create(req);
+        return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
     @RolesAllowed("ADMIN")
-    public ResponseEntity<TenantDto> update(@PathVariable String id, @RequestBody UpdateTenantRequest req) {
-        return ResponseEntity.ok(tenantService.update(id, req));
+    public ResponseEntity<Void> update(@PathVariable String id, @RequestBody UpdateTenantRequest req) {
+        tenantService.update(id, req);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")
     @RolesAllowed("ADMIN")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         tenantService.delete(id);
         return ResponseEntity.noContent().build();
     }

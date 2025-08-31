@@ -20,7 +20,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const validationApiUrl =
-    process.env.TENANT_VALIDATION_API_URL || "http://backend:8000/api/tenant";
+    process.env.TENANT_VALIDATION_API_URL || "http://backend:8080/tenant";
 
   const url = validationApiUrl + `?domain=${encodeURIComponent(hostname)}`;
   const res = await fetch(url);

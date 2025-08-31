@@ -40,7 +40,7 @@ export default function AdminLogin() {
           typeof window !== "undefined" &&
           window.location.hostname !== centralDomain;
         router.push(
-          isTenant ? "/central/dashboard/tenant" : "/central/dashboard/admin"
+          isTenant ? "/central/dashboard/tenant" : "/central/dashboard/central"
         );
       }
     } catch (error) {

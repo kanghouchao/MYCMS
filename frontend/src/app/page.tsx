@@ -5,7 +5,7 @@ export default function Home() {
   const role = headers().get("x-mw-role");
 
   if (role === "admin") {
-    redirect("/admin/dashboard");
+    redirect("/central/dashboard");
   }
 
   if (role === "tenant") {

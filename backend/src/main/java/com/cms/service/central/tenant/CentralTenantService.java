@@ -1,6 +1,10 @@
 package com.cms.service.central.tenant;
 
-import com.cms.dto.central.tenant.*;
+import com.cms.dto.central.tenant.TenantDto;
+import com.cms.dto.central.tenant.PaginatedResponse;
+import com.cms.dto.central.tenant.CreateTenantRequest;
+import com.cms.dto.central.tenant.TenantStats;
+import com.cms.dto.central.tenant.UpdateTenantRequest;
 
 import java.util.Optional;
 
@@ -9,9 +13,9 @@ public interface CentralTenantService {
 
     Optional<TenantDto> getById(String id);
 
-    TenantDto create(CreateTenantRequest req);
+    void create(CreateTenantRequest req);
 
-    TenantDto update(String id, UpdateTenantRequest req);
+    void update(String id, UpdateTenantRequest req);
 
     void delete(String id);
 

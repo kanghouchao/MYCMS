@@ -21,12 +21,12 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: domain
-                  type: VARCHAR(255)
+                  type: VARCHAR(128)
                   constraints:
                     nullable: true
               - column:
-                  name: template
-                  type: VARCHAR(100)
+                  name: email
+                  type: VARCHAR(128)
                   constraints:
                     nullable: true
               - column:

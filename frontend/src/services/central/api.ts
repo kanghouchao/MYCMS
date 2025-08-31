@@ -12,17 +12,17 @@ import {
 
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<LoginResponse> => {
-    const response = await apiClient.post("/admin/login", credentials);
+    const response = await apiClient.post("/central/login", credentials);
     return response.data;
   },
 
   me: async (): Promise<Admin> => {
-    const response = await apiClient.get("/admin/me");
+    const response = await apiClient.get("/central/me");
     return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post("/admin/logout");
+    await apiClient.post("/central/logout");
   },
 };
 
@@ -32,26 +32,26 @@ export const centralApi = {
     per_page?: number;
     search?: string;
   }): Promise<PaginatedResponse<Tenant>> => {
-    const response = await apiClient.get("/admin/tenants", { params });
+    const response = await apiClient.get("/central/tenants", { params });
     return response.data;
   },
   getById: async (id: string): Promise<Tenant> => {
-    const response = await apiClient.get(`/admin/tenants/${id}`);
+    const response = await apiClient.get(`/central/tenants/${id}`);
     return response.data;
   },
   create: async (data: CreateTenantRequest): Promise<Tenant> => {
-    const response = await apiClient.post("/admin/tenants", data);
+    const response = await apiClient.post("/central/tenants", data);
     return response.data;
   },
   update: async (id: string, data: UpdateTenantRequest): Promise<Tenant> => {
-    const response = await apiClient.put(`/admin/tenants/${id}`, data);
+    const response = await apiClient.put(`/central/tenants/${id}`, data);
     return response.data;
   },
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/admin/tenants/${id}`);
+    await apiClient.delete(`/central/tenants/${id}`);
   },
   getStats: async (): Promise<TenantStats> => {
-    const response = await apiClient.get("/admin/tenants/stats");
+    const response = await apiClient.get("/central/tenants/stats");
     return response.data;
   },
 };

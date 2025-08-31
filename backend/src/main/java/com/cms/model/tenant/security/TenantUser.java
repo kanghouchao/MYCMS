@@ -22,6 +22,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantUser extends BaseEntity {
+
     @Column(nullable = false, length = 150)
     private String nickname;
 
@@ -33,6 +34,7 @@ public class TenantUser extends BaseEntity {
 
     @Column(nullable = false)
     private Boolean enabled = true;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "t_user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<TenantRole> roles = new HashSet<>();

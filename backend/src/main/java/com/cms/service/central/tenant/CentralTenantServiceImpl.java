@@ -8,6 +8,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.ApplicationEventPublisher;
+
+import com.cms.event.tenant.TenantCreatedEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class CentralTenantServiceImpl implements CentralTenantService {
 
     private final TenantRepository tenantRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional(readOnly = true)
@@ -53,28 +57,22 @@ public class CentralTenantServiceImpl implements CentralTenantService {
 
     @Override
     @Transactional
-    public TenantDto create(CreateTenantRequest req) {
+    public void create(CreateTenantRequest req) {
         Tenant t = new Tenant();
         t.setName(req.getName());
         t.setDomain(req.getDomain());
-        t.setTemplate(req.getTemplate());
+        t.setEmail(req.getEmail());
         Tenant saved = tenantRepository.save(t);
-        return toDto(saved);
+        eventPublisher.publishEvent(new TenantCreatedEvent(saved));
     }
 
     @Override
     @Transactional
-    public TenantDto update(String id, UpdateTenantRequest req) {
+    public void update(String id, UpdateTenantRequest req) {
         var tenant = tenantRepository.findById(Long.valueOf(id))
                 .orElseThrow(() -> new IllegalArgumentException("tenant not found"));
-        if (req.getName() != null)
-            tenant.setName(req.getName());
-        if (req.getDomain() != null)
-            tenant.setDomain(req.getDomain());
-        if (req.getTemplate() != null)
-            tenant.setTemplate(req.getTemplate());
-        Tenant saved = tenantRepository.save(tenant);
-        return toDto(saved);
+        tenant.setName(req.getName());
+        tenantRepository.save(tenant);
     }
 
     @Override
@@ -92,6 +90,6 @@ public class CentralTenantServiceImpl implements CentralTenantService {
     }
 
     private TenantDto toDto(Tenant t) {
-        return new TenantDto(String.valueOf(t.getId()), t.getName(), t.getDomain(), t.getTemplate());
+        return new TenantDto(String.valueOf(t.getId()), t.getName(), t.getDomain(), t.getEmail());
     }
 }
