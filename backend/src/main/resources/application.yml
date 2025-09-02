@@ -25,9 +25,7 @@ spring:
         sslrootcert: ${DB_SSLROOTCERT:}
   jpa:
     show-sql: ${SPRING_JPA_SHOW_SQL:true}
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
   cache:
     type: redis
     redis:
