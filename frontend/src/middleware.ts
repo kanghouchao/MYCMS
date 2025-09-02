@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const ADMIN_DOMAINS = new Set(["oli-cms.test"]);
 
 export const config = {
-  matcher: ["/((?!api|_next/static|health|favicon.ico|.*\\..*).*)"],
+  matcher: ["/((?!api|_next/static|welcome|health|favicon.ico|.*\\..*).*)"],
 };
 
 export async function middleware(request: NextRequest) {
@@ -20,30 +20,19 @@ export async function middleware(request: NextRequest) {
   }
 
   const validationApiUrl =
-    process.env.TENANT_VALIDATION_API_URL || "http://backend:8080/tenant";
+    process.env.TENANT_VALIDATION_API_URL ||
+    "http://backend:8080/central/tenants";
 
   const url = validationApiUrl + `?domain=${encodeURIComponent(hostname)}`;
   const res = await fetch(url);
   const data = await res.json().catch(() => null);
 
-  if (!res.ok || !data || !data.tenant_id) {
-    return NextResponse.redirect(
-      new URL(
-        (process.env.APP_URL || "//oli-cms.test") + "/welcome",
-        request.url
-      )
-    );
-  }
-
-  let token = request.cookies.get("token")?.value;
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
   const nextRes = NextResponse.next();
   nextRes.headers.set("x-mw-role", "tenant");
-  nextRes.headers.set("x-mw-tenant-template", String(data.template_key));
-  nextRes.headers.set("x-mw-tenant-id", String(data.tenant_id));
-  nextRes.headers.set("x-mw-tenant-name", String(data.tenant_name));
+  if (!data || !data.valid) {
+    nextRes.headers.set("x-mw-tenant-template", String(data.template_key));
+    nextRes.headers.set("x-mw-tenant-id", String(data.tenant_id));
+    nextRes.headers.set("x-mw-tenant-name", String(data.tenant_name));
+  }
   return nextRes;
 }
