@@ -12,9 +12,9 @@
 
 	<Properties>
 		<!-- directory for logs; override with LOG_DIR env var -->
-		<Property name="log.dir">${env:LOG_DIR:-${sys:user.home}/logs/mycms}</Property>
+		<Property name="log.dir">${env:LOG_DIR:-./logs}</Property>
 		<!-- application name used in file names; override with APP_NAME -->
-		<Property name="app.name">${env:APP_NAME:-mycms}</Property>
+		<Property name="app.name">${env:APP_NAME:-cms}</Property>
 		<!-- default root log level; override with LOG_LEVEL -->
 		<Property name="root.level">${env:LOG_LEVEL:-INFO}</Property>
 		<!-- pattern used by all appenders -->
