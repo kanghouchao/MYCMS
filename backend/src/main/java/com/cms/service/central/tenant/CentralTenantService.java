@@ -13,6 +13,8 @@ public interface CentralTenantService {
 
     Optional<TenantDto> getById(String id);
 
+    Optional<TenantDto> getByDomain(String domain);
+
     void create(CreateTenantRequest req);
 
     void update(String id, UpdateTenantRequest req);

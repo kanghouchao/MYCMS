@@ -56,6 +56,12 @@ public class CentralTenantServiceImpl implements CentralTenantService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public Optional<TenantDto> getByDomain(String domain) {
+        return tenantRepository.findByDomain(domain).map(this::toDto);
+    }
+
+    @Override
     @Transactional
     public void create(CreateTenantRequest req) {
         Tenant t = new Tenant();

@@ -1,6 +1,10 @@
 package com.cms.controller.central;
 
-import com.cms.dto.central.tenant.*;
+import com.cms.dto.central.tenant.CreateTenantRequest;
+import com.cms.dto.central.tenant.PaginatedResponse;
+import com.cms.dto.central.tenant.TenantDto;
+import com.cms.dto.central.tenant.TenantStats;
+import com.cms.dto.central.tenant.UpdateTenantRequest;
 import com.cms.service.central.tenant.CentralTenantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +18,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/central/tenants")
@@ -37,8 +41,17 @@ public class CentralTenantController {
     @GetMapping("/{id}")
     @RolesAllowed("ADMIN")
     public ResponseEntity<TenantDto> getById(@PathVariable String id) {
-        Optional<TenantDto> t = tenantService.getById(id);
-        return t.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return tenantService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(params = "domain")
+    @PermitAll
+    public ResponseEntity<TenantDto> getByDomain(@RequestParam String domain) {
+        return tenantService.getByDomain(domain)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
