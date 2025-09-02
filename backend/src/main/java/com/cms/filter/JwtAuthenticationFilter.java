@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.log4j.Log4j2;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -22,7 +21,6 @@ import com.cms.utils.JwtUtil;
 
 import java.io.IOException;
 
-@Log4j2
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
@@ -46,7 +44,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (username != null && (existingAuth == null || !existingAuth.isAuthenticated()
                 || existingAuth instanceof AnonymousAuthenticationToken)) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            log.debug("Token: {}, User Details: {}", token, userDetails);
             if (jwtUtil.validateToken(token, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
