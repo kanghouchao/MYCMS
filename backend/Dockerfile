@@ -38,7 +38,7 @@ COPY --from=build /app/build/libs/cms-*.jar app.jar
 EXPOSE 8080
 
 # ヘルスチェック: Spring Boot Actuator の /actuator/health を確認します
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:8080/actuator/health || exit 1
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

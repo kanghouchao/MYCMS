@@ -32,10 +32,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 
-# run as non-root for better security (node user exists in official images)
-USER node
-EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD wget -q -O /dev/null http://127.0.0.1:3000/health || exit 1
-
 CMD ["npx", "next", "start", "-p", "3000"]

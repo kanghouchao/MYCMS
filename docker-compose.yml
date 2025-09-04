@@ -79,8 +79,14 @@ services:
       - "traefik.http.routers.backend.entrypoints=web"
       - "traefik.http.routers.backend.middlewares=backend-strip@docker"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
-      # Define a StripPrefix middleware so Traefik removes the /api prefix before forwarding
       - "traefik.http.middlewares.backend-strip.stripPrefix.prefixes=/api"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      start_period: 15s
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: on-failure:3
 
   # Frontend: next.js
   frontend:
@@ -98,6 +104,13 @@ services:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/health"]
+      start_period: 10s
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: on-failure:3
 
 networks:
   oli-cms-network:
