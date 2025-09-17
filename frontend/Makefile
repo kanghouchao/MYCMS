@@ -16,7 +16,7 @@ help: ## ヘルプ情報を表示
 
 build: ## フロントエンドDockerイメージをビルド
 	@echo "🏗️  フロントエンドDockerイメージをビルド中..."
-	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) . --progress=plain
+	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
 test: ## Docker コンテナ内でフロントエンドのユニットテストを実行（Dockerfile の test ステージを使用）
 	@echo "Docker 上でテストを実行しています..."

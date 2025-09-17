@@ -9,12 +9,11 @@ export const config = {
     /*
      * Match all request paths except for the ones starting with:
      * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
+     * - _next (Next.js internal assets and data)
      * - favicon.ico (favicon file)
      * - health (health check)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|health).*)",
+    "/((?!api|_next|favicon.ico|health).*)",
   ],
 };
 
