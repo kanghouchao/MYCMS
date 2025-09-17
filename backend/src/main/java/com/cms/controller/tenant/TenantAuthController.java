@@ -21,7 +21,8 @@ public class TenantAuthController {
 
     @PostMapping("/login")
     @PermitAll
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(
+            @Valid @RequestBody LoginRequest req) {
         return ResponseEntity.ok(authService.login(req.getUsername(), req.getPassword()));
     }
 }

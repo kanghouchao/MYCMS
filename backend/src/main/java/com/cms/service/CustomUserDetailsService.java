@@ -33,7 +33,17 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (tenantContext.isTenant()) {
-            return tenantUserRepository.findByEmail(username)
+            String tenantId = tenantContext.getTenantId();
+            if (!org.springframework.util.StringUtils.hasText(tenantId)) {
+                throw new UsernameNotFoundException("Missing tenant context");
+            }
+            Long tenantIdLong;
+            try {
+                tenantIdLong = Long.valueOf(tenantId);
+            } catch (NumberFormatException ex) {
+                throw new UsernameNotFoundException("Invalid tenant id format: " + tenantId);
+            }
+            return tenantUserRepository.findByTenant_IdAndEmail(tenantIdLong, username)
                     .map(u -> {
                         List<SimpleGrantedAuthority> authorities = buildAuthorities(
                                 u.getRoles(),
@@ -43,7 +53,7 @@ public class CustomUserDetailsService implements UserDetailsService {
                         return buildUser(u.getEmail(), u.getPassword(), u.getEnabled(), authorities);
                     })
                     .orElseThrow(() -> new UsernameNotFoundException(
-                            "User not found (tenant): " + username));
+                            "User not found (tenant): " + username + " @ tenant=" + tenantId));
         } else {
             return centralUserRepository.findByUsername(username)
                     .map(u -> {

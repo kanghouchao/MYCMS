@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface TenantUserRepository extends CrudRepository<TenantUser, String> {
     Optional<TenantUser> findByEmail(String email);
+
+    Optional<TenantUser> findByTenant_IdAndEmail(Long tenantId, String email);
 }
