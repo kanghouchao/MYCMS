@@ -1,5 +1,35 @@
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+
+# Gradle
+.gradle/
+build/
+out/
+!gradle/wrapper/gradle-wrapper.properties
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Logs
 *.log
+
+# OS
+.DS_Store
+
+# Env
 .env
-/vendor
-composer.lock
-bootstrap/cache
+
+# Others
+*.swp
+*.swo
+*.tmp
+*.bak
+*.pid
+*.lock

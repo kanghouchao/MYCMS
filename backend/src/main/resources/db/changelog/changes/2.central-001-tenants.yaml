@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: central-002-create-tenants-table
+      author: copilot
+      changes:
+        - createTable:
+            tableName: central_tenants
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_central_tenants
+              - column:
+                  name: name
+                  type: VARCHAR(200)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: domain
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: email
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP

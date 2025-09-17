@@ -1,29 +1,30 @@
-# Frontend Docker Makefile
+
+# フロントエンド用 Docker Makefile
 # ======================
 
-# 变量定义
-DOCKER_IMAGE = cms-frontend
-DOCKER_TAG = latest
+# 変数定義
+DOCKER_IMAGE ?= cms-frontend
+DOCKER_TAG ?= latest
 
-# 默认目标
+
+# デフォルトターゲット
 .DEFAULT_GOAL := help
 
-# ======================
-# 帮助信息
-# ======================
-help: ## 显示帮助信息
-	@echo "可用命令:"
+help: ## ヘルプ情報を表示
+	@echo "利用可能なコマンド一覧:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
-# ======================
-# Docker 镜像管理
-# ======================
-build: ## 构建Docker镜像
-	@echo "🏗️  构建前端Docker镜像..."
-	@docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+build: ## フロントエンドDockerイメージをビルド
+	@echo "🏗️  フロントエンドDockerイメージをビルド中..."
+	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
-rmi: ## 删除Docker镜像
-	@echo "🗑️  删除前端Docker镜像..."
-	@docker rmi $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null || echo "镜像不存在或已删除"
+test: ## Docker コンテナ内でフロントエンドのユニットテストを実行（Dockerfile の test ステージを使用）
+	@echo "Docker 上でテストを実行しています..."
+	@docker buildx build --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 
-.PHONY: help build rmi
+clean: ## Dockerイメージを削除
+	@echo "🗑️  フロントエンドDockerイメージを削除中..."
+	@docker rmi $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null || echo "イメージが存在しないか、既に削除されています"
+	@docker rmi $(DOCKER_IMAGE)-test:$(DOCKER_TAG) 2>/dev/null || echo "テストイメージが存在しないか、既に削除されています"
+
+.PHONY: help build test clean

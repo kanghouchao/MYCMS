@@ -1,0 +1,140 @@
+databaseChangeLog:
+  - changeSet:
+      id: tenant-002-create-users
+      author: copilot
+      changes:
+        - createTable:
+            tableName: t_users
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_t_users
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nickname
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+  - changeSet:
+      id: tenant-003-create-authorities
+      author: copilot
+      changes:
+        - createTable:
+            tableName: t_roles
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_t_roles
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+        - createTable:
+            tableName: t_permissions
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_t_permissions
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+        - createTable:
+            tableName: t_role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - addUniqueConstraint:
+                  tableName: t_role_permissions
+                  columnNames: role_id,permission_id
+                  constraintName: uq_t_role_permissions
+        - createTable:
+            tableName: t_user_roles
+            columns:
+              - column:
+                  name: tenant_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - addUniqueConstraint:
+                  tableName: t_user_roles
+                  columnNames: tenant_id,user_id,role_id
+                  constraintName: uq_t_user_roles

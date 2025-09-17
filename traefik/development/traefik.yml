@@ -1,0 +1,24 @@
+# traefik/development/traefik.yml
+# Configuration for DEVELOPMENT (HTTP ONLY).
+
+global:
+  checkNewVersion: false
+  sendAnonymousUsage: false
+
+api:
+  dashboard: true
+  insecure: true
+
+# Enable ping for health checks
+ping: {}
+
+# Define the HTTP entrypoint
+entryPoints:
+  web:
+    address: ":80"
+
+# Configure the Docker provider
+providers:
+  docker:
+    endpoint: "unix:///var/run/docker.sock"
+    exposedByDefault: false

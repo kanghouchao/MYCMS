@@ -1,15 +1,20 @@
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export default function Home() {
-  const role = headers().get("x-mw-role");
+  const cookieStore = cookies();
+  const role = cookieStore.get("x-mw-role")?.value;
 
-  if (role === "admin") {
-    redirect("/admin/dashboard");
+  console.log("🏠 Home page - Role from cookie:", role);
+
+  if (role === "central") {
+    redirect("/central/dashboard");
   }
 
   if (role === "tenant") {
-    const templateKey = headers().get("x-mw-tenant-template") || "default";
+    const templateKey =
+      cookieStore.get("x-mw-tenant-template")?.value || "default";
+    console.log("🎨 Template key:", templateKey);
     try {
       const TemplateComponent =
         require(`@/app/tenant/templates/${templateKey}/page`).default;

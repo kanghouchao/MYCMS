@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: central-001-insert-admin
+      author: copilot
+      changes:
+        - insert:
+            tableName: central_roles
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: name
+                  value: ADMIN
+        - insert:
+            tableName: central_users
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: username
+                  value: admin
+              - column:
+                  name: password
+                  value: "$2a$10$TAnVD5vZNlATP5wayRg1SOo8UKP7m9TpzbaLJejOplq55OJxRhPnS"
+              - column:
+                  name: enabled
+                  valueBoolean: true
+        - insert:
+            tableName: central_user_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueNumeric: 1
+              - column:
+                  name: role_id
+                  valueNumeric: 1

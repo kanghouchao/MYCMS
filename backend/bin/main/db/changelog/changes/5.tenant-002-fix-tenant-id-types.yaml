@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: tenant-004-fix-tenant-id-types
+      author: copilot
+      changes:
+        # Convert tenant_id columns from VARCHAR to BIGINT to match central_tenants.id (Long)
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            sql: |
+              ALTER TABLE t_users ALTER COLUMN tenant_id TYPE BIGINT USING tenant_id::bigint;
+              ALTER TABLE t_pages ALTER COLUMN tenant_id TYPE BIGINT USING tenant_id::bigint;
+              ALTER TABLE t_roles ALTER COLUMN tenant_id TYPE BIGINT USING tenant_id::bigint;
+              ALTER TABLE t_permissions ALTER COLUMN tenant_id TYPE BIGINT USING tenant_id::bigint;
+        # Add foreign keys to central_tenants(id)
+        - addForeignKeyConstraint:
+            baseTableName: t_users
+            baseColumnNames: tenant_id
+            constraintName: fk_t_users_central_tenant
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: t_pages
+            baseColumnNames: tenant_id
+            constraintName: fk_t_pages_central_tenant
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: t_roles
+            baseColumnNames: tenant_id
+            constraintName: fk_t_roles_central_tenant
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            baseTableName: t_permissions
+            baseColumnNames: tenant_id
+            constraintName: fk_t_permissions_central_tenant
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: RESTRICT

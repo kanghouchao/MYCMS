@@ -12,7 +12,7 @@ services:
       - "8080:8080"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "./traefik/${ENVIRONMENT:-local}/:/etc/traefik/:ro"
+      - "./traefik/${APP_ENV:-development}/:/etc/traefik/:ro"
     networks:
       - oli-cms-network
     depends_on:
@@ -32,15 +32,15 @@ services:
     image: postgres:16-alpine
     container_name: oli-cms-database
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-cms}
-      POSTGRES_USER: ${DB_USERNAME:-cms_user}
+      POSTGRES_DB: ${DB_NAME:-cms}
+      POSTGRES_USER: ${DB_USERNAME:-cms}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
     volumes:
       - oli-cms-db-data:/var/lib/postgresql/data
     networks:
       - oli-cms-network
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-cms_user} -d ${DB_DATABASE:-cms}" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-cms} -d ${DB_NAME:-cms}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -60,7 +60,7 @@ services:
       timeout: 5s
       retries: 5
 
-  # Backend: PHP Laravel
+  # Backend: Java Spring Boot
   backend:
     image: cms-backend:latest
     container_name: oli-cms-backend
@@ -75,9 +75,18 @@ services:
         condition: service_healthy
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=PathPrefix(`/api/`)"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
       - "traefik.http.routers.backend.entrypoints=web"
-      - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      - "traefik.http.routers.backend.middlewares=backend-strip@docker"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.backend-strip.stripPrefix.prefixes=/api"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      start_period: 15s
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: on-failure:3
 
   # Frontend: next.js
   frontend:
@@ -95,26 +104,13 @@ services:
       - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && !PathPrefix(`/api`)"
       - "traefik.http.routers.frontend.entrypoints=web"
       - "traefik.http.services.frontend.loadbalancer.server.port=3000"
-
-  worker:
-    image: cms-backend:latest
-    container_name: oli-cms-worker
-    networks:
-      - oli-cms-network
-    env_file:
-      - .env
-    depends_on:
-      database:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    command: ["php", "artisan", "queue:work", "${QUEUE_CONNECTION:-database}", "--sleep=3", "--tries=3"]
-    restart: unless-stopped
     healthcheck:
-      test: ["CMD", "php", "artisan", "queue:work", "${QUEUE_CONNECTION:-database}", "--once"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/health || exit 1"]
+      start_period: 20s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: on-failure:3
 
 networks:
   oli-cms-network:

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+	<!--
+		Best-practice Log4j2 configuration for Spring Boot app:
+		- Properties allow environment variable overrides
+		- Console appender for local/dev
+		- Rolling file appender with size & time based rollover
+		- Delete action to remove old logs (keep 30 days)
+		- AsyncAppender wrapping file appender for throughput
+		- Sensible pattern including thread & logger
+	-->
+
+	<Properties>
+		<!-- directory for logs; override with LOG_DIR env var -->
+		<Property name="log.dir">${env:LOG_DIR:-./logs}</Property>
+		<!-- application name used in file names; override with APP_NAME -->
+		<Property name="app.name">${env:APP_NAME:-cms}</Property>
+		<!-- default root log level; override with LOG_LEVEL -->
+		<Property name="root.level">${env:LOG_LEVEL:-INFO}</Property>
+		<!-- pattern used by all appenders -->
+		<Property name="pattern">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+	</Properties>
+
+	<Appenders>
+		<!-- Console appender for stdout (useful for Docker and local) -->
+		<Console name="Console" target="SYSTEM_OUT">
+			<PatternLayout pattern="${pattern}"/>
+		</Console>
+
+		<!-- Rolling file appender: daily files + size limit per file -->
+		<RollingFile name="File" fileName="${log.dir}/${app.name}.log"
+				 filePattern="${log.dir}/${app.name}-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout pattern="${pattern}"/>
+			<Policies>
+				<!-- roll every day -->
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+				<!-- or when file grows beyond 100 MB -->
+				<SizeBasedTriggeringPolicy size="100MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="30" fileIndex="min">
+				<Delete basePath="${log.dir}" maxDepth="1">
+					<IfFileName glob="${app.name}-*"/>
+					<IfLastModified age="30d"/>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<!-- Optional: separate error file -->
+		<RollingFile name="ErrorFile" fileName="${log.dir}/${app.name}-error.log"
+				 filePattern="${log.dir}/${app.name}-error-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout pattern="${pattern}"/>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+				<SizeBasedTriggeringPolicy size="50MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="90" fileIndex="min">
+				<Delete basePath="${log.dir}" maxDepth="1">
+					<IfFileName glob="${app.name}-error-*"/>
+					<IfLastModified age="90d"/>
+				</Delete>
+			</DefaultRolloverStrategy>
+		</RollingFile>
+
+		<!-- Async appender references the underlying appenders by name -->
+		<Async name="Async" includeLocation="false" blocking="false" bufferSize="1024">
+			<AppenderRef ref="File"/>
+			<AppenderRef ref="ErrorFile" level="ERROR"/>
+			<!-- Console may remain synchronous for immediate stdout, but included here to
+			     preserve ordering if desired. Remove if you want console flushed in-app threads. -->
+			<AppenderRef ref="Console"/>
+		</Async>
+	</Appenders>
+
+	<Loggers>
+		<!-- Framework and noisy libraries at INFO or WARN to reduce noise -->
+		<Logger name="org.springframework" level="INFO" additivity="false">
+			<AppenderRef ref="Async"/>
+		</Logger>
+		<Logger name="org.hibernate" level="WARN" additivity="false">
+			<AppenderRef ref="Async"/>
+		</Logger>
+
+		<!-- Application package logger (set to DEBUG for local troubleshooting) -->
+		<Logger name="com.cms" level="${env:APP_LOG_LEVEL:-DEBUG}" additivity="false">
+			<AppenderRef ref="Async"/>
+		</Logger>
+
+		<!-- Root logger uses Async appender -->
+		<Root level="${root.level}">
+			<AppenderRef ref="Async"/>
+		</Root>
+	</Loggers>
+
+</Configuration>
+

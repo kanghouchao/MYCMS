@@ -1,27 +1,46 @@
 ## frontend/Dockerfile
-## Dynamic Next.js runtime (supports Middleware) - multi-stage
 
-FROM node:24.6.0-alpine3.22 AS deps
+FROM node:24.7.0-alpine3.22 AS deps
 WORKDIR /app
 COPY package.json ./
-RUN npm install --no-audit --no-fund
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/root/.cache \
+    npm install --no-audit --no-fund
+
+FROM deps AS test
+ENV NEXT_TELEMETRY_DISABLED=1
+WORKDIR /app
+COPY . .
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/root/.cache \
+    npm run test --no-watch --ci --reporters=default --reporters=jest-junit
 
 FROM deps AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
-RUN npm run build
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/root/.cache \
+    npm run build
 
-FROM node:24.6.0-alpine3.22 AS runner
+FROM node:24.7.0-alpine3.22 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# Ensure Next server binds correctly in containers
+ENV HOSTNAME=0.0.0.0
+ENV PORT=3000
+
+# Alpine: add glibc compatibility for Next/SWC native binaries and tools for healthcheck
+RUN apk add --no-cache libc6-compat wget curl
+
+# Copy standalone server output to root (as Next docs recommend)
+COPY --from=builder /app/.next/standalone ./
+# Static assets
+COPY --from=builder /app/.next/static ./.next/static
+# Public assets (e.g., /health)
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD wget -q -O /dev/null http://127.0.0.1:3000/health || exit 1
 
-CMD ["npx", "next", "start", "-p", "3000"]
+CMD ["node", "server.js"]
