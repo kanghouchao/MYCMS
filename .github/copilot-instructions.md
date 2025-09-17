@@ -44,40 +44,58 @@ const ADMIN_DOMAINS = new Set(["oli-cms.test"]);
 ### 2. API分離パターン
 ```typescript
 // services/central/api.ts vs services/tenant/api.ts
-// AuthContextでホスト名判定し適切なAPIを選択
-const getAuthApi = () => (isTenantDomain() ? tenantAuthApi : centralAuthApi);
-```
+## Oli CMS — AI Coding Agent Guide
 
-### 3. ルーティング戦略
-- Traefik: `/api/*` は必ずbackendへ
-- Next.js middleware: ホスト名でcentralアプリかtenantアプリか判定
-- 同一コードベースで完全に独立したUX
+This repo is a multi-tenant CMS with a split architecture: Spring Boot backend and Next.js frontend, orchestrated behind Traefik. These notes capture the project-specific patterns you must follow to be productive.
 
-## 開発ワークフロー
+### Architecture in one glance
+- Reverse proxy: Traefik routes `/api/*` to backend, everything else to frontend (`docker-compose.yml`, `traefik/development/traefik.yml`). Backend sees paths without `/api` due to a stripPrefix middleware.
+- Frontend: Next.js 14 app with middleware-based domain routing (`frontend/src/middleware.ts`). Admin domains → central app; other domains → tenant app.
+- Backend: Spring Boot 3.5 (Java 21). Namespace your endpoints under `/central/*` (admin) and `/tenant/*` (tenant). Health: `/actuator/health`.
+- Data: PostgreSQL + Redis (configured via env; see `backend/src/main/resources/application.yml`).
 
-### 起動手順
-```bash
-make build              # 全サービスビルド
-make up                 # Docker Compose起動
-make logs service=backend  # 個別ログ確認
-```
+### Multi-tenant flow and cookies contract
+- Domain switch: `ADMIN_DOMAINS` in `frontend/src/middleware.ts` (defaults to `oli-cms.test`).
+- Tenant validation: middleware calls `${TENANT_VALIDATION_API_URL || http://backend:8080/central/tenants}?domain=<host>` and expects JSON `{ valid, template_key, tenant_id, tenant_name }`.
+- Cookies set by middleware:
+	- `x-mw-role`: `central | tenant`
+	- `x-mw-tenant-template`: template key for SSR
+	- `x-mw-tenant-id`, `x-mw-tenant-name`: tenant meta
+- Root routing (`frontend/src/app/page.tsx`): loads `tenant/templates/<template_key>/page` dynamically or redirects to `/central/dashboard` when role is `central`.
+- Important: In server components, read these via `cookies()` (not raw `headers()`), since middleware writes cookies.
 
-### テスト
-```bash
-make test               # 全テスト実行
-make test service=backend  # バックエンドのみ
-```
+### API client and auth patterns
+- Always use the shared axios client `frontend/src/lib/client.ts` (baseURL `/api`, attaches `Authorization: Bearer <token>` from `js-cookie`, 401 → clear token and redirect `/login`). Do not create ad-hoc axios instances.
+- Split API surface:
+	- Central: `frontend/src/services/central/api.ts` (e.g., `/central/login`, `/central/tenants`, `/central/tenants/stats`).
+	- Tenant: `frontend/src/services/tenant/api.ts` (e.g., `/tenant/register`, `/tenant/login`).
+- Choose auth API by domain using `AuthContext` (`frontend/src/contexts/AuthContext.tsx`): `NEXT_PUBLIC_CENTRAL_DOMAIN` defines the central host; others treated as tenant.
 
-### ローカル開発設定
-`/etc/hosts` に追加:
-```
-127.0.0.1 oli-cms.test              # 管理者サイト
-127.0.0.1 tenant.example.com        # テナントサイト例
-```
+### Templates and UX isolation
+- Tenant templates live under `frontend/src/app/tenant/templates/<key>/page.tsx`.
+- To add a new template:
+	1) Create the folder and a `page.tsx` export.
+	2) Ensure tenant validation returns `template_key` matching the folder name.
+	3) Middleware will set `x-mw-tenant-template`; the root page will resolve and render it.
 
-## コーディング規約
+### Local development & ops
+- Build & run with Docker:
+	- `make build` → builds backend and frontend images (`cms-backend`, `cms-frontend`).
+	- `make up` → starts Traefik, DB, Redis, backend, frontend; health checks gate readiness.
+	- `make logs service=backend|frontend|traefik` for focused logs; `make ps` for status.
+- Tests:
+	- `make test` (all), or `make test service=backend|frontend` (runs Dockerfile test stages).
+- Hosts setup (for domain switching): add `oli-cms.test` and a tenant domain to `/etc/hosts`.
 
-- **言語**: 日本語コメント・ログ、英語コード・DB
-- **認証**: JWT token、stateless設計
-- **エラーハンドリング**: Spring Boot例外→日本語ログ、フロント→toast通知
-- **CSS**: Tailwind CSS utility-first、responsive考慮
+### Conventions that matter here
+- Use English for code, comments, and docs. Keep API paths under `/central/*` and `/tenant/*` consistently.
+- All frontend API traffic must go through `/api` so Traefik routes it to backend and strips the prefix.
+- Do not bypass the middleware for tenant context; rely on the cookie contract above.
+- When changing the central domain, update both `ADMIN_DOMAINS` (middleware) and `NEXT_PUBLIC_CENTRAL_DOMAIN` (AuthContext).
+
+### Key files for orientation
+- Frontend: `src/middleware.ts`, `src/app/page.tsx`, `src/contexts/AuthContext.tsx`, `src/lib/client.ts`, `src/services/{central,tenant}/api.ts`, `src/app/tenant/templates/*`.
+- Backend: `src/main/java/com/cms/controller/{central,tenant}/`, `application.yml`.
+- Infra: `docker-compose.yml`, `traefik/development/traefik.yml`, top-level `Makefile`.
+
+If any section is unclear (e.g., tenant validation response shape or adding new templates), leave a short note in your PR and we’ll extend this guide.
