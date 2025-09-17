@@ -75,8 +75,9 @@ export async function middleware(request: NextRequest) {
     return nextRes;
   } catch (error) {
     console.error("🚨 Middleware error:", error);
-    const nextRes = NextResponse.next();
-    nextRes.cookies.set("x-mw-role", "tenant");
-    return nextRes;
+    // Return a 403 Forbidden response to prevent unauthorized access on validation failure
+    return new NextResponse("Forbidden: Tenant validation failed", {
+      status: 403,
+    });
   }
 }

@@ -48,9 +48,13 @@ public class TenantAuthServiceImpl implements TenantAuthService {
     public void register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
         Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
         TenantUser entity = new TenantUser();
-        entity.setNickname(tenantRegisterRequest.getToken());
+        // Derive a default nickname from email local-part instead of using the
+        // registration token
+        String email = tenantRegisterRequest.getEmail();
+        String nickname = (email != null && email.contains("@")) ? email.substring(0, email.indexOf('@')) : "admin";
+        entity.setNickname(nickname);
         entity.setTenant(tenant);
-        entity.setEmail(tenantRegisterRequest.getEmail());
+        entity.setEmail(email);
         entity.setPassword(passwordEncoder.encode(tenantRegisterRequest.getPassword()));
         userRepository.save(entity);
     }

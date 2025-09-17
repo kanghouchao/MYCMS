@@ -39,11 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authHeader.substring(7);
             Claims claims = jwtUtil.getClaims(token);
             if (new Date().before(claims.getExpiration())) {
-                // Scope/issuer check against requested role
+                // Scope/issuer check based on request path, do NOT trust client-provided
+                // headers
                 String issuer = claims.getIssuer();
-                String role = request.getHeader("X-Role");
-                boolean scopeOk = ("tenant".equalsIgnoreCase(role) && "TenantAuth".equals(issuer)) ||
-                        (role == null || !"tenant".equalsIgnoreCase(role)) && "CentralAuth".equals(issuer);
+                String path = request.getRequestURI();
+                boolean isTenantPath = path != null && (path.startsWith("/tenant/") || path.equals("/tenant"));
+                boolean isCentralPath = path != null && (path.startsWith("/central/") || path.equals("/central"));
+                boolean scopeOk = (isTenantPath && "TenantAuth".equals(issuer)) ||
+                        (isCentralPath && "CentralAuth".equals(issuer)) ||
+                        // allow non-namespaced endpoints when issuer exists
+                        (!isTenantPath && !isCentralPath);
                 if (!scopeOk) {
                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token scope for role");
                     return;
