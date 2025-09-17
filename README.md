@@ -1,5 +1,5 @@
 
-# Oli CMS - マルチテナント型コンテンツ管理システム
+# Oli CMS — Multi-tenant CMS (Spring Boot + Next.js)
 
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.5+-green.svg)
 ![Next.js](https://img.shields.io/badge/Next.js-14+-blue.svg)
@@ -7,250 +7,165 @@
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-latest-blue.svg)
 
-Spring Boot + Next.js をベースにしたモダンなマルチテナント型コンテンツ管理システムです。フロントエンド・バックエンド分離、Docker・Traefikによるコンテナオーケストレーションを採用しています。
+Oli CMS is a modern, multi-tenant Content Management System built with a split architecture: Spring Boot backend and Next.js frontend, orchestrated with Docker and Traefik.
 
-## 📋 目次
+## Highlights
 
-- [概要](#概要)
-- [技術スタック](#技術スタック)
-- [アーキテクチャ](#アーキテクチャ)
-- [クイックスタート](#クイックスタート)
+- Multi-tenant by host name: one frontend, isolated tenant contexts
+- Split architecture: Spring Boot API + Next.js app
+- Stateless JWT auth; admin (central) and tenant APIs split
+- Responsive UI with Tailwind CSS
+- Container-first: easy local dev and ops via Make + Docker
 
-## 🎯 概要
+## Tech Stack
 
-Oli CMS は以下の特徴を持つエンタープライズ向けマルチテナントCMSです：
+| Area | Tech | Version |
+|------|------|---------|
+| Backend | Spring Boot | 3.5+ |
+| Frontend | Next.js | 14+ |
+| Language | Java | 21+ |
+| DB | PostgreSQL | 16+ |
+| Cache | Redis | 7+ |
+| Proxy | Traefik | 3.5+ |
+| Containers | Docker | latest |
+| Styling | Tailwind CSS | 3.4+ |
+| Auth | JWT (stateless) | - |
 
-- **マルチテナント**：各テナントが独立したデータベース・ドメインを持つ
-- **フロント/バック分離**：Spring Boot API + Next.js フロントエンド
-- **モダンUI**：Tailwind CSS によるレスポンシブデザイン
-- **管理者認証**：JWTベースのAPI認証
-- **コンテナ構成**：Docker / Traefik による容易な起動・運用
-- **水平スケール**：サービス分離 & ステートレス設計
+## Architecture
 
-## 🛠 技術スタック
+Traefik routes all requests to the right service. The frontend and backend are fully decoupled and communicate over HTTP. All frontend API calls go through the reverse proxy under the `/api` prefix.
 
-| カテゴリ | 技術 | バージョン | 用途 |
-|----------|------|-----------|------|
-| バックエンド | Spring Boot | 3.5+ | REST APIサーバ |
-| フロントエンド | Next.js | 14+ | SSR/CSR対応Webアプリ |
-| 言語 | Java | 21+ | バックエンド実装 |
-| DB | PostgreSQL | 16+ | テナント毎のデータ隔離 |
-| キャッシュ | Redis | 7+ | キャッシュ・セッション管理 |
-| 逆プロキシ | Traefik | 3.5+ | ルーティング・L7制御 |
-| コンテナ | Docker | latest | 本番/開発環境統一 |
-| スタイル | Tailwind CSS | 3.4+ | ユーティリティCSS |
-| マルチテナント | 独自実装/拡張 | - | テナント管理 |
-| 認証 | JWT + Stateless | - | API認証 |
-
-## 🏗 アーキテクチャ
-
-### 全体構成
-
-**⚠️ 注意:** 初期管理者パスワードは自動生成されます。パスワードは以下のHTMLコメント内に記載されています。
-<!-- 初期管理者パスワード: admin1234 -->
-**⚠️ 重要:** このパスワードはセキュリティ上の理由から、初回ログイン後に必ず変更してください。
 ```text
-                        ┌─────────────────┐
-                        │   Frontend      │
-                        │   Next.js (Node)│
-           ┌───────────►│   Port: 3000    │
-           │            └────────────────┘
-┌─────────────────┐
-│   Traefik       │        ┌─────────────────┐
-│   (ReverseProxy)│◄────────►│   Backend       │
-│   Port: 80      │        │   Spring Boot    │
-   └─────────────────┘         │   Port: 8080    │
-                            └─────────────────┘
-                                     │
-                            ┌─────────────────┐
-                            │   PostgreSQL    │
-                            │   Redis         │
-                            └─────────────────┘
+                   ┌─────────────────┐
+                   │   Frontend      │
+   ┌──────────────►│   Next.js (3000)│
+   │               └─────────────────┘
+┌───────────┐
+│ Traefik   │           ┌─────────────────┐
+│ :80       │◄──────────►│  Backend        │
+└───────────┘            │  Spring Boot    │
+                         │  :8080          │
+                         └─────────────────┘
+                                   │
+                          ┌─────────────────┐
+                          │ PostgreSQL/Redis│
+                          └─────────────────┘
 ```
 
-- **Frontend**: Next.js による動的Webアプリ
-- **Backend**: Spring Boot によるREST API
-- **Routing**: Traefikが `/api/*` をバックエンド、その他をフロントエンドへ振り分け
-- **Data Layer**: PostgreSQL + Redis
+- Routing: `/api/*` → backend (prefix stripped before reaching Spring); everything else → frontend
+- Backend API namespaces: `/central/*` (admin) and `/tenant/*` (tenant)
+- Domain switch (frontend middleware): admin domains render the central app, others render the tenant app
 
-## 🚀 クイックスタート
+### Multi-tenant flow and cookies
 
-### 必要環境
+- Frontend middleware decides the role based on the host name and validates the tenant via backend
+- Middleware sets cookies for server components to read:
+  - `x-mw-role`: `central | tenant`
+  - `x-mw-tenant-template`: template key to load SSR tenant page
+  - `x-mw-tenant-id`, `x-mw-tenant-name`: tenant meta
+- In server components, read via `cookies()` (not raw `headers()`).
+
+## Quick Start
+
+### Prerequisites
 
 - Docker & Docker Compose
 - Make
 
-### セットアップ手順
+### Setup
 
-1. **リポジトリのクローン**
-
-   ```bash
-   git clone https://github.com/kanghouchao/MYCMS.git
-   cd oli-CMS
-   ```
-
-2. **サービス起動**
-
-   ```bash
-   make build up
-   ```
-
-3. **ローカルドメイン設定**
-
-   `/etc/hosts` に以下を追加してください：
-
-   ``` text
-   127.0.0.1 oli-cms.test
-   127.0.0.1 tenant.domain.example.com  # 例
-   ```
-
-4. **Make コマンド一覧**
-
-   ```bash
-   make help
-   ```
-
-## 📁 ディレクトリ構成
-
-```text
-oli-CMS/
-├── backend/                # Spring Boot バックエンド
-│   ├── src/
-│   │   ├── main/java/      # Java ソース
-│   │   ├── main/resources/ # 設定・マイグレーション
-│   │   └── test/           # テストコード
-│   ├── build.gradle        # Gradle 設定
-│   └── Dockerfile          # バックエンド用Docker
-├── frontend/               # Next.js フロントエンド
-│   ├── src/                # ページ・コンポーネント等
-│   ├── public/             # 静的リソース
-│   └── package.json        # 依存管理
-├── traefik/                # Traefik 設定
-│   ├── development/        # 開発用
-│   └── production/         # 本番用
-├── docker-compose.yml      # コンテナ定義
-└── Makefile                # 管理コマンド
-```
-
-## 🙋‍♂️ サポート
-
-ご質問・不具合報告は以下をご利用ください：
-
-- [GitHub Issues](https://github.com/kanghouchao/MYCMS/issues)
-
----
-
-**作者:** [kanghouchao](https://github.com/kanghouchao)  
-**リポジトリ:** [oli-CMS](https://github.com/kanghouchao/MYCMS)  
-**最終更新:** 2025-08-23
-
----
-
-## 🚀 クイックスタート
-
-### 必要環境
-
-- Docker & Docker Compose
-- Make
-
-### セットアップ手順
-
-1. **リポジトリのクローン**
-
-   ```bash
-   git clone https://github.com/kanghouchao/MYCMS.git
-   cd oli-CMS
-   ```
-
-2. **サービス起動**
-
-   ```bash
-   make build up
-   ```
-
-3. **ローカルドメイン設定**
-
-   `/etc/hosts` に以下を追加してください：
-
-   ``` text
-   127.0.0.1 oli-cms.test
-   127.0.0.1 tenant.domain.example.com  # 例
-   ```
-
-4. **Make コマンド一覧**
-
-   ```bash
-   make help
-   ```
-
-## 📁 ディレクトリ構成
-
-```text
-oli-CMS/
-├── backend/                # Spring Boot バックエンド
-│   ├── src/
-│   │   ├── main/java/      # Java ソース
-│   │   ├── main/resources/ # 設定・マイグレーション
-│   │   └── test/           # テストコード
-│   ├── build.gradle        # Gradle 設定
-│   └── Dockerfile          # バックエンド用Docker
-├── frontend/               # Next.js フロントエンド
-│   ├── src/                # ページ・コンポーネント等
-│   ├── public/             # 静的リソース
-│   └── package.json        # 依存管理
-├── traefik/                # Traefik 設定
-│   ├── local/              # 開発用
-│   └── prod/               # 本番用
-├── docker-compose.yml      # コンテナ定義
-└── Makefile                # 管理コマンド
-```
-
-## 🙋‍♂️ サポート
-
-ご質問・不具合報告は以下をご利用ください：
-
-- [GitHub Issues](https://github.com/kanghouchao/MYCMS/issues)
-
----
-   cd oli-CMS
-   ```
-
-2. **サービス起動**
-
-   ```bash
-   make build up
-   ```
-
-### ローカルドメイン設定
-
-``` text
-もしあなたがカスタムドメインを設定する必要がある場合は、以下の内容を `/etc/hosts` ファイルに追加してください：
-
-``` text
-127.0.0.1 oli-cms.test
-127.0.0.1 tenant.domain.example.com  ## 例
-```
-
-### Make コマンド
+1. Clone the repo
 
 ```bash
-make help        # 全てのコマンドを表示
+git clone https://github.com/kanghouchao/MYCMS.git
+cd MYCMS
 ```
 
-**技術内訳:**
+1. Start services
 
-- Laravel 11+ 后端 API (Swoole 运行时)
-- Next.js 14+ Node.js ランタイム実行 (Middleware 対応)
-- PostgreSQL 16 数据库
-- Traefik 3.5 反向代理
-- Docker & Docker Compose
+```bash
+make build up
+```
 
-## 🙋‍♂️ サポート
+1. Map local domains (for admin/tenant switching)
 
-もし質問や問題がある場合は、以下のリソースを参照してください：
+Add the following lines to `/etc/hosts`:
 
-1. [GitHub Issues](https://github.com/kanghouchao/MYCMS/issues)
+```text
+127.0.0.1 oli-cms.test
+127.0.0.1 tenant.example.test  # sample tenant domain
+```
+
+1. Access
+
+- Central (admin UI): [oli-cms.test](http://oli-cms.test)
+- Sample tenant: [tenant.example.test](http://tenant.example.test)
+
+1. First-time admin setup
+
+- Use the central registration screen to create the first admin account: `/central/register` on the admin domain
+- No default password is published in this repo for security reasons
+
+### Useful Make targets
+
+- `make help` — list all commands
+- `make build` — build backend and frontend images
+- `make up` — start the full stack (Traefik, DB, Redis, backend, frontend)
+- `make down` — stop and remove containers
+- `make ps` — show running services
+- `make logs service=backend|frontend|traefik` — follow service logs
+- `make test` or `make test service=backend|frontend` — run tests
+
+## Development Notes
+
+- All frontend API traffic must go through `/api` so Traefik can route and strip the prefix
+- Central domain configuration lives in two places:
+  - `frontend/src/middleware.ts` → `ADMIN_DOMAINS`
+  - `NEXT_PUBLIC_CENTRAL_DOMAIN` env (used by `AuthContext`)
+- Backend health endpoint: `/actuator/health`
+- Tenant templates live under `frontend/src/app/tenant/templates/<key>/page.tsx`
+  - To add a template: create the folder, export a `page.tsx`, and ensure the tenant validation API returns `template_key` matching the folder name
+
+## Project Structure
+
+```text
+MYCMS/
+├── backend/                     # Spring Boot API
+│   ├── src/
+│   │   ├── main/java/com/cms/
+│   │   ├── main/resources/
+│   │   └── test/
+│   ├── build.gradle
+│   └── Dockerfile
+├── frontend/                    # Next.js app
+│   ├── src/
+│   │   ├── middleware.ts
+│   │   ├── app/
+│   │   │   ├── central/
+│   │   │   ├── tenant/
+│   │   │   └── login/
+│   │   ├── contexts/
+│   │   ├── lib/
+│   │   └── services/
+│   └── package.json
+├── traefik/
+│   ├── development/
+│   └── production/
+├── docker-compose.yml
+└── Makefile
+```
+
+## Troubleshooting
+
+- If ports are busy, ensure nothing else is using 80 (Traefik), 3000 (frontend), or 8080 (backend)
+- Confirm `/etc/hosts` entries resolve to your machine
+- If the frontend shows a 401 and redirects to `/login`, your token may be missing or expired; log in again
+
+## Support
+
+- Open an issue: [github.com/kanghouchao/MYCMS/issues](https://github.com/kanghouchao/MYCMS/issues)
 
 ---
 
-
+Author: [kanghouchao](https://github.com/kanghouchao)
+Repository: [github.com/kanghouchao/MYCMS](https://github.com/kanghouchao/MYCMS)
