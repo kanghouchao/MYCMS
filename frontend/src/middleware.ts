@@ -51,14 +51,24 @@ export async function middleware(request: NextRequest) {
 
     const nextRes = NextResponse.next();
     nextRes.cookies.set("x-mw-role", "tenant");
-    if (data && data.valid) {
-      nextRes.cookies.set(
-        "x-mw-tenant-template",
-        String(data.template_key || "")
-      );
-      nextRes.cookies.set("x-mw-tenant-id", String(data.tenant_id || ""));
-      nextRes.cookies.set("x-mw-tenant-name", String(data.tenant_name || ""));
-      console.error("✅ Valid tenant, cookies set");
+    // Accept both legacy shape { valid, template_key, tenant_id, tenant_name }
+    // and current shape { id, name, domain, email }
+    if (data && typeof data === "object") {
+      const templateKey = String((data.template_key ?? "default") || "default");
+      const tenantId = String(data.tenant_id ?? data.id ?? "");
+      const tenantName = String(data.tenant_name ?? data.name ?? "");
+
+      // If tenantId and tenantName exist or domain exists, treat as valid
+      const isValid = Boolean(tenantId || tenantName || data.domain);
+
+      if (isValid) {
+        nextRes.cookies.set("x-mw-tenant-template", templateKey);
+        nextRes.cookies.set("x-mw-tenant-id", tenantId);
+        nextRes.cookies.set("x-mw-tenant-name", tenantName);
+        console.error("✅ Tenant recognized, cookies set");
+      } else {
+        console.error("❌ Tenant payload lacked required identifiers");
+      }
     } else {
       console.error("❌ Invalid tenant or no data");
     }
