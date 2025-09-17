@@ -1,9 +1,6 @@
 ## frontend/Dockerfile
 
-FROM node:24.6.0-alpine3.22 AS base
-WORKDIR /app
-
-FROM base AS deps
+FROM node:24.7.0-alpine3.22 AS deps
 COPY package.json ./
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/root/.cache \
@@ -24,12 +21,14 @@ RUN --mount=type=cache,target=/root/.npm \
     npm run build && \
     npm prune --production
 
-FROM node:24.6.0-alpine3.22 AS runner
+FROM node:24.7.0-alpine3.22 AS runner
 WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder ./public ./public
+COPY --from=builder ./.next ./.next
+COPY --from=builder ./node_modules ./node_modules
+
+EXPOSE 3000
 
 CMD ["npx", "next", "start", "-p", "3000"]

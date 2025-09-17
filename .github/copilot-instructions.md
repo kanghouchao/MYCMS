@@ -1,38 +1,83 @@
-# 项目概述
-这是一个前后端分离的多租户内容管理系统（CMS）。租户共用数据库。
-后端使用 Java 21 和 Spring boot 框架，前端使用 TypeScript 和 Next.js。数据库使用PostgreSQL。
-代理网关使用Traefik，运行时使用Docker compose，启动脚本使用makefile。
-鉴权使用无状态Token，前端充分考虑CSR和SSR的优缺点酌情使用。
+# Oli CMS - マルチテナント型CMSの開発ガイド
 
-## 文件夹结构
+## プロジェクト概要
+フロント/バック分離＋Dockerコンテナオーケストレーションによるマルチテナント型CMS。
+管理者サイト(central)と各テナント独立サイトをホスト名で判別する単一フロントエンドアプリ。
 
-- `frontend`：前端代码，标准的Next.js项目结构，管理后台页面在`frontend/src/app/central`目录下，租户页面在`frontend/src/app/tenant`目录下
-- `backend`：后端代码，使用Java 21和Spring Boot框架，管理后台API在`backend/src/main/java/com/cms/central`，租户API在`backend/src/main/java/com/cms/tenant`
-- `traefik`：Traefik配置文件，分了开发环境和生产环境
-- `docker-compose.yml`：Docker Compose配置文件
-- `Makefile`：Makefile配置文件
+**アーキテクチャの核心**:
+- Spring Boot 3.5 (Java 21) + Next.js 14 のフル分離
+- Traefikがルーティング: `/api/*` → backend、その他 → frontend
+- マルチテナント: ホスト名ベースでcentral/tenant切り替え(`frontend/src/middleware.ts`)
+- 認証: JWT stateless token、central/tenantで異なるAPI(`services/central/api.ts`, `services/tenant/api.ts`)
 
-## 框架和技术栈
+## ディレクトリ構造＆責務
 
-- 前端：Node JS、Next.js、TypeScript、Tailwind CSS、npm。
-- 后端：Java 21、Spring Boot、Spring Security、liquibase、PostgreSQL、Redis、Gradle。
-- 代理：Traefik
-- 容器化：Docker、Docker Compose
-- 脚本：Makefile
+```
+├── backend/                     # Spring Boot API
+│   └── src/main/java/com/cms/
+│       ├── controller/
+│       │   ├── central/        # 管理者API (tenant管理等)
+│       │   └── tenant/         # テナント専用API  
+│       ├── model/              # JPA Entity
+│       └── service/            # ビジネスロジック
+├── frontend/                   # Next.js アプリ
+│   └── src/
+│       ├── middleware.ts       # ホスト名判定＆ルーティング
+│       ├── app/
+│       │   ├── central/        # 管理者UI (oli-cms.test)
+│       │   ├── tenant/         # テナントUI (各独自ドメイン)
+│       │   └── login/          # 共通ログイン
+│       ├── contexts/AuthContext.tsx  # central/tenant判定認証
+│       └── services/           # API クライアント分離
+└── traefik/                    # 逆プロキシ設定
+```
 
-## 代码风格
+## 重要な開発パターン
 
-- 参考 `.editorconfig` 文件
-- 注释和文档，错误日志等使用日文
-- 数据库表和字段、函数、变量、类名等使用英文
+### 1. マルチテナント切り替え
+```typescript
+// frontend/src/middleware.ts - ドメイン判定ロジック
+const ADMIN_DOMAINS = new Set(["oli-cms.test"]);
+// oli-cms.test → central管理画面、その他 → tenant画面
+```
 
-## 启动命令
+### 2. API分離パターン
+```typescript
+// services/central/api.ts vs services/tenant/api.ts
+// AuthContextでホスト名判定し適切なAPIを選択
+const getAuthApi = () => (isTenantDomain() ? tenantAuthApi : centralAuthApi);
+```
 
-参看 `Makefile`
+### 3. ルーティング戦略
+- Traefik: `/api/*` は必ずbackendへ
+- Next.js middleware: ホスト名でcentralアプリかtenantアプリか判定
+- 同一コードベースで完全に独立したUX
 
-- 构建镜像: `make build service=($service)`
-- 运行测试: `make test service=($service)`
-- 启动开发环境：`make up`
-- 停止开发环境：`make down`
-- 查看日志：`make logs service=($service)`
-- 进入后端容器：`make exec service=($service)`
+## 開発ワークフロー
+
+### 起動手順
+```bash
+make build              # 全サービスビルド
+make up                 # Docker Compose起動
+make logs service=backend  # 個別ログ確認
+```
+
+### テスト
+```bash
+make test               # 全テスト実行
+make test service=backend  # バックエンドのみ
+```
+
+### ローカル開発設定
+`/etc/hosts` に追加:
+```
+127.0.0.1 oli-cms.test              # 管理者サイト
+127.0.0.1 tenant.example.com        # テナントサイト例
+```
+
+## コーディング規約
+
+- **言語**: 日本語コメント・ログ、英語コード・DB
+- **認証**: JWT token、stateless設計
+- **エラーハンドリング**: Spring Boot例外→日本語ログ、フロント→toast通知
+- **CSS**: Tailwind CSS utility-first、responsive考慮

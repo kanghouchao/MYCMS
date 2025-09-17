@@ -1,4 +1,3 @@
-
 # 1. 依存関係をダウンロードしてキャッシュします
 FROM gradle:9.0.0-jdk24-ubi-minimal AS dependencies
 WORKDIR /app

@@ -1,6 +1,9 @@
 package com.cms.service.tenant;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
+import java.util.Map;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +21,7 @@ import com.cms.repository.tenant.TenantUserRepository;
 import com.cms.utils.JwtUtil;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class TenantAuthServiceImpl implements TenantAuthService {
 
@@ -30,9 +34,13 @@ public class TenantAuthServiceImpl implements TenantAuthService {
     @Override
     @Transactional(readOnly = true)
     public Token login(String username, String password) {
+        log.debug("Attempting login for user: {}", username);
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password));
-        return jwtUtil.generateToken(auth.getName());
+        return jwtUtil.generateToken(auth.getName(),
+                "TenantAuth",
+                Map.of("authorities",
+                        auth.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
     }
 
     @Override

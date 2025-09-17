@@ -6,18 +6,17 @@ import com.cms.service.mail.MailService;
 import com.cms.service.central.tenant.TenantRegistrationService;
 import com.cms.config.AppProperties;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.event.TransactionalEventListener;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.stereotype.Component;
 
+@Log4j2
 @Component
 @RequiredArgsConstructor
 public class TenantCreatedListener {
-
-    private static final Logger log = LoggerFactory.getLogger(TenantCreatedListener.class);
 
     private final MailService mailService;
     private final TenantRegistrationService registrationService;
@@ -28,7 +27,7 @@ public class TenantCreatedListener {
     public void onTenantCreated(TenantCreatedEvent ev) {
         Tenant t = ev.getTenant();
         if (t.getEmail() == null || t.getEmail().isBlank()) {
-            log.info("tenant {} has no email, skipping registration mail", t.getId());
+            log.warn("tenant {} has no email, skipping registration mail", t.getId());
             return;
         }
 

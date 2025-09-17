@@ -1,6 +1,7 @@
 package com.cms.config;
 
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class TenantContext {
@@ -12,6 +13,10 @@ public class TenantContext {
 
     public String getTenantId() {
         return CURRENT_TENANT.get();
+    }
+
+    public boolean isTenant() {
+        return StringUtils.hasText(getTenantId());
     }
 
     public void clear() {

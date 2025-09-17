@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
@@ -33,9 +32,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        boolean isTenant = StringUtils.hasText(tenantContext.getTenantId());
-
-        if (isTenant) {
+        if (tenantContext.isTenant()) {
             return tenantUserRepository.findByEmail(username)
                     .map(u -> {
                         List<SimpleGrantedAuthority> authorities = buildAuthorities(
@@ -43,7 +40,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                                 r -> r.getName(),
                                 r -> r.getPermissions(),
                                 p -> p.getName());
-
                         return buildUser(u.getEmail(), u.getPassword(), u.getEnabled(), authorities);
                     })
                     .orElseThrow(() -> new UsernameNotFoundException(

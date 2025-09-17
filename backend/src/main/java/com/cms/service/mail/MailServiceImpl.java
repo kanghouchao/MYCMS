@@ -1,18 +1,17 @@
 package com.cms.service.mail;
 
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Log4j2
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
-
-    private static final Logger log = LoggerFactory.getLogger(MailServiceImpl.class);
 
     @Autowired(required = false)
     private JavaMailSender mailSender;

@@ -1,21 +1,40 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
 const ADMIN_DOMAINS = new Set(["oli-cms.test"]);
 
 export const config = {
-  matcher: ["/((?!api|_next/static|welcome|health|favicon.ico|.*\\..*).*)"],
+  // 匹配所有路径，除了静态资源和 API
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - health (health check)
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|health).*)",
+  ],
 };
 
 export async function middleware(request: NextRequest) {
+  // 强制输出到错误日志
+  console.error("🔄 MIDDLEWARE CALLED! Path:", request.nextUrl.pathname);
+
   const rawHost =
     request.headers.get("x-forwarded-host") ||
     request.headers.get("host") ||
     request.nextUrl.hostname;
   const hostname = rawHost.split(",")[0].trim().split(":")[0].toLowerCase();
 
+  console.error("🌐 Raw host:", rawHost);
+  console.error("🏠 Processed hostname:", hostname);
+
   if (ADMIN_DOMAINS.has(hostname)) {
+    console.error("👑 Admin domain detected");
     const res = NextResponse.next();
-    res.headers.set("x-mw-role", "central");
+    res.cookies.set("x-mw-role", "central");
     return res;
   }
 
@@ -24,15 +43,31 @@ export async function middleware(request: NextRequest) {
     "http://backend:8080/central/tenants";
 
   const url = validationApiUrl + `?domain=${encodeURIComponent(hostname)}`;
-  const res = await fetch(url);
-  const data = await res.json().catch(() => null);
+  console.error("🔍 Validating tenant with URL:", url);
 
-  const nextRes = NextResponse.next();
-  nextRes.headers.set("x-mw-role", "tenant");
-  if (!data || !data.valid) {
-    nextRes.headers.set("x-mw-tenant-template", String(data.template_key));
-    nextRes.headers.set("x-mw-tenant-id", String(data.tenant_id));
-    nextRes.headers.set("x-mw-tenant-name", String(data.tenant_name));
+  try {
+    const res = await fetch(url);
+    const data = await res.json().catch(() => null);
+    console.error("📡 Tenant validation response:", data);
+
+    const nextRes = NextResponse.next();
+    nextRes.cookies.set("x-mw-role", "tenant");
+    if (data && data.valid) {
+      nextRes.cookies.set(
+        "x-mw-tenant-template",
+        String(data.template_key || "")
+      );
+      nextRes.cookies.set("x-mw-tenant-id", String(data.tenant_id || ""));
+      nextRes.cookies.set("x-mw-tenant-name", String(data.tenant_name || ""));
+      console.error("✅ Valid tenant, cookies set");
+    } else {
+      console.error("❌ Invalid tenant or no data");
+    }
+    return nextRes;
+  } catch (error) {
+    console.error("🚨 Middleware error:", error);
+    const nextRes = NextResponse.next();
+    nextRes.cookies.set("x-mw-role", "tenant");
+    return nextRes;
   }
-  return nextRes;
 }

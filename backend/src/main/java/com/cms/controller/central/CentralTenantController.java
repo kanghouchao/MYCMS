@@ -7,6 +7,8 @@ import com.cms.dto.central.tenant.TenantStats;
 import com.cms.dto.central.tenant.UpdateTenantRequest;
 import com.cms.service.central.tenant.CentralTenantService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,6 +24,7 @@ import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
+@Log4j2
 @RestController
 @RequestMapping("/central/tenants")
 @RequiredArgsConstructor
