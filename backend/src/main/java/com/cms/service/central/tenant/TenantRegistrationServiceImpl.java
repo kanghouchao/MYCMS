@@ -33,7 +33,9 @@ public class TenantRegistrationServiceImpl implements TenantRegistrationService 
   public Long validate(String token) {
     String key = keyFor(token);
     String val = redisTemplate.opsForValue().get(key);
-    if (val == null) return null;
+    if (val == null) {
+      return null;
+    }
     try {
       return Long.valueOf(val);
     } catch (NumberFormatException e) {
