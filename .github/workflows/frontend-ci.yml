@@ -8,18 +8,10 @@ on:
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
-  pull_request:
-    branches:
-      - master
-      - release/**
-    paths:
-      - 'frontend/**'
-      - '.github/workflows/frontend-ci.yml'
-  workflow_dispatch:
 
-concurrency:
-  group: frontend-ci-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
+  pull-requests: read
 
 jobs:
   lint-and-test:
