@@ -33,3 +33,6 @@ out/
 *.bak
 *.pid
 *.lock
+
+# Test Reports
+reports/

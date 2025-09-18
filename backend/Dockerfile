@@ -12,7 +12,8 @@ WORKDIR /app
 COPY src src
 RUN --mount=type=cache,target=/home/gradle/.gradle \
 	--mount=type=cache,target=/app/.gradle \
-	gradle test --no-daemon --info
+	# Run unit tests, generate Jacoco reports, and enforce coverage thresholds
+	gradle clean test jacocoTestReport jacocoTestCoverageVerification --no-daemon --info
 
 # 3. ビルド成果物を作成します
 FROM dependencies AS build

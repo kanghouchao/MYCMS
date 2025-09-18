@@ -4,6 +4,8 @@ package-lock.json
 
 # Testing
 /coverage
+artifacts/
+junit.xml
 
 # Next.js
 /.next/

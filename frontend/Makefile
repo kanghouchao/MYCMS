@@ -5,6 +5,7 @@
 # 変数定義
 DOCKER_IMAGE ?= cms-frontend
 DOCKER_TAG ?= latest
+COVERAGE_DIR ?= coverage
 
 
 # デフォルトターゲット
@@ -18,9 +19,17 @@ build: ## フロントエンドDockerイメージをビルド
 	@echo "🏗️  フロントエンドDockerイメージをビルド中..."
 	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
-test: ## Docker コンテナ内でフロントエンドのユニットテストを実行（Dockerfile の test ステージを使用）
+test: ## Docker コンテナ内でユニットテストを実行し、artifacts/ にレポートを収集
 	@echo "Docker 上でテストを実行しています..."
-	@docker buildx build --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
+	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
+	@$(MAKE) test-copy-artifacts
+
+test-copy-artifacts: ## テスト成果物を frontend/coverage と frontend/junit.xml にコピー
+	@rm -rf $(COVERAGE_DIR) && mkdir -p $(COVERAGE_DIR)
+	@cid=$(shell docker create $(DOCKER_IMAGE)-test:$(DOCKER_TAG) true) && \
+		docker cp $$cid:/app/coverage $(COVERAGE_DIR) || true && \
+		docker cp $$cid:/app/junit.xml $(COVERAGE_DIR)/junit.xml || true && \
+		docker rm -f $$cid >/dev/null 2>&1 || true
 
 clean: ## Dockerイメージを削除
 	@echo "🗑️  フロントエンドDockerイメージを削除中..."
