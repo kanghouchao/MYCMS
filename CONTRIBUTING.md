@@ -32,6 +32,7 @@ Before requesting review, ensure the following succeed locally:
 - Use GitHub Flow: issue → branch → PR → review → squash & merge
 - One PR per issue; link the issue in the PR (e.g., `Closes #123`)
 - Name branches like `<area>/issue-<no>-<slug>` (e.g., `chore/issue-13-ai-pr-template`)
+- PR descriptions must follow `.github/pull_request_template.md`. CI will check for required sections and fail otherwise.
 
 ## Tests & Coverage
 

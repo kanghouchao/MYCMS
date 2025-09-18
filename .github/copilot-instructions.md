@@ -66,6 +66,8 @@ This repo is a split-architecture, multi-tenant CMS behind Traefik. Follow these
 ### Solo development (pre-open-source)
 - Even as a single maintainer, follow the same issue → branch → PR → squash flow to preserve reviewable history.
 - In PR descriptions, include scope, risks, validation steps, and affected services (frontend/backend/infra).
+- Follow the repository PR template `.github/pull_request_template.md`; fill in Quality Gates (build/lint/tests/coverage/smoke) and provide links or logs.
+- For multi-file edits, add a short progress summary (what changed, why, and what's next) in the PR.
 - Prefer small, incremental PRs and keep `master` deployable at all times.
 
 ### Key files

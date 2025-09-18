@@ -1,0 +1,28 @@
+name: PR Template Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  check-pr-body:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ensure PR body contains required sections
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = context.payload.pull_request.body || '';
+            const required = [
+              '## Context & Motivation',
+              '## Scope of Changes',
+              '## Quality Gates',
+              '## Test Notes',
+              '## Risk & Mitigation'
+            ];
+            const missing = required.filter(s => !body.includes(s));
+            if (missing.length) {
+              core.setFailed(`PR description missing sections: ${missing.join(', ')}`);
+            } else {
+              core.info('PR description contains required sections.');
+            }
