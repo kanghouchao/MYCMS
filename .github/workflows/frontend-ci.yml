@@ -1,9 +1,10 @@
 name: Frontend CI
 
 on:
-  pull_request:
-    branches:
+  push:
+    branches-ignore:
       - master
+      - release/**
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
