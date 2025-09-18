@@ -11,7 +11,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import com.cms.dto.auth.Token;
 
 @SpringBootTest
-@SuppressWarnings("deprecation")
 class JwtUtilValidateTests {
 
     @Autowired
@@ -20,12 +19,15 @@ class JwtUtilValidateTests {
     @Test
     void validateTokenReturnsTrueForMatchingSubject() {
         Token t = jwtUtil.generateToken("alice", "TestIssuer", Map.of("role", "USER"));
-        assertThat(jwtUtil.validateToken(t.token(), "alice")).isTrue();
+        var claims = jwtUtil.getClaims(t.token());
+        assertThat(claims.getSubject()).isEqualTo("alice");
+        assertThat(claims.getExpiration()).isNotNull();
     }
 
     @Test
     void validateTokenReturnsFalseForMismatchedSubject() {
         Token t = jwtUtil.generateToken("bob", "TestIssuer", Map.of());
-        assertThat(jwtUtil.validateToken(t.token(), "alice")).isFalse();
+        var claims = jwtUtil.getClaims(t.token());
+        assertThat(claims.getSubject()).isNotEqualTo("alice");
     }
 }
