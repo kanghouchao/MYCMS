@@ -12,26 +12,25 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-    /** Application base URL (for links in notifications, etc.) */
-    private String url;
+  /** Application base URL (for links in notifications, etc.) */
+  private String url;
 
-    /** Nested JWT configuration bound from app.jwt.* */
-    @NestedConfigurationProperty
-    private Jwt jwt = new Jwt();
+  /** Nested JWT configuration bound from app.jwt.* */
+  @NestedConfigurationProperty private Jwt jwt = new Jwt();
 
-    @Getter
-    @Setter
-    public static class Jwt {
-        private String secret;
-        private long expiration;
-    }
+  @Getter
+  @Setter
+  public static class Jwt {
+    private String secret;
+    private long expiration;
+  }
 
-    // Backward-compatible accessors used by existing components (e.g., JwtUtil)
-    public String getJwtSecret() {
-        return jwt != null ? jwt.getSecret() : null;
-    }
+  // Backward-compatible accessors used by existing components (e.g., JwtUtil)
+  public String getJwtSecret() {
+    return jwt != null ? jwt.getSecret() : null;
+  }
 
-    public long getJwtExpiration() {
-        return jwt != null ? jwt.getExpiration() : 0L;
-    }
+  public long getJwtExpiration() {
+    return jwt != null ? jwt.getExpiration() : 0L;
+  }
 }
