@@ -2,9 +2,9 @@ name: CodeQL
 
 on:
   push:
-    branches:
+    branches-ignore:
       - master
-      - 'releases/**'
+      - release/**
   schedule:
     - cron: '0 3 * * *'
 
