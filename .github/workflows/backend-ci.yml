@@ -1,0 +1,52 @@
+name: Backend CI
+
+on:
+  push:
+    branches-ignore:
+      - master
+      - release/**
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [ master ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+
+jobs:
+  lint-and-test:
+    name: Lint and Test (backend)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x gradlew || true
+
+      - name: Lint (Spotless check via Docker stage)
+        run: make lint
+
+      - name: Test (via Docker stage; collects reports)
+        run: make test
+
+      - name: Upload JUnit and Jacoco reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-artifacts
+          path: |
+            backend/reports/junit
+            backend/reports/jacoco
+          if-no-files-found: ignore
