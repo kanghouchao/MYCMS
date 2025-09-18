@@ -8,12 +8,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import java.util.HashSet;
-import java.util.Set;
 
 @Entity
 @Table(name = "central_users")
@@ -23,15 +23,19 @@ import java.util.Set;
 @AllArgsConstructor
 public class CentralUser extends BaseEntity {
 
-    @Column(nullable = false, unique = true, length = 150)
-    private String username;
+  @Column(nullable = false, unique = true, length = 150)
+  private String username;
 
-    @Column(nullable = false)
-    private String password;
+  @Column(nullable = false)
+  private String password;
 
-    @Column(nullable = false)
-    private Boolean enabled = true;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "central_user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<CentralRole> roles = new HashSet<>();
+  @Column(nullable = false)
+  private Boolean enabled = true;
+
+  @ManyToMany(fetch = FetchType.LAZY)
+  @JoinTable(
+      name = "central_user_roles",
+      joinColumns = @JoinColumn(name = "user_id"),
+      inverseJoinColumns = @JoinColumn(name = "role_id"))
+  private Set<CentralRole> roles = new HashSet<>();
 }

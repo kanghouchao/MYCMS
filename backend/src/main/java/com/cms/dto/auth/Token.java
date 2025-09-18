@@ -1,6 +1,3 @@
 package com.cms.dto.auth;
 
-public record Token(
-        String token,
-        long expiresAt) {
-}
+public record Token(String token, long expiresAt) {}

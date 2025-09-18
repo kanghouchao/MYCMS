@@ -10,12 +10,12 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateTenantRequest {
 
-    @NotBlank(message = "name is required")
-    private String name;
+  @NotBlank(message = "name is required")
+  private String name;
 
-    @NotBlank(message = "domain is required")
-    private String domain;
+  @NotBlank(message = "domain is required")
+  private String domain;
 
-    @NotBlank(message = "email is required")
-    private String email;
+  @NotBlank(message = "email is required")
+  private String email;
 }

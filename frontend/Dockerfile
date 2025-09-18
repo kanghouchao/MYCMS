@@ -7,6 +7,14 @@ RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/root/.cache \
     npm install --no-audit --no-fund
 
+FROM deps AS lint
+WORKDIR /app
+ENV NEXT_TELEMETRY_DISABLED=1
+COPY . .
+RUN --mount=type=cache,target=/root/.npm \
+    --mount=type=cache,target=/root/.cache \
+    npm run lint
+
 FROM deps AS test
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV JEST_JUNIT_OUTPUT=/app/junit.xml

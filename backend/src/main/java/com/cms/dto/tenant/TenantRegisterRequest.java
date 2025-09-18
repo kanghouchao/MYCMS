@@ -9,13 +9,9 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class TenantRegisterRequest {
-    @NotBlank
-    private String token;
+  @NotBlank private String token;
 
-    @NotBlank
-    private String email;
+  @NotBlank private String email;
 
-    @NotBlank
-    private String password;
-
+  @NotBlank private String password;
 }

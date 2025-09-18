@@ -19,6 +19,15 @@ build: ## フロントエンドDockerイメージをビルド
 	@echo "🏗️  フロントエンドDockerイメージをビルド中..."
 	@docker buildx build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
 
+lint: ## ESLint を実行（Docker lint ステージ経由）
+	@echo "🧹 Docker の lint ステージで ESLint を実行中..."
+	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
+
+format: ## ESLint の自動修正をローカルで実行
+	@echo "✍️  ESLint の自動修正を実行中..."
+	@if [ ! -d node_modules ]; then echo "📦 依存をインストール中..."; npm ci || npm install; fi
+	@npm run lint:fix
+
 test: ## Docker コンテナ内でユニットテストを実行し、artifacts/ にレポートを収集
 	@echo "Docker 上でテストを実行しています..."
 	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
