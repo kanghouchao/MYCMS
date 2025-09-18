@@ -165,6 +165,11 @@ MYCMS/
 
 - Open an issue: [github.com/kanghouchao/MYCMS/issues](https://github.com/kanghouchao/MYCMS/issues)
 
+## Contributing & AI Guidelines
+
+- Contributing Guide: see `CONTRIBUTING.md`
+- AI submission rules and PR checklist: see `.github/pull_request_template.md` and `.github/copilot-instructions.md`
+
 ---
 
 Author: [kanghouchao](https://github.com/kanghouchao)
