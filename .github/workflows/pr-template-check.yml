@@ -3,6 +3,15 @@ name: PR Template Check
 on:
   pull_request:
     types: [opened, edited, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-template-check-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   check-pr-body:

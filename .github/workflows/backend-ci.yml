@@ -8,6 +8,18 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches:
+      - master
+      - release/**
+    paths:
+      - 'backend/**'
+      - '.github/workflows/backend-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: backend-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint-and-test:
