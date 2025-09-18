@@ -6,6 +6,14 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 	--mount=type=cache,target=/app/.gradle \
 	gradle dependencies --configuration runtimeClasspath --no-daemon
 
+# Lint stage: run Spotless check
+FROM dependencies AS lint
+WORKDIR /app
+COPY src src
+RUN --mount=type=cache,target=/home/gradle/.gradle \
+	--mount=type=cache,target=/app/.gradle \
+	gradle --no-daemon --info spotlessCheck
+
 # 2. テストを実行します
 FROM dependencies AS test
 WORKDIR /app

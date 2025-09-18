@@ -17,12 +17,11 @@ import lombok.Setter;
 @AllArgsConstructor
 public class Tenant extends BaseEntity {
 
-    @Column(nullable = false)
-    private String name;
+  @Column(nullable = false)
+  private String name;
 
-    @Column(nullable = false, unique = true)
-    private String domain;
+  @Column(nullable = false, unique = true)
+  private String domain;
 
-    @Column
-    private String email;
+  @Column private String email;
 }

@@ -10,8 +10,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TenantDto {
-    private String id;
-    private String name;
-    private String domain;
-    private String email;
+  private String id;
+  private String name;
+  private String domain;
+  private String email;
 }

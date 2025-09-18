@@ -18,6 +18,19 @@ else
 	@make -C frontend build
 endif
 
+lint: ## すべてのサービスのLintを実行（service=frontend|backend で個別指定可）
+ifdef service
+	@echo "🧹 $(service) の Lint を実行中..."
+	@make -C $(service) lint
+else
+	@echo "🧹 すべてのサービスの Lint を実行中..."
+	@echo "🧹 Frontend lint..."
+	@make -C frontend lint
+	@echo "🧹 Backend lint..."
+	@make -C backend lint
+	@echo "✅ Lint 完了"
+endif
+
 test: ## すべてのサービスのテストを実行（frontend/coverage & backend/reports に収集）
 ifdef service
 	@echo "🔍 $(service)サービスのテストを実行中..."
@@ -29,6 +42,19 @@ else
 	@echo "🧪 Backend tests..."
 	@make -C backend test
 	@echo "✅ Done. frontend/coverage と backend/reports を参照してください。"
+endif
+
+format: ## すべてのサービスのフォーマットを実行（service=frontend|backend で個別指定可）
+ifdef service
+	@echo "✍️  $(service) のフォーマットを実行中..."
+	@make -C $(service) format
+else
+	@echo "✍️  すべてのサービスのフォーマットを実行中..."
+	@echo "✍️  Frontend format..."
+	@make -C frontend format
+	@echo "✍️  Backend format..."
+	@make -C backend format
+	@echo "✅ Format 完了"
 endif
 
 up: ## サービスを起動

@@ -7,14 +7,14 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-    private final com.cms.config.TenantInterceptor tenantInterceptor;
+  private final com.cms.config.TenantInterceptor tenantInterceptor;
 
-    public WebMvcConfig(com.cms.config.TenantInterceptor tenantInterceptor) {
-        this.tenantInterceptor = tenantInterceptor;
-    }
+  public WebMvcConfig(com.cms.config.TenantInterceptor tenantInterceptor) {
+    this.tenantInterceptor = tenantInterceptor;
+  }
 
-    @Override
-    public void addInterceptors(@NonNull InterceptorRegistry registry) {
-        registry.addInterceptor(tenantInterceptor);
-    }
+  @Override
+  public void addInterceptors(@NonNull InterceptorRegistry registry) {
+    registry.addInterceptor(tenantInterceptor);
+  }
 }

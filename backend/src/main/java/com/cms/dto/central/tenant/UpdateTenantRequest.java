@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UpdateTenantRequest {
-    private String name;
+  private String name;
 }

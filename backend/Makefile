@@ -14,6 +14,14 @@ help: ## ヘルプ情報を表示
 	@echo "利用可能なコマンド一覧:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
+lint: ## コードスタイルを検査（Docker lint ステージ経由）
+	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
+	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
+
+format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
+	@echo "✍️  Spotless で自動整形を実行中..."
+	@gradle --no-daemon --warning-mode=all spotlessApply
+
 test: ## バックエンドの全テストを実行し、backend/reports にレポートを収集
 	@echo "🧪  バックエンドのテストを実行中..."
 	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
