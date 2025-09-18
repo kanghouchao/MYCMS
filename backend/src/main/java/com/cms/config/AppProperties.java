@@ -12,8 +12,29 @@ import lombok.Setter;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-    private String jwtSecret;
-    private long jwtExpiration;
+    /**
+     * Application base URL (for links in notifications, etc.)
+     */
     private String url;
 
+    /**
+     * Nested JWT configuration bound from app.jwt.*
+     */
+    private Jwt jwt = new Jwt();
+
+    @Getter
+    @Setter
+    public static class Jwt {
+        private String secret;
+        private long expiration;
+    }
+
+    // Backward-compatible accessors used by existing components (e.g., JwtUtil)
+    public String getJwtSecret() {
+        return jwt != null ? jwt.getSecret() : null;
+    }
+
+    public long getJwtExpiration() {
+        return jwt != null ? jwt.getExpiration() : 0L;
+    }
 }
