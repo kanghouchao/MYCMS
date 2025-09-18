@@ -31,11 +31,14 @@ This repo is a split-architecture, multi-tenant CMS behind Traefik. Follow these
 
 ### VS Code AI agent execution tips (terminal + MCP)
 - Single-shot terminal runs: prefer chaining commands in one invocation or using Makefile targets to avoid repeated terminal sessions hanging in some agent modes.
-	- For zsh: use `&&` to chain and enable safer flags at the start: `set -euo pipefail` when using bash -lc.
+	- For zsh: use `&&` to chain commands and enable safer flags at the start: `set -eo pipefail`.
+	- For bash: use `&&` to chain commands and enable safer flags at the start: `set -euo pipefail`.
 	- Prefer Makefile targets for multi-step flows (build, lint, test) instead of issuing many commands from the agent.
 - Recommended patterns
 	- One-shot commit/push (example):
+		- (Assumes the branch does not already exist and there are changes to commit. If not, commands may fail or behave unexpectedly.)
 		- `git checkout -b chore/update-copilot-instructions && git add .github/copilot-instructions.md && git commit -m "docs: update Copilot instructions (agent & MCP)" && git push -u origin chore/update-copilot-instructions`
+		- For extra safety in scripts, use `set -e` or prefer a Makefile target.
 	- One-shot local CI run via Make:
 		- `make test && make lint || true` (adjust to your targets; prefer a single Make target like `make ci-local` that runs build/lint/test together)
 - Long-running tasks: start once in background (watch/dev servers) and interact via logs rather than restarting.
