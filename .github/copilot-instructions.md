@@ -37,10 +37,10 @@ This repo is a split-architecture, multi-tenant CMS behind Traefik. Follow these
 - Recommended patterns
 	- One-shot commit/push (example):
 		- (Assumes the branch does not already exist and there are changes to commit. If not, commands may fail or behave unexpectedly.)
-		- `git checkout -b chore/update-copilot-instructions && git add .github/copilot-instructions.md && git commit -m "docs: update Copilot instructions (agent & MCP)" && git push -u origin chore/update-copilot-instructions`
+		- `git checkout -b <branch-name> && git add <file-path> && git commit -m "<commit-message>" && git push -u origin <branch-name>`
 		- For extra safety in scripts, use `set -e` or prefer a Makefile target.
 	- One-shot local CI run via Make:
-		- `make test && make lint || true` (adjust to your targets; prefer a single Make target like `make ci-local` that runs build/lint/test together)
+		- `make test && make lint` (do not use `|| true`, as it masks failures; prefer a single Make target like `make ci-local` that runs build/lint/test together)
 - Long-running tasks: start once in background (watch/dev servers) and interact via logs rather than restarting.
 - When an action would require multiple sequential terminal calls, either:
 	1) create or reuse a Make target (e.g., `make ci-local`, `make release`), or
