@@ -18,7 +18,7 @@ out/
 *.iws
 
 # Logs
-*.log
+logs/
 
 # OS
 .DS_Store
@@ -33,3 +33,6 @@ out/
 *.bak
 *.pid
 *.lock
+
+# Test Reports
+reports/

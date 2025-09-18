@@ -18,14 +18,17 @@ else
 	@make -C frontend build
 endif
 
-test: ## バックエンドのテストを実行
+test: ## すべてのサービスのテストを実行（frontend/coverage & backend/reports に収集）
 ifdef service
 	@echo "🔍 $(service)サービスのテストを実行中..."
 	@make -C $(service) test
 else
 	@echo "🔍 すべてのサービスのテストを実行中..."
-	@make -C backend test
+	@echo "🧪 Frontend tests..."
 	@make -C frontend test
+	@echo "🧪 Backend tests..."
+	@make -C backend test
+	@echo "✅ Done. frontend/coverage と backend/reports を参照してください。"
 endif
 
 up: ## サービスを起動

@@ -10,3 +10,5 @@ Thumbs.db
 .vscode/
 
 .tsconfig.tsbuildinfo
+
+# test artifacts are kept per service

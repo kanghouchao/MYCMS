@@ -9,11 +9,12 @@ RUN --mount=type=cache,target=/root/.npm \
 
 FROM deps AS test
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV JEST_JUNIT_OUTPUT=/app/junit.xml
 WORKDIR /app
 COPY . .
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/root/.cache \
-    npm run test --no-watch --ci --reporters=default --reporters=jest-junit
+    npm run test -- --ci --reporters=default --reporters=jest-junit
 
 FROM deps AS builder
 WORKDIR /app

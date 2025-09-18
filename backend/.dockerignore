@@ -20,3 +20,4 @@ out/
 # Temporary files
 *.tmp
 **/*.log
+reports/

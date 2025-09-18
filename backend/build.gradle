@@ -2,6 +2,7 @@ plugins {
     id 'org.springframework.boot' version '3.5.5'
     id 'io.spring.dependency-management' version '1.1.7'
     id 'java'
+    id 'jacoco'
 }
 
 group = 'com.cms'
@@ -63,6 +64,41 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    // Focus initial coverage on critical utility/model packages
+    afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect { fileTree(dir: it, include: [
+                'com/cms/utils/**',
+                'com/cms/model/tenant/**'
+        ]) }))
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            element = 'BUNDLE'
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.70
+            }
+            // Limit verification to the same focused set as the report
+            includes = [
+                    'com.cms.utils.*',
+                    'com.cms.model.tenant.*'
+            ]
+        }
+    }
+}
+
+check.dependsOn jacocoTestReport, jacocoTestCoverageVerification
 
 jar {
     archiveBaseName.set(rootProject.name)
