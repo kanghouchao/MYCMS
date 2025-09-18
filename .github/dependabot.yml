@@ -7,6 +7,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "03:00"
+      timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
 
   # Frontend npm dependencies
@@ -16,6 +17,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "03:00"
+      timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
     versioning-strategy: increase
 
@@ -26,6 +28,7 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "03:00"
+      timezone: "Asia/Tokyo"
     open-pull-requests-limit: 5
     groups:
       minor-and-patch:

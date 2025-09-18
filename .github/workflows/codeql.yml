@@ -2,11 +2,15 @@ name: CodeQL
 
 on:
   push:
-    branches-ignore:
+    branches:
       - master
-      - release/**
+      - 'releases/**'
+  pull_request:
+    branches:
+      - master
   schedule:
-    - cron: '0 3 * * *'
+    # Weekly at 03:00 UTC every Monday
+    - cron: '0 3 * * 1'
 
 permissions:
   contents: read
