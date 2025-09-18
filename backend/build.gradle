@@ -60,6 +60,10 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+
+    // Generate configuration metadata for @ConfigurationProperties
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    testAnnotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
 
 test {
