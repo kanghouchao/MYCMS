@@ -6,6 +6,8 @@
 ![Java](https://img.shields.io/badge/Java-21+-blue.svg)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-latest-blue.svg)
+[![CodeQL](https://github.com/kanghouchao/MYCMS/actions/workflows/codeql.yml/badge.svg)](https://github.com/kanghouchao/MYCMS/actions/workflows/codeql.yml)
+[![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/kanghouchao/MYCMS/security/dependabot)
 
 Oli CMS is a modern, multi-tenant Content Management System built with a split architecture: Spring Boot backend and Next.js frontend, orchestrated with Docker and Traefik.
 
@@ -174,3 +176,17 @@ MYCMS/
 
 Author: [kanghouchao](https://github.com/kanghouchao)
 Repository: [github.com/kanghouchao/MYCMS](https://github.com/kanghouchao/MYCMS)
+
+## Security
+
+This repository enables automated security scanning and dependency updates:
+
+- Static analysis via GitHub CodeQL for Java (backend) and JavaScript/TypeScript (frontend).
+- Dependency updates powered by Dependabot for GitHub Actions, npm, and Gradle.
+
+Operational guidance:
+
+- CodeQL runs on PRs targeting master and on a weekly schedule; review alerts in the Security tab and address high/critical findings promptly.
+- Dependabot opens weekly PRs (grouped for minor/patch where applicable). Prioritize PRs with security advisories, and test in CI before merge.
+
+If a tool or schedule needs adjustment, propose changes via PR and reference the related issue (see issue #12).
