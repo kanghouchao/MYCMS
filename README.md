@@ -187,6 +187,6 @@ This repository enables automated security scanning and dependency updates:
 Operational guidance:
 
 - CodeQL runs on pushes to master/releases, PRs targeting master, and on a weekly schedule (Mondays 03:00 UTC); review alerts in the Security tab and address high/critical findings promptly.
-- Dependabot opens weekly PRs (grouped for minor/patch where applicable). Prioritize PRs with security advisories, and test in CI before merge.
+- Dependabot opens weekly PRs (grouped for minor/patch where applicable), scheduled in the Asia/Tokyo timezone. Prioritize PRs with security advisories, and test in CI before merge.
 
 If a tool or schedule needs adjustment, propose changes via PR and reference the related issue (see issue #12).

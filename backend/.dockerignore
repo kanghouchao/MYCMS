@@ -4,6 +4,7 @@ out/
 .gradle/
 *.log
 *.jar
+!gradle/wrapper/gradle-wrapper.jar
 *.war
 *.iml
 *.class

@@ -10,7 +10,7 @@
 build/
 bin/
 out/
-!gradle/wrapper/gradle-wrapper.properties
+!gradle/wrapper/gradle-wrapper.jar
 
 # IDE
 .idea/
