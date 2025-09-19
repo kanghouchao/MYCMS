@@ -1,13 +1,9 @@
 name: Backend CI
 
 on:
-  push:
-    branches-ignore:
+  pull_request:
+    branches:
       - master
-      - release/**
-    paths:
-      - 'backend/**'
-      - '.github/workflows/backend-ci.yml'
 
 jobs:
   lint-and-test:
