@@ -36,7 +36,7 @@
 ---
 
 ## Phase 1 — Setup (prereqs)
-- T001 Ensure GitHub CLI (`gh`) is available and authenticated (repository root)
+- [X] T001 Ensure GitHub CLI (`gh`) is available and authenticated (repository root)
   - File(s): `/usr/bin/gh` (system path) — verify installed
   - Commands (execute from repository root `/Users/kanghouchao/CodeProjects/cms`):
     ```bash
