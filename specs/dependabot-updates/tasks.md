@@ -51,7 +51,7 @@ Notes: If `gh` is unavailable, the tasks provide equivalent curl/REST alternativ
 ## Phase 2 — Triage (Tests first)  (TESTS MUST PASS BEFORE MERGING)
 Rules applied: frontend PRs all change the same file path `frontend/package.json` so treat frontend triage tasks as sequential (no [P] among them). Backend and workflow PRs touch different areas and can run in parallel with frontend triage.
 
-- T002 Triage PR #33 — axios upgrade (frontend)
+- [X] T002 Triage PR #33 — axios upgrade (frontend)
   - Affected path: `/Users/kanghouchao/CodeProjects/cms/frontend/package.json`
   - Purpose: run install, build, tests, lint for frontend to detect breakage from axios ^1.6.0 → ^1.12.2
   - Commands:
