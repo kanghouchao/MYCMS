@@ -11,6 +11,3 @@ Thumbs.db
 
 .tsconfig.tsbuildinfo
 
-# specify kit
-.specify/
-.github/prompts/
