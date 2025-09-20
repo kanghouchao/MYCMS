@@ -24,37 +24,51 @@ This repo is a split-architecture, multi-tenant CMS behind Traefik. Follow these
 - All frontend requests arrive without the `/api` prefix; design mappings accordingly.
 - Persisted IDs may use custom generators (e.g., `SnowflakeId`).
 
+### Java coding guidelines
+- Do not use `import *`: always explicitly import required classes (disable star imports in your IDE).
+- Avoid fully qualified class names in code: import then use the simple class name (e.g., first `import java.time.Instant;` then write `Instant.now()`).
+- Follow standard naming conventions: packages lowercase; Classes/Interfaces PascalCase; methods/fields camelCase; constants UPPER_SNAKE_CASE; test classes end with `Test`.
+- Prefer modern Java features (Java 21): use Stream API for collection transformations, `Optional` to express absence, `switch` expressions and pattern matching; use parallel streams cautiously to avoid unnecessary overhead.
+- Manage dependencies via the build tool: declare dependencies only in `backend/build.gradle`; do not commit or manually reference JARs; rely on Spring Boot dependency management and avoid pinning versions unless necessary.
+
 ### Dev workflow
 - Build/run: `make build` then `make up` (starts Traefik, DB, Redis, backend, frontend). Logs: `make logs service=backend|frontend|traefik`.
 - Tests: `make test` (all) or `make test service=backend|frontend`.
 - Local domain switch: add `oli-cms.test` and a tenant host to `/etc/hosts`.
 
-### VS Code AI agent execution tips (terminal + MCP)
-- Single-shot terminal runs: prefer chaining commands in one invocation or using Makefile targets to avoid repeated terminal sessions hanging in some agent modes.
-	- For zsh: use `&&` to chain commands and enable safer flags at the start: `set -eo pipefail`.
-	- For bash: use `&&` to chain commands and enable safer flags at the start: `set -euo pipefail`.
-	- Prefer Makefile targets for multi-step flows (build, lint, test) instead of issuing many commands from the agent.
-- Recommended patterns
-	- One-shot commit/push (example):
-		- (Assumes the branch does not already exist and there are changes to commit. If not, commands may fail or behave unexpectedly.)
-		- `git checkout -b <branch-name> && git add <file-path> && git commit -m "<commit-message>" && git push -u origin <branch-name>`
-		- For extra safety in scripts, use `set -e` or prefer a Makefile target.
-	- One-shot local CI run via Make:
-		- `make test && make lint` (do not use `|| true`, as it masks failures; prefer a single Make target like `make ci-local` that runs build/lint/test together)
-- Long-running tasks: start once in background (watch/dev servers) and interact via logs rather than restarting.
-- When an action would require multiple sequential terminal calls, either:
-	1) create or reuse a Make target (e.g., `make ci-local`, `make release`), or
-	2) use a single `bash -lc 'set -euo pipefail; cmd1 && cmd2 && cmd3'`.
+### Agent Execution: Avoiding Hung Terminals
 
-### Model Context Protocol (MCP) usage guidelines
-- Purpose: MCP servers let the AI agent perform multi-step or remote tasks (GitHub issues/PRs, web research, repo IO) more reliably than ad-hoc terminal calls.
-- Recommended servers to enable (when available in your editor):
-	- GitHub server: create/update issues, PRs, reviews, labels.
-	- Web/content server (e.g., crawl/scrape): gather documentation or changelogs to support PRs.
-	- Filesystem/repository helpers: structured read/write and searches.
-- Installation/enablement: if your editor supports MCP, enable relevant servers in the AI/agent settings and authenticate as required. The agent should proactively remind you to install useful servers when a task would benefit from them.
-- Security: never exfiltrate secrets; prefer repository or organization-level tokens with least privilege; keep tokens out of commit history and logs.
-- Fallbacks: if MCP is unavailable, prefer Make targets and single-shot terminal invocations to keep interactions stable.
+Executing shell commands via an AI agent in VS Code can be unreliable, often leading to hung sessions. To ensure productivity and stability, follow these patterns:
+
+**1. The Golden Rule: Use `Makefile` Targets**
+- **Why**: Makefiles provide robust, reusable, and environment-agnostic scripts. They are the **most reliable** way to run multi-step tasks like builds, tests, and deployments.
+- **How**: Instead of typing `npm run build && npm run test`, use `make ci-local` if it exists. If a suitable target doesn't exist, create one.
+- **Example**:
+  - **Bad (fragile)**: `docker-compose build backend && docker-compose build frontend`
+  - **Good (robust)**: `make build`
+
+**2. For Simple Tasks: Use Single-Shot Command Chains**
+- **Why**: If a `Makefile` target is overkill, chain commands into a single line using `&&`. This avoids the overhead of multiple terminal sessions. Always start with `set -eo pipefail` (for `zsh`) or `set -euo pipefail` (for `bash`) to ensure the chain fails if any command fails.
+- **How**: Use the pattern `bash -lc 'set -euo pipefail; command1 && command2'`.
+- **Example (Git workflow)**:
+  - `git checkout -b new-feature && git add . && git commit -m "feat: new feature" && git push -u origin new-feature`
+
+**3. For Long-Running Processes: Start in Background**
+- **Why**: Watchers, dev servers, and other long-running tasks will block the agent. Start them once as a background process.
+- **How**: Use `make up` to start services and `make logs service=<name>` to monitor them, rather than running them directly in the agent's terminal session.
+
+**4. Use Model Context Protocol (MCP) When Available**
+- **Why**: MCP provides a structured, API-like way for the agent to perform tasks (e.g., interacting with GitHub, searching the web) without touching the shell. This is far more reliable than running `curl` or `gh` commands manually.
+- **How**: If your editor supports MCP, enable the GitHub and other relevant servers. The agent should prefer these tools over raw terminal commands for supported operations.
+
+**5. Background reliably with `nohup` and `&` (macOS zsh)**
+- **Why**: Long-running tasks can block the agent; sessions may terminate and kill child processes. `&` sends tasks to the background; `nohup` keeps them alive after the session ends.
+- **How**: Prefer Make targets first. When you must run a long task directly, use `nohup ... >/tmp/oli-<task>.log 2>&1 &` so output goes to a log file instead of `nohup.out`.
+- **Examples (optional, adapt paths/names)**:
+  - Start the stack without blocking the agent: `nohup make up >/tmp/oli-up.log 2>&1 &`
+  - Run a longer local CI chain in background: `nohup bash -lc 'set -eo pipefail; make build && make test' >/tmp/oli-ci.log 2>&1 &`
+- **Observe output**: Prefer `make logs service=backend|frontend|traefik` over tailing `nohup` logs when possible.
+
 
 ### Collaboration workflow (GitHub Flow)
 - Start with an issue: track scope and acceptance; one PR per issue; link the issue in PR (e.g., "Closes #123").
