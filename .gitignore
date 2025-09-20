@@ -11,4 +11,6 @@ Thumbs.db
 
 .tsconfig.tsbuildinfo
 
-# test artifacts are kept per service
+# specify kit
+.specify/
+.github/prompts/
