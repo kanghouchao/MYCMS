@@ -1,23 +1,22 @@
 # <!--
 # Sync Impact Report
-# Version change: template/example v2.1.1 (example) -> 1.0.0
+# Version change: 1.0.0 -> 1.1.0
+# Bump rationale: MINOR — added Code Quality, Testing and Commit/PR governance sections
 # Modified principles:
-# - Added: Tenant-first Multi-tenant Design (explicit for this repo)
-# - Added: Split Architecture & Clear API Boundaries
-# - Clarified: Test-First (made NON-NEGOTIABLE and repository-specific)
-# - Added: Observability & Structured Logging
-# - Clarified: Semantic Versioning & Breaking Changes
+# - Added: Code Quality & Testing
+# - Added: Commit and PR Standards (GitHub Flow enforcement)
+# - Clarified: cross-reference to `.github/copilot-instructions.md` for agent execution patterns
 # Added sections:
-# - Constraints & Security Requirements
-# - Development Workflow & Quality Gates
-# Removed sections: none (template placeholders converted to concrete text)
+# - Code Quality & Testing
+# - Commit and PR Standards
+# - Contributor Workflow: GitHub Flow enforcement
 # Templates reviewed and status:
-# - .specify/templates/plan-template.md: ✅ updated (version note set to v1.0.0)
-# - .specify/templates/spec-template.md: ⚠ pending (contains placeholder markers intended for feature specs; no change required)
-# - .specify/templates/tasks-template.md: ⚠ pending (template placeholders remain; no change required)
+# - .specify/templates/plan-template.md: ✅ updated (version note set to v1.1.0)
+# - .specify/templates/spec-template.md: ⚠ pending (placeholder markers unchanged; no forced edits)
+# - .specify/templates/tasks-template.md: ⚠ pending (placeholder markers unchanged)
 # Follow-up TODOs:
-# - TODO(RATIFICATION_DATE) inserted for Ratified date; maintainers must fill the original adoption date.
-# - Review `.specify/templates/agent-file-template.md` for any agent-specific mentions to generalize if needed.
+# - TODO(RATIFICATION_DATE) remains; maintainers must fill the original adoption date.
+# - Review `.specify/templates/agent-file-template.md` to remove agent-specific tokens if needed.
 # -->
 
 # Oli CMS Constitution
@@ -77,6 +76,42 @@ reduces upgrade friction for tenants and integrators.
   lint/typecheck, unit tests, and smoke tests. PRs MUST reference the related issue.
 - Testing policy: run `make test` before merge; failing tests block merges.
 
+### Code Quality & Testing
+
+- All production code MUST include automated tests. New features MUST include unit,
+  integration, and (where applicable) contract tests. Tests MUST be written before
+  implementation (TDD): tests are committed and pushed to feature branches first.
+- Tests MUST be readable, deterministic, and fast for CI (aim for <60s unit test
+  suite where practical). Time-consuming integration tests should be marked and run
+  in CI stages that tolerate longer runtimes.
+- Code style and linting MUST be enforced by CI. Use the repository-approved tools
+  (frontend: ESLint/TypeScript rules in `package.json`; backend: Spotless/Checkstyle
+  or Gradle plugins). Failing linters block merges.
+- Documentation: public modules, exported functions, and APIs MUST have concise
+  inline docs and a short usage example in the repository docs. Maintain a `docs/`
+  directory for design notes and migration guides.
+
+### Commit and PR Standards (GitHub Flow)
+
+- Branching: create short-lived branches from `master` named `issue-<id>-short-desc`
+  or `feat/<short-desc>`; avoid long-lived feature branches.
+- Commits: use conventional commits style (e.g., `feat:`, `fix:`, `docs:`, `chore:`,
+  `test:`, `refactor:`). Commit messages MUST be imperative and reference issue IDs
+  when applicable (e.g., `feat: add tenant validation (Closes #123)`).
+- PRs: open PRs against `master`. Each PR MUST use the repository PR template and
+  include: scope, risk, testing steps, Quality Gates status, and changelog notes.
+- Reviews: at least one approving review is required for non-trivial changes. The
+  maintainer(s) may request additional reviewers for infra, security, or data
+  model changes.
+- Merge strategy: squash and merge only. Delete branch after merge.
+
+### Documentation & Release Notes
+
+- Every change that affects behavior visible to integrators or tenants MUST include
+  a short changelog entry. Changelogs are generated from PR descriptions and
+  consolidated in `CHANGELOG.md` following semantic versioning.
+
+
 ## Governance
 
 Amendments to this Constitution require a documented PR describing the change, a
@@ -101,5 +136,11 @@ Compliance expectations:
 - Tooling (plans, specs, tasks generators) MUST automatically include a "Constitution
   Check" step and reject or flag work that violates non-negotiable principles (e.g., test-
   first violations, tenant isolation failures).
+
+Note: Operational agent guidance and execution patterns (terminal safety, Makefile
+usage, MCP guidance) are maintained in `.github/copilot-instructions.md` and the
+`.specify/templates/*` files. The Constitution is authoritative for governance and
+principles; implementation and agent-run patterns should reference the copilot
+instructions to avoid duplication.
 
 **Version**: 1.0.0 | **Ratified**: TODO(RATIFICATION_DATE): provide original adoption date | **Last Amended**: 2025-09-20
