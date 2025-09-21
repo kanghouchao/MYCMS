@@ -46,10 +46,4 @@ public class JwtUtil {
         .parseSignedClaims(token)
         .getPayload();
   }
-
-  @Deprecated
-  public boolean validateToken(String token, String subject) {
-    Claims claims = getClaims(token);
-    return claims.getSubject().equals(subject) && !claims.getExpiration().before(new Date());
-  }
 }

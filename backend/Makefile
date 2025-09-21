@@ -10,6 +10,13 @@ REPORT_DIR ?= reports
 # デフォルトターゲット
 .DEFAULT_GOAL := help
 
+# Use the Gradle wrapper; on Windows use gradlew.bat
+ifeq ($(OS),Windows_NT)
+	GRADLEW = gradlew.bat
+else
+	GRADLEW = ./gradlew
+endif
+
 help: ## ヘルプ情報を表示
 	@echo "利用可能なコマンド一覧:"
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
@@ -20,7 +27,7 @@ lint: ## コードスタイルを検査（Docker lint ステージ経由）
 
 format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
 	@echo "✍️  Spotless で自動整形を実行中..."
-	@gradle --no-daemon --warning-mode=all spotlessApply
+	@$(GRADLEW) --no-daemon --warning-mode=all spotlessApply
 
 test: ## バックエンドの全テストを実行し、backend/reports にレポートを収集
 	@echo "🧪  バックエンドのテストを実行中..."
