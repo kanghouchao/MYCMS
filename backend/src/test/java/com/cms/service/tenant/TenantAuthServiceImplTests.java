@@ -50,7 +50,7 @@ class TenantAuthServiceImplTests {
     String rawPassword = java.util.UUID.randomUUID().toString();
     req.setPassword(rawPassword);
 
-    when(passwordEncoder.encode("rawpw")).thenReturn("encoded");
+    when(passwordEncoder.encode(rawPassword)).thenReturn("encoded");
 
     service.register(1L, req);
 
