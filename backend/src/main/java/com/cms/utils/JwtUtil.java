@@ -25,17 +25,16 @@ public class JwtUtil {
     Date now = new Date(nowMillis);
     Date exp = new Date(nowMillis + appProperties.getJwtExpiration() * 1000);
     Key key = Keys.hmacShaKeyFor(appProperties.getJwtSecret().getBytes());
-    String token =
-        Jwts.builder()
-            .claims()
-            .issuer(issuer)
-            .subject(subject)
-            .issuedAt(now)
-            .expiration(exp)
-            .add(claims)
-            .and()
-            .signWith(key)
-            .compact();
+    String token = Jwts.builder()
+        .claims()
+        .issuer(issuer)
+        .subject(subject)
+        .issuedAt(now)
+        .expiration(exp)
+        .add(claims)
+        .and()
+        .signWith(key)
+        .compact();
     return new Token(token, exp.getTime());
   }
 
@@ -45,11 +44,5 @@ public class JwtUtil {
         .build()
         .parseSignedClaims(token)
         .getPayload();
-  }
-
-  @Deprecated
-  public boolean validateToken(String token, String subject) {
-    Claims claims = getClaims(token);
-    return claims.getSubject().equals(subject) && !claims.getExpiration().before(new Date());
   }
 }

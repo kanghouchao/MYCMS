@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class AuthExceptionHandler {
 
   @ExceptionHandler(AuthenticationException.class)
-  public ResponseEntity<?> handleAuthentication(AuthenticationException ex) {
+  public ResponseEntity<Map<String, Object>> handleAuthentication(AuthenticationException ex) {
     Map<String, Object> body = new HashMap<>();
     body.put("error", "Invalid credentials");
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<?> handleValidation(MethodArgumentNotValidException ex) {
+  public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
     Map<String, Object> body = new HashMap<>();
     body.put("error", "validation_failed");
     Map<String, String> fieldErrors = new HashMap<>();
