@@ -21,13 +21,19 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 class TenantAuthServiceImplTests {
 
-  @Mock private PasswordEncoder passwordEncoder;
-  @Mock private AuthenticationManager authenticationManager;
-  @Mock private JwtUtil jwtUtil;
-  @Mock private TenantUserRepository userRepository;
-  @Mock private TenantRepository tenantRepository;
+  @Mock
+  private PasswordEncoder passwordEncoder;
+  @Mock
+  private AuthenticationManager authenticationManager;
+  @Mock
+  private JwtUtil jwtUtil;
+  @Mock
+  private TenantUserRepository userRepository;
+  @Mock
+  private TenantRepository tenantRepository;
 
-  @InjectMocks private TenantAuthServiceImpl service;
+  @InjectMocks
+  private TenantAuthServiceImpl service;
 
   @BeforeEach
   void setup() {
@@ -41,7 +47,8 @@ class TenantAuthServiceImplTests {
 
     TenantRegisterRequest req = new TenantRegisterRequest();
     req.setEmail("bob@example.com");
-    req.setPassword("rawpw");
+    String rawPassword = java.util.UUID.randomUUID().toString();
+    req.setPassword(rawPassword);
 
     when(passwordEncoder.encode("rawpw")).thenReturn("encoded");
 
