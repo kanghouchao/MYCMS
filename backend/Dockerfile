@@ -2,8 +2,8 @@
 FROM gradle:9.0.0-jdk24-ubi-minimal AS dependencies
 WORKDIR /app
 COPY build.gradle settings.gradle ./
-COPY backend/gradlew gradlew
-COPY backend/gradle gradle
+COPY gradlew gradlew
+COPY gradle gradle
 RUN chmod +x gradlew
 RUN --mount=type=cache,target=/home/gradle/.gradle \
 	--mount=type=cache,target=/app/.gradle \
