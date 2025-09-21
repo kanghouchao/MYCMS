@@ -1,7 +1,7 @@
 # MYCMS Constitution
 <!--
 Sync Impact Report
-Version change: 2.1.1 -> 2.1.2
+Version change: 2.1.1 -> 2.1.3
 Modified principles:
  - I. Code Quality & Maintainability (new wording / explicit rules)
  - II. Test-First & Verifiable Quality (clarified non-negotiable testing rules)
@@ -11,6 +11,7 @@ Modified principles:
 Added sections:
  - Non-Functional Requirements & Constraints
  - Development Workflow & Quality Gates
+ - PR template enforcement: Every PR MUST follow `.github/pull_request_template.md` and complete the Quality Gates section.
 Removed sections:
  - None
 Templates updated:
@@ -104,7 +105,7 @@ Rationale: Centralizing non-functional constraints avoids ad-hoc decisions that 
 Code review and branches:
 
 - Feature branches MUST follow the Spec Kit naming convention: branch names MUST start with a three-digit numeric prefix followed by a hyphen (regexp: `^[0-9]{3}-`).
-- Every PR MUST include a short description of the change, testing steps, and links to relevant spec/plan artifacts.
+ - Every PR MUST follow and complete the repository's Pull Request template: `.github/pull_request_template.md`. The Quality Gates section of the template MUST be completed before requesting merge.
 - At least one approving review from a repository maintainer or component owner is REQUIRED for merges; larger or riskier changes MAY require two approvers.
 
 CI and gates:
@@ -135,4 +136,4 @@ This Constitution is the canonical set of guiding principles for the MYCMS proje
 - Minor clarifications (typo fixes, wording clarifications) MAY be applied via a single maintainer PR but MUST be documented in the change log.
 - Compliance checks: New /plan outputs and generated tasks MUST include a "Constitution Check" section; CI/merge gates SHOULD validate obvious violations where feasible.
 
-**Version**: 2.1.2 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-09-21
+**Version**: 2.1.3 | **Ratified**: TODO(RATIFICATION_DATE): original adoption date unknown | **Last Amended**: 2025-09-21
