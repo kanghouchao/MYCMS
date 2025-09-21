@@ -66,7 +66,6 @@ test {
     useJUnitPlatform()
 }
 
-// Code formatting & linting: Spotless + Google Java Format (Java 21)
 spotless {
     java {
         target 'src/**/*.java'
@@ -82,9 +81,11 @@ jacocoTestReport {
         html.required = true
     }
     afterEvaluate {
-        classDirectories.setFrom(files(classDirectories.files.collect { fileTree(dir: it, include: [
-                'com/cms/utils/**',
-                'com/cms/model/tenant/**'
+        classDirectories.setFrom(files(classDirectories.files.collect { fileTree(dir: it, exclude: [
+                'build/**',
+                'generated/**',
+                '**/generated/**',
+                '**/external/**'
         ]) }))
     }
 }
@@ -98,10 +99,6 @@ jacocoTestCoverageVerification {
                 value = 'COVEREDRATIO'
                 minimum = 0.70
             }
-            includes = [
-                    'com.cms.utils.*',
-                    'com.cms.model.tenant.*'
-            ]
         }
     }
 }

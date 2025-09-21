@@ -9,7 +9,7 @@
 [![CodeQL](https://github.com/kanghouchao/MYCMS/actions/workflows/codeql.yml/badge.svg)](https://github.com/kanghouchao/MYCMS/actions/workflows/codeql.yml)
 [![Dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen.svg)](https://github.com/kanghouchao/MYCMS/security/dependabot)
 
-Oli CMS is a modern, multi-tenant Content Management System built with a split architecture: Spring Boot backend and Next.js frontend, orchestrated with Docker and Traefik.
+Oli CMS is a modern, multi-tenant Content Management System built with a split architecture: Spring Boot backend and Next.js frontend, orchestrated with Docker compose.
 
 ## Highlights
 
@@ -17,21 +17,42 @@ Oli CMS is a modern, multi-tenant Content Management System built with a split a
 - Split architecture: Spring Boot API + Next.js app
 - Stateless JWT auth; admin (central) and tenant APIs split
 - Responsive UI with Tailwind CSS
-- Container-first: easy local dev and ops via Make + Docker
+- Container-first: easy local dev and ops via Make + Docker compose
+
+## Spec-Driven Development (SDD)
+
+We follow a Spec-Driven Development (API-first) approach. The living API specifications are maintained under `docs/specs/`. See the specs directory for the current OpenAPI files and development guidance.
+
+Source / inspiration: GitHub Spec Kit — https://github.com/github/spec-kit
+
+## AI assistant configuration note
+
+This repository includes AI assistant configuration specific to GitHub. See `.github/copilot-instructions.md` for the current GitHub AI assistant guidance.
 
 ## Tech Stack
 
-| Area | Tech | Version |
-|------|------|---------|
-| Backend | Spring Boot | 3.5+ |
-| Frontend | Next.js | 14+ |
-| Language | Java | 21+ |
-| DB | PostgreSQL | 16+ |
-| Cache | Redis | 7+ |
-| Proxy | Traefik | 3.5+ |
-| Containers | Docker | latest |
-| Styling | Tailwind CSS | 3.4+ |
-| Auth | JWT (stateless) | - |
+Below are the actual frameworks and key dependency versions used in this repository (extracted from `backend/build.gradle` and `frontend/package.json`). If you upgrade any of these in the project, please update this table accordingly.
+
+| Area | Technology | Version / Notes |
+|------|------------|-----------------|
+| Backend framework | Spring Boot | 3.5.6 (see `backend/build.gradle`)
+| Backend language | Java | 21 (sourceCompatibility in `backend/build.gradle`)
+| Web / Security | Spring Web, Spring Security | `spring-boot-starter-web`, `spring-boot-starter-security`
+| JWT library | JJWT | 0.13.0 (`io.jsonwebtoken`)
+| Data / DB | Spring Data JPA, PostgreSQL driver | `org.postgresql:postgresql` (runtime)
+| Cache | Spring Data Redis, Lettuce | `io.lettuce:lettuce-core` (runtime)
+| Migrations | Liquibase | `org.liquibase:liquibase-core`
+| Frontend framework | Next.js | ^14 (`frontend/package.json`)
+| Frontend UI | React | ^18
+| Frontend language | TypeScript | 5.4.5 (devDependency)
+| Styling | Tailwind CSS | ^3.4.1
+| HTTP client | axios | ^1.6.0
+| Containers / Local orchestration | Docker, Docker Compose | see `docker-compose.yml`
+| Reverse proxy | Traefik | configured under `traefik/`
+| Testing | JUnit/Jacoco (backend), Jest (frontend) | see `backend/build.gradle` and `frontend/package.json`
+
+Note: references to other frameworks (e.g. Micronaut, Quarkus) were removed from the table — they are not used in this repository.
+
 
 ## Architecture
 
@@ -82,86 +103,66 @@ Traefik routes all requests to the right service. The frontend and backend are f
 git clone https://github.com/kanghouchao/MYCMS.git
 cd MYCMS
 ```
+2. copy .env.example to .env and adjust if needed
 
-1. Start services
+```bash
+cp .env.example .env
+```
+
+2. edit .env to set your preferred admin domain (e.g. `cms.com`)
+
+3. Start services
 
 ```bash
 make build up
 ```
 
-1. Map local domains (for admin/tenant switching)
+4. Map local domains (for admin/tenant switching)
 
 Add the following lines to `/etc/hosts`:
 
 ```text
-127.0.0.1 oli-cms.test
-127.0.0.1 tenant.example.test  # sample tenant domain
+127.0.0.1 cms.com
 ```
 
-1. Access
+5. Access
 
-- Central (admin UI): [oli-cms.test](http://oli-cms.test)
-- Sample tenant: [tenant.example.test](http://tenant.example.test)
+- Central (admin UI): [cms.com](http://cms.com)
 
-1. First-time admin setup
+6. You can find password in [5.central-001-admin.yaml](./backend/src/main/resources/db/changelog/changes/5.central-001-admin.yaml) 
 
-- Use the central registration screen to create the first admin account: `/central/register` on the admin domain
-- No default password is published in this repo for security reasons
+7. Login and have fun!
 
 ### Useful Make targets
 
 - `make help` — list all commands
-- `make build` — build backend and frontend images
+- `make build` or `make build service=frontend|backend` — build docker images for all or specified service
 - `make up` — start the full stack (Traefik, DB, Redis, backend, frontend)
 - `make down` — stop and remove containers
+- `make clean` or `make clean service=frontend|backend` — remove containers, volumes, and images for all or specified service
 - `make ps` — show running services
-- `make logs service=backend|frontend|traefik` — follow service logs
+- `make logs` or `make logs service=frontend|backend|traefik|database` — follow service logs
 - `make test` or `make test service=backend|frontend` — run tests
-
-## Development Notes
-
-- All frontend API traffic must go through `/api` so Traefik can route and strip the prefix
-- Central domain configuration lives in two places:
-  - `frontend/src/middleware.ts` → `ADMIN_DOMAINS`
-  - `NEXT_PUBLIC_CENTRAL_DOMAIN` env (used by `AuthContext`)
-- Backend health endpoint: `/actuator/health`
-- Tenant templates live under `frontend/src/app/tenant/templates/<key>/page.tsx`
-  - To add a template: create the folder, export a `page.tsx`, and ensure the tenant validation API returns `template_key` matching the folder name
+ - `make lint` or `make lint service=frontend|backend` — run linters for all or specified service
+ - `make format` or `make format service=frontend|backend` — run code formatters (Spotless for backend, eslint fixes for frontend)
 
 ## Project Structure
 
 ```text
 MYCMS/
-├── backend/                     # Spring Boot API
-│   ├── src/
-│   │   ├── main/java/com/cms/
-│   │   ├── main/resources/
-│   │   └── test/
-│   ├── build.gradle
-│   └── Dockerfile
-├── frontend/                    # Next.js app
-│   ├── src/
-│   │   ├── middleware.ts
-│   │   ├── app/
-│   │   │   ├── central/
-│   │   │   ├── tenant/
-│   │   │   └── login/
-│   │   ├── contexts/
-│   │   ├── lib/
-│   │   └── services/
-│   └── package.json
-├── traefik/
-│   ├── development/
-│   └── production/
+├── backend/                     # Backend Spring Boot API
+├── frontend/                    # Frontend Next.js app
+├── traefik/                     # Traefik config
+├── .env.example                 # Example env file
 ├── docker-compose.yml
 └── Makefile
 ```
 
 ## Troubleshooting
 
-- If ports are busy, ensure nothing else is using 80 (Traefik), 3000 (frontend), or 8080 (backend)
+- If ports are busy, ensure nothing else is using 80, 443
 - Confirm `/etc/hosts` entries resolve to your machine
-- If the frontend shows a 401 and redirects to `/login`, your token may be missing or expired; log in again
+- if you cannot login, please create a new password hash via [bcrypt-generator.com](https://bcrypt-generator.com/) and update the password in [5.central-001-admin.yaml](./backend/src/main/resources/db/changelog/changes/5.central-001-admin.yaml), then run `make clean` and `make up` again.
 
 ## Support
 
@@ -176,17 +177,3 @@ MYCMS/
 
 Author: [kanghouchao](https://github.com/kanghouchao)
 Repository: [github.com/kanghouchao/MYCMS](https://github.com/kanghouchao/MYCMS)
-
-## Security
-
-This repository enables automated security scanning and dependency updates:
-
-- Static analysis via GitHub CodeQL for Java (backend) and JavaScript/TypeScript (frontend).
-- Dependency updates powered by Dependabot for GitHub Actions, npm, and Gradle.
-
-Operational guidance:
-
-- CodeQL runs on pushes to master/releases, PRs targeting master, and on a weekly schedule (Mondays 03:00 UTC); review alerts in the Security tab and address high/critical findings promptly.
-- Dependabot opens weekly PRs (grouped for minor/patch where applicable), scheduled in the Asia/Tokyo timezone. Prioritize PRs with security advisories, and test in CI before merge.
-
-If a tool or schedule needs adjustment, propose changes via PR and reference the related issue (see issue #12).
