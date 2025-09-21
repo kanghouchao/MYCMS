@@ -15,21 +15,16 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TenantInterceptorTest {
 
-  @Mock
-  TenantContext tenantContext;
+  @Mock TenantContext tenantContext;
 
-  @Mock
-  HttpServletRequest req;
+  @Mock HttpServletRequest req;
 
-  @Mock
-  HttpServletResponse resp;
+  @Mock HttpServletResponse resp;
 
-  @InjectMocks
-  TenantInterceptor interceptor;
+  @InjectMocks TenantInterceptor interceptor;
 
   @BeforeEach
-  void setUp() {
-  }
+  void setUp() {}
 
   @Test
   void preHandle_tenantPath_withTenantRole_andTenantId() throws Exception {

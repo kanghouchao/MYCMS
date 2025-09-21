@@ -30,7 +30,8 @@ public class AuthExceptionHandlerTests {
   void handleValidation_returnsBadRequest_withFieldErrors() {
     AuthExceptionHandler handler = new AuthExceptionHandler();
 
-    BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "objectName");
+    BeanPropertyBindingResult bindingResult =
+        new BeanPropertyBindingResult(new Object(), "objectName");
     bindingResult.addError(new FieldError("objectName", "username", "must not be blank"));
 
     MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);

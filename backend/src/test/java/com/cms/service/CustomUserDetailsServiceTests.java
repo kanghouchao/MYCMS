@@ -24,15 +24,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 class CustomUserDetailsServiceTests {
 
-  @Mock
-  private CentralUserRepository centralUserRepository;
-  @Mock
-  private TenantUserRepository tenantUserRepository;
-  @Mock
-  private TenantContext tenantContext;
+  @Mock private CentralUserRepository centralUserRepository;
+  @Mock private TenantUserRepository tenantUserRepository;
+  @Mock private TenantContext tenantContext;
 
-  @InjectMocks
-  private CustomUserDetailsService service;
+  @InjectMocks private CustomUserDetailsService service;
 
   @BeforeEach
   void setup() {
@@ -69,8 +65,7 @@ class CustomUserDetailsServiceTests {
     when(tenantContext.isTenant()).thenReturn(false);
     when(centralUserRepository.findByUsername("nope")).thenReturn(Optional.empty());
 
-    assertThrows(
-        UsernameNotFoundException.class, () -> service.loadUserByUsername("nope"));
+    assertThrows(UsernameNotFoundException.class, () -> service.loadUserByUsername("nope"));
   }
 
   @Test

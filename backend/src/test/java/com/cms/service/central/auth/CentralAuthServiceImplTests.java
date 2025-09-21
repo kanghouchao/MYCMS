@@ -18,33 +18,31 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 class CentralAuthServiceImplTests {
 
-    @Mock
-    private AuthenticationManager authenticationManager;
-    @Mock
-    private JwtUtil jwtUtil;
+  @Mock private AuthenticationManager authenticationManager;
+  @Mock private JwtUtil jwtUtil;
 
-    @InjectMocks
-    private CentralAuthServiceImpl service;
+  @InjectMocks private CentralAuthServiceImpl service;
 
-    @BeforeEach
-    void setup() {
-        MockitoAnnotations.openMocks(this);
-    }
+  @BeforeEach
+  void setup() {
+    MockitoAnnotations.openMocks(this);
+  }
 
-    @Test
-    void loginReturnsTokenWithAuthorities() {
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "alice", "pw", List.of(new SimpleGrantedAuthority("ROLE_USER")));
+  @Test
+  void loginReturnsTokenWithAuthorities() {
+    Authentication auth =
+        new UsernamePasswordAuthenticationToken(
+            "alice", "pw", List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-        when(authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken("alice", "pw")))
-                .thenReturn(auth);
+    when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("alice", "pw")))
+        .thenReturn(auth);
 
-        Token expected = new Token("tkn", System.currentTimeMillis() + 10000);
-        when(jwtUtil.generateToken("alice", "CentralAuth", java.util.Map.of("authorities", List.of("ROLE_USER"))))
-                .thenReturn(expected);
+    Token expected = new Token("tkn", System.currentTimeMillis() + 10000);
+    when(jwtUtil.generateToken(
+            "alice", "CentralAuth", java.util.Map.of("authorities", List.of("ROLE_USER"))))
+        .thenReturn(expected);
 
-        Token actual = service.login("alice", "pw");
-        assertThat(actual.token()).isEqualTo(expected.token());
-    }
+    Token actual = service.login("alice", "pw");
+    assertThat(actual.token()).isEqualTo(expected.token());
+  }
 }

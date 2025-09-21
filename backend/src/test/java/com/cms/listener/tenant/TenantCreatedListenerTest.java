@@ -18,17 +18,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TenantCreatedListenerTest {
 
-  @Mock
-  MailService mailService;
+  @Mock MailService mailService;
 
-  @Mock
-  TenantRegistrationService registrationService;
+  @Mock TenantRegistrationService registrationService;
 
-  @Mock
-  AppProperties appProperties;
+  @Mock AppProperties appProperties;
 
-  @InjectMocks
-  TenantCreatedListener listener;
+  @InjectMocks TenantCreatedListener listener;
 
   @BeforeEach
   void setUp() {
@@ -72,7 +68,9 @@ class TenantCreatedListenerTest {
     t.setDomain("acme.example");
     t.setEmail("owner2@example.com");
     when(registrationService.createToken(30L)).thenReturn("tok456");
-    doThrow(new RuntimeException("smtp down")).when(mailService).send(anyString(), anyString(), anyString());
+    doThrow(new RuntimeException("smtp down"))
+        .when(mailService)
+        .send(anyString(), anyString(), anyString());
 
     // should not throw
     listener.onTenantCreated(new TenantCreatedEvent(t));
