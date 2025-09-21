@@ -1,0 +1,27 @@
+name: dependabot-rebase-and-merge
+version: 1.0
+description: Operational contract for rebasing Dependabot PRs onto main, verifying CI, and merging.
+inputs:
+  - pr_number: integer
+  - pr_branch: string
+  - base_branch: string
+outputs:
+  - merged: boolean
+  - ci_status: string
+  - notes: string
+steps:
+  - id: fetch
+    description: Fetch main and PR head
+  - id: rebase
+    description: Rebase PR branch onto main
+  - id: test
+    description: Run backend and frontend tests locally or rely on CI
+  - id: push
+    description: Force-push rebased branch to update PR
+  - id: verify_ci
+    description: Wait for CI to reach success before merging
+  - id: merge
+    description: Merge PR (manual or via CLI) and delete branch
+error_handling:
+  - on_conflict: "Document conflict, attempt trivial resolution. If unresolved, comment on PR and skip."
+  - on_ci_failure: "Do not merge; document failure and request remediation or approval with justification."

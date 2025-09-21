@@ -1,7 +1,7 @@
 ```markdown
 # Feature Specification: Dependabot PR rebase & merge workflow
 
-**Feature Branch**: `001-001-dependabot-updates`  
+**Feature Branch**: `001-dependabot-updates`  
 **Created**: 2025-09-21  
 **Status**: Draft  
 **Input**: User description: "我现在在001-dependabot-updates分支上，这个分支的本意是解决现在由dependabot扫描而自动创建的所有pr，这不是开发任务，只是要将由dependabot创建的pr对应的分支下载检查然后rebase main分支，再force提交，然后合并pr，为了规范操作这个任务也创建了pr，并引入了并实验spec-kit的运行，完成dependabot创建的任务之后，再关闭当前分支"
@@ -51,7 +51,7 @@ As a repository maintainer, I want to process all dependabot-created PR branches
 
 ### Acceptance Scenarios
 1. **Given** a dependabot PR with a branch `dependabot/...`, **When** the maintainer checks out that branch and rebases onto `main`, **Then** the branch history is rebased with no unrelated commits and the maintainer can force-push to update the PR.
-2. **Given** multiple dependabot PRs, **When** each is processed in sequence, **Then** each PR is merged and tests/CI pass (or failures are documented), and the coordination branch `001-001-dependabot-updates` remains solely as a coordinator which will be closed at the end.
+2. **Given** multiple dependabot PRs, **When** each is processed in sequence, **Then** each PR is merged and tests/CI pass (or failures are documented), and the coordination branch `001-dependabot-updates` remains solely as a coordinator which will be closed at the end.
 
 ### Edge Cases
 - What if a rebase produces conflicts? See FR-003 for conflict handling.
@@ -64,14 +64,14 @@ As a repository maintainer, I want to process all dependabot-created PR branches
 - **FR-002**: Maintainer MUST rebase the dependabot branch onto the latest `main` and force-push the branch to update the PR.
 - **FR-003**: If a rebase results in merge conflicts, the maintainer MUST document the conflict, attempt to resolve it if trivial, and if not resolvable quickly, post a comment on the PR and skip to the next PR.
 - **FR-004**: After force-push, the maintainer MUST ensure CI runs and passes for the rebased branch before merging; if CI fails, the PR is not merged until fixed or an approval is recorded with risk justification.
-- **FR-005**: The coordinating branch `001-001-dependabot-updates` MUST be used only for orchestration and closed once all target dependabot PRs have been processed.
+- **FR-005**: The coordinating branch `001-dependabot-updates` MUST be used only for orchestration and closed once all target dependabot PRs have been processed.
 
 *Ambiguities / Clarifications*:
 - **FR-006**: Does the team want a fully automated flow (bot) or manual operator workflow? [NEEDS CLARIFICATION: automation desired?]
 
 ### Key Entities *(if applicable)*
 - **Dependabot PR**: a pull request created by Dependabot containing dependency updates.
-- **Coordinator Branch**: `001-001-dependabot-updates` used to coordinate the manual tasks and experiments with spec-kit.
+- **Coordinator Branch**: `001-dependabot-updates` used to coordinate the manual tasks and experiments with spec-kit.
 
 ---
 
