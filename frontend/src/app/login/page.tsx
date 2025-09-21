@@ -20,9 +20,8 @@ function getAuthApi() {
 }
 
 export default function AdminLogin() {
-  //TODO default values should clear
-  const [username, setUsername] = useState("admin");
-  const [password, setPassword] = useState("admin1234");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
