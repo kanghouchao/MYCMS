@@ -31,3 +31,37 @@ jobs:
             backend/reports/junit
             backend/reports/jacoco
           if-no-files-found: ignore
+
+      - name: Publish Test Report
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: JUnit Tests
+          path: backend/reports/junit/*.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: Upload coverage report artifact
+        if: always()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload the generated JaCoCo HTML report (assumed at backend/reports/jacoco/html)
+          path: backend/reports/jacoco/html
+
+    # 部署到 GitHub Pages
+  deploy-coverage:
+    needs: lint-and-test
+    if: always()
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Show deployed Pages URL
+        if: success()
+        run: |
+          echo "Deployed Pages URL: ${{ steps.deployment.outputs.page_url }}"
