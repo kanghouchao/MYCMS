@@ -1,4 +1,11 @@
 import Cookies from "js-cookie";
+
+// mock navigation helper before importing client so that interceptor uses the mock
+const redirectMock = jest.fn();
+jest.mock("@/lib/navigation", () => ({
+  redirectToLogin: () => redirectMock(),
+}));
+
 import apiClient from "@/lib/client";
 
 jest.mock("js-cookie");
@@ -14,25 +21,20 @@ describe("apiClient 401 interceptor", () => {
     });
   });
   afterEach(() => {
-    Object.defineProperty(window, "location", { value: originalLocation });
+    // restore any spies/mocks on location.assign
+    jest.restoreAllMocks();
+    // restore original URL to avoid affecting other tests
+    try {
+      window.history.pushState({}, "", originalHref);
+    } catch {
+      // ignore if pushState fails
+    }
   });
 
   it("clears token and redirects on 401", async () => {
     const removeSpy = jest.spyOn(Cookies, "remove");
     const original = apiClient.defaults.adapter as any;
-    // Stub location.href setter to avoid jsdom navigation error
-    Object.defineProperty(window, "location", {
-      configurable: true,
-      value: {
-        ...originalLocation,
-        set href(_v: string) {
-          /* no-op in test */
-        },
-        get href() {
-          return originalHref;
-        },
-      },
-    });
+    // Let location.assign run (can't reliably spy on it in jsdom v30)
     apiClient.defaults.adapter = (async (_config: any) => {
       const error: any = new Error("Unauthorized");
       error.response = { status: 401 };
@@ -42,6 +44,8 @@ describe("apiClient 401 interceptor", () => {
     // avoid infinite loop by calling request to any url
     await expect(apiClient.get("/central/me")).rejects.toBeDefined();
     expect(removeSpy).toHaveBeenCalledWith("token");
+    // assert that our navigation helper was called (no real navigation in jsdom)
+    expect(redirectMock).toHaveBeenCalled();
 
     apiClient.defaults.adapter = original;
   });
