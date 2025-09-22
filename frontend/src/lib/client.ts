@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import { redirectToLogin } from "@/lib/navigation";
 
 const apiClient = axios.create({
   baseURL: "/api",
@@ -51,7 +52,7 @@ apiClient.interceptors.response.use(
         typeof window !== "undefined" &&
         !window.location.pathname.includes("/login")
       ) {
-        window.location.href = "/login";
+        redirectToLogin();
       }
     }
     return Promise.reject(error);

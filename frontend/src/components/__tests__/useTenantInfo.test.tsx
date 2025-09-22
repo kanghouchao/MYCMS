@@ -14,15 +14,14 @@ function TestComp() {
 }
 
 describe("useTenantInfo", () => {
-  const originalLocation = window.location;
-  const setLocation = (hostname: string, pathname: string) => {
-    Object.defineProperty(window, "location", {
-      value: { ...originalLocation, hostname, pathname },
-      configurable: true,
-    });
+  const originalHref = window.location.href;
+  const setLocation = (_hostname: string, pathname: string) => {
+    // Use history.pushState with a relative path to avoid cross-origin pushState errors in jsdom
+    window.history.pushState({}, "", pathname);
   };
   afterEach(() => {
-    Object.defineProperty(window, "location", { value: originalLocation });
+    // restore original URL
+    window.history.pushState({}, "", originalHref);
     (global as any).fetch?.mockClear?.();
   });
 

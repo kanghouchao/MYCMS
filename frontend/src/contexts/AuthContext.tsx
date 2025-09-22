@@ -5,6 +5,7 @@ import { authApi as centralAuthApi } from "@/services/central/api";
 import { authApi as tenantAuthApi } from "@/services/tenant/api";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { isTenantDomain } from "@/lib/config";
 
 interface AuthContextType {
   logout: () => void;
@@ -22,14 +23,6 @@ export const useAuth = () => {
 
 interface AuthProviderProps {
   children: React.ReactNode;
-}
-
-function isTenantDomain(): boolean {
-  if (typeof window === "undefined") return false;
-  const hostname = window.location.hostname;
-  const centralDomain =
-    process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
-  return hostname !== centralDomain;
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {

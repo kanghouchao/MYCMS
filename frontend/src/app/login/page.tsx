@@ -6,14 +6,7 @@ import Cookies from "js-cookie";
 import { authApi as centralAuthApi } from "@/services/central/api";
 import { authApi as tenantAuthApi } from "@/services/tenant/api";
 import toast from "react-hot-toast";
-
-function isTenantDomain(): boolean {
-  if (typeof window === "undefined") return false;
-  const hostname = window.location.hostname;
-  const centralDomain =
-    process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
-  return hostname !== centralDomain;
-}
+import { getCentralDomain, isTenantDomain } from "@/lib/config";
 
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
@@ -33,11 +26,7 @@ export default function AdminLogin() {
       const response = await getAuthApi().login({ username, password });
       if (response.token && response.expires_at) {
         Cookies.set("token", response.token, { expires: response.expires_at });
-        const centralDomain =
-          process.env.NEXT_PUBLIC_CENTRAL_DOMAIN || "oli-cms.test";
-        const isTenant =
-          typeof window !== "undefined" &&
-          window.location.hostname !== centralDomain;
+        const isTenant = isTenantDomain();
         router.push(
           isTenant ? "/central/dashboard/tenant" : "/central/dashboard/central"
         );
