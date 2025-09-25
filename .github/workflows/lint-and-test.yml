@@ -34,9 +34,11 @@ jobs:
       pages: write
       id-token: write
     environment:
-      name: backend-test-reports
+      name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4.0.5
+        with:
+          artifact_name: backend-test-reports
