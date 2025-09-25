@@ -5,7 +5,7 @@
 # 変数定義
 DOCKER_IMAGE ?= cms-backend
 DOCKER_TAG ?= latest
-REPORT_DIR ?= reports
+REPORT_DIR ?= ../reports/
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -29,19 +29,16 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 	@echo "✍️  Spotless で自動整形を実行中..."
 	@$(GRADLEW) --no-daemon --warning-mode=all spotlessApply
 
-test: ## バックエンドの全テストを実行し、backend/reports にレポートを収集
+test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
 	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 	@$(MAKE) test-copy-artifacts
 
-test-copy-artifacts: ## テスト成果物を backend/reports にコピー
-	@mkdir -p $(REPORT_DIR)/junit $(REPORT_DIR)/jacoco
+test-copy-artifacts: ## テスト成果物を REPORT_DIR/backend にコピー
+	@rm -rf $(REPORT_DIR)/backend
 	@set -e; \
 		cid=$$(docker create $(DOCKER_IMAGE)-test:$(DOCKER_TAG) true); \
-		echo "Copying test artifacts from container $$cid..."; \
-		docker cp $$cid:/app/build/reports/tests/test $(REPORT_DIR)/junit || true; \
-		docker cp $$cid:/app/build/reports/jacoco/test/html $(REPORT_DIR)/jacoco/html || true; \
-		docker cp $$cid:/app/build/reports/jacoco/test/jacocoTestReport.xml $(REPORT_DIR)/jacoco/jacoco.xml || true; \
+		docker cp $$cid:/app/build/reports $(REPORT_DIR)/backend || true; \
 		docker rm -f $$cid >/dev/null 2>&1 || true
 
 build: ## バックエンドDockerイメージをビルド

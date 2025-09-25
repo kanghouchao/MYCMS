@@ -30,8 +30,9 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-test-artifacts
+          name: frontend-test-reports
           path: |
-            frontend/coverage
-            frontend/coverage/junit.xml
-          if-no-files-found: ignore
+            reports/frontend
+            reports/index.html
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4.0.5

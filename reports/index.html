@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>MYCMS — Test Reports</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto,
+          "Helvetica Neue", Arial;
+        max-width: 720px;
+        margin: 48px auto;
+        color: #111;
+      }
+      header {
+        margin-bottom: 24px;
+      }
+      a {
+        color: #0366d6;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      ul {
+        line-height: 1.8;
+      }
+      .note {
+        color: #555;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Test Reports</h1>
+      <p class="note">
+        This page links to the frontend and backend unit test / coverage reports
+        published on GitHub Pages. Replace the links below with the actual Pages
+        URLs for your repository.
+      </p>
+    </header>
+
+    <main>
+      <ul>
+        <li>
+          <strong>Frontend</strong> —
+          <a
+            id="frontend-link"
+            href="https://kanghouchao.github.io/MYCMS/reports/frontend/lcov-report/index.html"
+            >Open frontend test reports</a
+          >
+        </li>
+        <li>
+          <strong>Backend</strong> —
+          <a
+            id="backend-test-link"
+            href="https://kanghouchao.github.io/MYCMS/reports/backend/tests/test/index.html"
+            >Open backend test reports</a
+          >
+          <a
+            id="backend-jacoco-link"
+            href="https://kanghouchao.github.io/MYCMS/reports/backend/jacoco/test/index.html"
+            >Open backend jacoco reports</a
+          >
+        </li>
+      </ul>
+
+      <section style="margin-top: 24px">
+        <h2>How to update the links</h2>
+        <ol>
+          <li>
+            Go to the repository Settings → Pages to confirm the Pages URLs and
+            paths.
+          </li>
+          <li>
+            Replace <code>&lt;OWNER&gt;</code> and <code>&lt;REPO&gt;</code> in
+            the links above with the actual owner and repository name, or
+            replace the links with the full Pages URLs.
+          </li>
+        </ol>
+      </section>
+    </main>
+  </body>
+</html>

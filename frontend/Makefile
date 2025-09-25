@@ -5,7 +5,7 @@
 # 変数定義
 DOCKER_IMAGE ?= cms-frontend
 DOCKER_TAG ?= latest
-COVERAGE_DIR ?= coverage
+COVERAGE_DIR ?= ../reports/
 
 
 # デフォルトターゲット
@@ -33,11 +33,11 @@ test: ## Docker コンテナ内でユニットテストを実行し、artifacts/
 	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 	@$(MAKE) test-copy-artifacts
 
-test-copy-artifacts: ## テスト成果物を frontend/coverage と frontend/junit.xml にコピー
-	@rm -rf $(COVERAGE_DIR) && mkdir -p $(COVERAGE_DIR)
-	@cid=$(shell docker create $(DOCKER_IMAGE)-test:$(DOCKER_TAG) true) && \
-		docker cp $$cid:/app/coverage $(COVERAGE_DIR) || true && \
-		docker cp $$cid:/app/junit.xml $(COVERAGE_DIR)/junit.xml || true && \
+test-copy-artifacts: ## テスト成果物を COVERAGE_DIR/frontend にコピー
+	@rm -rf $(COVERAGE_DIR)/frontend
+	@set -e; \
+		cid=$(shell docker create $(DOCKER_IMAGE)-test:$(DOCKER_TAG) true) && \
+		docker cp $$cid:/app/coverage $(COVERAGE_DIR)/frontend || true && \
 		docker rm -f $$cid >/dev/null 2>&1 || true
 
 clean: ## Dockerイメージを削除
