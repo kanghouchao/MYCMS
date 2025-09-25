@@ -21,6 +21,18 @@ jobs:
       - name: Lint & Test (via Docker stage; collects reports)
         run: make lint test
 
+      - name: Inject report metadata (branch & PR)
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PULL_REQUEST_NUMBER: ${{ github.event.pull_request.number || '' }}
+        run: |
+          set -euo pipefail
+          bash ./.github/workflows/scripts/inject-report-metadata.sh
+
       - name: Upload Pages artifact (from test/)
         if: always()
         uses: actions/upload-pages-artifact@v4
