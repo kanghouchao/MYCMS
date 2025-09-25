@@ -25,8 +25,8 @@ jobs:
         if: always()
         env:
           BRANCH_NAME: ${{ github.ref_name }}
+          PR_NUMBER: ${{ github.event.pull_request.number || 'N/A' }}
         run: |
-          set -euo pipefail
           bash ./.github/scripts/inject-report-metadata.sh
 
       - name: Upload Pages artifact (from test/)
