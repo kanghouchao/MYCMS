@@ -11,3 +11,5 @@ Thumbs.db
 
 .tsconfig.tsbuildinfo
 
+reports/**
+!reports/index.html

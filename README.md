@@ -1,4 +1,3 @@
-
 # Oli CMS — Multi-tenant CMS (Spring Boot + Next.js)
 
 ![Spring Boot](https://img.shields.io/badge/SpringBoot-3.5+-green.svg)
@@ -129,7 +128,7 @@ Add the following lines to `/etc/hosts`:
 
 - Central (admin UI): [cms.com](http://cms.com)
 
-6. You can find password in [5.central-001-admin.yaml](./backend/src/main/resources/db/changelog/changes/5.central-001-admin.yaml) 
+6. You can find password in [5.central-001-admin.yaml](./backend/src/main/resources/db/changelog/changes/5.central-001-admin.yaml)
 
 7. Login and have fun!
 
@@ -172,6 +171,25 @@ MYCMS/
 
 - Contributing Guide: see `CONTRIBUTING.md`
 - AI submission rules and PR checklist: see `.github/pull_request_template.md` and `.github/copilot-instructions.md`
+
+## Test reports
+
+CI generates test and coverage reports for both frontend and backend and
+publishes them via GitHub Pages. A consolidated index is available in the
+repository under `reports/index.html`. The index links to the frontend
+coverage (`reports/frontend/lcov-report/index.html`) and backend test and
+jacoco output (`reports/backend/...`).
+
+When the reports are published the CI also injects metadata into the index
+page about which branch and pull request produced the report.
+
+To view the latest reports, open the `reports/` folder in the GitHub Pages
+deployment for this repository or visit the repository on GitHub:
+
+- https://github.com/kanghouchao/MYCMS
+
+If you need to update the links in `reports/index.html`, edit the local file
+and open a PR so the CI can regenerate and republish the artifact.
 
 ---
 
