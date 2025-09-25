@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v3.11.1
 
       - name: Lint (Spotless check via Docker stage)
         run: make -C backend lint
@@ -27,7 +27,7 @@ jobs:
 
       - name: Upload Pages artifact (from test/)
         if: always()
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v4
         with:
           name: backend-test-reports
           path: |
