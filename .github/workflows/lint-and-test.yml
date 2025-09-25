@@ -24,7 +24,7 @@ jobs:
       - name: Inject report metadata (branch & PR)
         if: always()
         env:
-          BRANCH_NAME: ${{ github.ref_name }}
+          BRANCH_NAME: ${{ github.head_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number || 'N/A' }}
         run: |
           bash ./.github/scripts/inject-report-metadata.sh
