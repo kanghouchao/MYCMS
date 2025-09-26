@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { centralApi } from "@/services/central/api";
-import { CreateTenantRequest } from "@/types/api";
-import toast from "react-hot-toast";
+import { useState, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { centralApi } from '@/services/central/api';
+import { CreateTenantRequest } from '@/types/api';
+import toast from 'react-hot-toast';
 
 export default function CreateTenantPage() {
   const { logout } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<CreateTenantRequest>({
-    name: "",
-    domain: "",
-    email: "",
+    name: '',
+    domain: '',
+    email: '',
   });
 
   const [errors, setErrors] = useState<Partial<CreateTenantRequest>>({});
@@ -23,28 +23,27 @@ export default function CreateTenantPage() {
     const newErrors: Partial<CreateTenantRequest> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "店舗名は必須です";
+      newErrors.name = '店舗名は必須です';
     }
 
     if (!formData.domain.trim()) {
-      newErrors.domain = "ドメインは必須です";
+      newErrors.domain = 'ドメインは必須です';
     } else {
-      const domainRegex =
-        /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/;
+      const domainRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/;
       if (!domainRegex.test(formData.domain)) {
-        newErrors.domain = "ドメイン形式が正しくありません";
+        newErrors.domain = 'ドメイン形式が正しくありません';
       }
 
       const domain = formData.domain.toLowerCase();
-      if (domain.startsWith("api.") || domain === "api") {
-        newErrors.domain = "api 関連のドメインは使用できません";
+      if (domain.startsWith('api.') || domain === 'api') {
+        newErrors.domain = 'api 関連のドメインは使用できません';
       }
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "メールアドレスは必須です";
+      newErrors.email = 'メールアドレスは必須です';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "メールアドレスの形式が正しくありません";
+      newErrors.email = 'メールアドレスの形式が正しくありません';
     }
 
     setErrors(newErrors);
@@ -62,39 +61,34 @@ export default function CreateTenantPage() {
 
     try {
       const created = await centralApi.create(formData);
-      toast.success("店舗を作成しました。店舗サイトへ移動します…");
+      toast.success('店舗を作成しました。店舗サイトへ移動します…');
 
       // Prefer the explicit domain from payload; fallback to first in domains list
-      const targetDomain =
-        created?.domain || created?.domains?.[0] || formData.domain;
+      const targetDomain = created?.domain || created?.domains?.[0] || formData.domain;
       if (targetDomain) {
         // Give the toast a brief moment to show before redirecting cross-domain
         setTimeout(() => {
-          const protocol =
-            typeof window !== "undefined" ? window.location.protocol : "https:";
+          const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
           window.location.assign(`${protocol}//${targetDomain}`);
         }, 600);
       } else {
         // Fallback to tenants list if domain is not available
-        router.push("/central/tenants");
+        router.push('/central/tenants');
       }
     } catch (error: any) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       }
-      toast.error("店舗作成に失敗しました。入力内容をご確認ください");
+      toast.error('店舗作成に失敗しました。入力内容をご確認ください');
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  const handleInputChange = (
-    field: keyof CreateTenantRequest,
-    value: string
-  ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleInputChange = (field: keyof CreateTenantRequest, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: undefined }));
+      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -106,7 +100,7 @@ export default function CreateTenantPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push("/central/tenants")}
+                onClick={() => router.push('/central/tenants')}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
               >
                 ← 店舗一覧に戻る
@@ -114,9 +108,7 @@ export default function CreateTenantPage() {
               <h1 className="text-xl font-semibold text-gray-900">店舗作成</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                ようこそ、someone さん
-              </span>
+              <span className="text-sm text-gray-700">ようこそ、someone さん</span>
               <button
                 onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -134,9 +126,7 @@ export default function CreateTenantPage() {
           <div className="bg-white shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
               <div className="mb-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  店舗情報
-                </h3>
+                <h3 className="text-lg leading-6 font-medium text-gray-900">店舗情報</h3>
                 <p className="mt-1 text-sm text-gray-500">
                   新しい店舗の基本情報を入力してください。ドメインは独立サイトへのアクセスに使用されます。
                 </p>
@@ -145,10 +135,7 @@ export default function CreateTenantPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* 店舗名 */}
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                     店舗名 <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-1">
@@ -157,26 +144,19 @@ export default function CreateTenantPage() {
                       name="name"
                       id="name"
                       value={formData.name}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
+                      onChange={e => handleInputChange('name', e.target.value)}
                       className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                        errors.name ? "border-red-300" : ""
+                        errors.name ? 'border-red-300' : ''
                       }`}
                       placeholder="例：ABC株式会社"
                     />
-                    {errors.name && (
-                      <p className="mt-2 text-sm text-red-600">{errors.name}</p>
-                    )}
+                    {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
                   </div>
                 </div>
 
                 {/* 域名 */}
                 <div>
-                  <label
-                    htmlFor="domain"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="domain" className="block text-sm font-medium text-gray-700">
                     ドメイン <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-1">
@@ -185,21 +165,14 @@ export default function CreateTenantPage() {
                       name="domain"
                       id="domain"
                       value={formData.domain}
-                      onChange={(e) =>
-                        handleInputChange(
-                          "domain",
-                          e.target.value.toLowerCase()
-                        )
-                      }
+                      onChange={e => handleInputChange('domain', e.target.value.toLowerCase())}
                       className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                        errors.domain ? "border-red-300" : ""
+                        errors.domain ? 'border-red-300' : ''
                       }`}
                       placeholder="example.com または tenant1.oli-cms.test"
                     />
                   </div>
-                  {errors.domain && (
-                    <p className="mt-2 text-sm text-red-600">{errors.domain}</p>
-                  )}
+                  {errors.domain && <p className="mt-2 text-sm text-red-600">{errors.domain}</p>}
                   <p className="mt-2 text-sm text-gray-500">
                     完全なドメイン名を入力してください（例：company.shop.example.org）
                   </p>
@@ -207,10 +180,7 @@ export default function CreateTenantPage() {
 
                 {/* 連絡用メール */}
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700"
-                  >
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                     連絡用メール <span className="text-red-500">*</span>
                   </label>
                   <div className="mt-1">
@@ -219,51 +189,31 @@ export default function CreateTenantPage() {
                       name="email"
                       id="email"
                       value={formData.email}
-                      onChange={(e) =>
-                        handleInputChange("email", e.target.value)
-                      }
+                      onChange={e => handleInputChange('email', e.target.value)}
                       className={`shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md ${
-                        errors.email ? "border-red-300" : ""
+                        errors.email ? 'border-red-300' : ''
                       }`}
                       placeholder="contact@abc-company.com"
                     />
-                    {errors.email && (
-                      <p className="mt-2 text-sm text-red-600">
-                        {errors.email}
-                      </p>
-                    )}
+                    {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
                   </div>
                 </div>
 
                 {/* 预览信息 */}
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-2">
-                    プレビュー情報
-                  </h4>
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">プレビュー情報</h4>
                   <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        店舗名
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {formData.name || "未入力"}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">店舗名</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{formData.name || '未入力'}</dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        アクセスドメイン
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {formData.domain || "未入力"}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">アクセスドメイン</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{formData.domain || '未入力'}</dd>
                     </div>
                     <div>
-                      <dt className="text-sm font-medium text-gray-500">
-                        連絡用メール
-                      </dt>
-                      <dd className="mt-1 text-sm text-gray-900">
-                        {formData.email || "未入力"}
-                      </dd>
+                      <dt className="text-sm font-medium text-gray-500">連絡用メール</dt>
+                      <dd className="mt-1 text-sm text-gray-900">{formData.email || '未入力'}</dd>
                     </div>
                   </dl>
                 </div>
@@ -272,7 +222,7 @@ export default function CreateTenantPage() {
                 <div className="flex justify-end space-x-3">
                   <button
                     type="button"
-                    onClick={() => router.push("/central/tenants")}
+                    onClick={() => router.push('/central/tenants')}
                     className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     キャンセル
@@ -306,7 +256,7 @@ export default function CreateTenantPage() {
                         作成中...
                       </>
                     ) : (
-                      "店舗を作成"
+                      '店舗を作成'
                     )}
                   </button>
                 </div>

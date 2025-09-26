@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import React, { createContext, useContext, useEffect } from "react";
-import { authApi as centralAuthApi } from "@/services/central/api";
-import { authApi as tenantAuthApi } from "@/services/tenant/api";
-import Cookies from "js-cookie";
-import { useRouter } from "next/navigation";
-import { isTenantDomain } from "@/lib/config";
+import React, { createContext, useContext, useEffect } from 'react';
+import { authApi as centralAuthApi } from '@/services/central/api';
+import { authApi as tenantAuthApi } from '@/services/tenant/api';
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
+import { isTenantDomain } from '@/lib/config';
 
 interface AuthContextType {
   logout: () => void;
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 };
@@ -31,9 +31,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = Cookies.get("token");
+      const token = Cookies.get('token');
       if (!token) {
-        router.push("/login");
+        router.push('/login');
       }
     };
     checkAuth();
@@ -42,9 +42,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async () => {
     try {
       await getAuthApi().logout();
-      router.push("/login");
+      router.push('/login');
     } finally {
-      Cookies.remove("token");
+      Cookies.remove('token');
     }
   };
 

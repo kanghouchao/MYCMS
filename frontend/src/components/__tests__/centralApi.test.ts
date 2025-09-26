@@ -1,7 +1,7 @@
-import { centralApi, authApi } from "@/services/central/api";
-import apiClient from "@/lib/client";
+import { centralApi, authApi } from '@/services/central/api';
+import apiClient from '@/lib/client';
 
-jest.mock("@/lib/client", () => ({
+jest.mock('@/lib/client', () => ({
   __esModule: true,
   default: {
     get: jest.fn(async (url: string) => ({ data: { url } })),
@@ -11,14 +11,14 @@ jest.mock("@/lib/client", () => ({
   },
 }));
 
-describe("central api", () => {
-  it("getList delegates to /central/tenants", async () => {
+describe('central api', () => {
+  it('getList delegates to /central/tenants', async () => {
     const res = await centralApi.getList({ page: 1 });
-    expect(res).toHaveProperty("url", "/central/tenants");
+    expect(res).toHaveProperty('url', '/central/tenants');
   });
 
-  it("login returns data", async () => {
-    const res = await authApi.login({ username: "a", password: "b" } as any);
+  it('login returns data', async () => {
+    const res = await authApi.login({ username: 'a', password: 'b' } as any);
     expect(res).toEqual({});
   });
 });

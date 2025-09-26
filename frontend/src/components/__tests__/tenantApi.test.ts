@@ -1,6 +1,6 @@
-import { authApi } from "@/services/tenant/api";
+import { authApi } from '@/services/tenant/api';
 
-jest.mock("@/lib/client", () => ({
+jest.mock('@/lib/client', () => ({
   __esModule: true,
   default: {
     get: jest.fn(async (url: string) => ({ data: { ok: true, url } })),
@@ -10,16 +10,16 @@ jest.mock("@/lib/client", () => ({
   },
 }));
 
-describe("tenant api", () => {
-  it("register calls /tenant/register", async () => {
+describe('tenant api', () => {
+  it('register calls /tenant/register', async () => {
     await expect(authApi.register({} as any)).resolves.toBeUndefined();
   });
-  it("login returns data from /tenant/login", async () => {
+  it('login returns data from /tenant/login', async () => {
     const res = await authApi.login({} as any);
-    expect(res).toEqual({ ok: true, url: "/tenant/login" });
+    expect(res).toEqual({ ok: true, url: '/tenant/login' });
   });
-  it("me calls /tenant/me", async () => {
+  it('me calls /tenant/me', async () => {
     const res = await authApi.me();
-    expect(res).toEqual({ ok: true, url: "/tenant/me" });
+    expect(res).toEqual({ ok: true, url: '/tenant/me' });
   });
 });

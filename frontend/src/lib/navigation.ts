@@ -2,7 +2,7 @@
 type NavigatorFn = (url: string) => void;
 
 function defaultNavigator(url: string) {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     try {
       window.location.assign(url);
     } catch {
@@ -14,10 +14,10 @@ function defaultNavigator(url: string) {
 let navigatorFn: NavigatorFn = defaultNavigator;
 
 export function redirectToLogin() {
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     try {
-      if (!window.location.pathname.includes("/login")) {
-        navigatorFn("/login");
+      if (!window.location.pathname.includes('/login')) {
+        navigatorFn('/login');
       }
     } catch {
       // reading pathname may throw in some environments; ignore

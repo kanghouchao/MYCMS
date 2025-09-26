@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect, Suspense } from "react";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
-import { authApi } from "@/services/tenant/api";
+import { useState, useEffect, Suspense } from 'react';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { authApi } from '@/services/tenant/api';
 
 export default function RegisterPage() {
   return (
@@ -16,15 +16,15 @@ export default function RegisterPage() {
 function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [token, setToken] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
+  const [token, setToken] = useState<string>('');
+  const [email, setEmail] = useState<string>('');
 
   useEffect(() => {
-    setToken(searchParams?.get("token") || "");
+    setToken(searchParams?.get('token') || '');
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -33,24 +33,24 @@ function RegisterForm() {
     setSuccess(null);
     if (!token) {
       setError(
-        "リンクが無効、またはトークンが不足しています。メールのリンクから再度アクセスしてください。"
+        'リンクが無効、またはトークンが不足しています。メールのリンクから再度アクセスしてください。'
       );
       return;
     }
     if (password.length < 8) {
-      setError("パスワードは8文字以上で入力してください。");
+      setError('パスワードは8文字以上で入力してください。');
       return;
     }
     if (password !== confirmPassword) {
-      setError("パスワードが一致しません。もう一度ご確認ください。");
+      setError('パスワードが一致しません。もう一度ご確認ください。');
       return;
     }
     try {
       await authApi.register({ token, email, password });
-      setSuccess("登録が完了しました。管理画面にログインしてください。");
-      setTimeout(() => router.push("/login"), 2000);
+      setSuccess('登録が完了しました。管理画面にログインしてください。');
+      setTimeout(() => router.push('/login'), 2000);
     } catch (err) {
-      setError("ネットワークエラーが発生しました");
+      setError('ネットワークエラーが発生しました');
     }
   };
 
@@ -66,16 +66,11 @@ function RegisterForm() {
             height={40}
             className="h-10 mr-3"
           />
-          <h2 className="text-2xl font-bold text-blue-700">
-            Oli-CMS 管理者登録
-          </h2>
+          <h2 className="text-2xl font-bold text-blue-700">Oli-CMS 管理者登録</h2>
         </div>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
               メールアドレス
             </label>
             <input
@@ -84,16 +79,13 @@ function RegisterForm() {
               id="email"
               placeholder="メールアドレス"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={e => setEmail(e.target.value)}
               className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
             />
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
               ログイン用パスワード設定
             </label>
             <input
@@ -102,7 +94,7 @@ function RegisterForm() {
               id="password"
               placeholder="パスワード（8文字以上）"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={e => setPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
               minLength={8}
@@ -121,7 +113,7 @@ function RegisterForm() {
               id="confirm-password"
               placeholder="パスワード（確認用）"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={e => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-400"
               required
               minLength={8}
@@ -135,9 +127,7 @@ function RegisterForm() {
           </button>
         </form>
         {error && <div className="text-red-500 mt-4 text-center">{error}</div>}
-        {success && (
-          <div className="text-green-600 mt-4 text-center">{success}</div>
-        )}
+        {success && <div className="text-green-600 mt-4 text-center">{success}</div>}
         <div className="mt-8 text-xs text-gray-400 text-center">
           ご不明点はOli-CMSサポートまでご連絡ください
         </div>

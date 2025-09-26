@@ -1,25 +1,25 @@
-const nextJest = require("next/jest");
+const nextJest = require('next/jest');
 
-const createJestConfig = nextJest({ dir: "./" });
+const createJestConfig = nextJest({ dir: './' });
 
 const customJestConfig = {
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/setupTests.ts"],
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/setupTests.ts'],
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  testPathIgnorePatterns: ["/node_modules/", "/.next/"],
+  testPathIgnorePatterns: ['/node_modules/', '/.next/'],
   // Coverage settings — focus on core client logic instead of pages/templates
   collectCoverage: true,
   collectCoverageFrom: [
-    "src/lib/**/*.{ts,tsx}",
-    "src/contexts/**/*.{ts,tsx}",
-    "src/services/**/*.{ts,tsx}",
-    "src/hooks/**/*.{ts,tsx}",
-    "!src/**/__tests__/**",
+    'src/lib/**/*.{ts,tsx}',
+    'src/contexts/**/*.{ts,tsx}',
+    'src/services/**/*.{ts,tsx}',
+    'src/hooks/**/*.{ts,tsx}',
+    '!src/**/__tests__/**',
   ],
-  coverageReporters: ["text", "lcov"],
-  coverageDirectory: "<rootDir>/coverage",
+  coverageReporters: ['text', 'lcov'],
+  coverageDirectory: '<rootDir>/coverage',
   coverageThreshold: {
     global: {
       lines: 70,

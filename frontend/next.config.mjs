@@ -8,7 +8,7 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  output: "standalone",
+  output: 'standalone',
   experimental: {
     instrumentationHook: true,
   },
