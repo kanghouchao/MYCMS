@@ -1,8 +1,9 @@
 import { headers } from "next/headers";
 
-export default function Page() {
-  const tenantId = headers().get("x-mw-tenant-id");
-  const tenantName = headers().get("x-mw-tenant-name");
+export default async function Page() {
+  const hdrs = await headers();
+  const tenantId = hdrs.get("x-mw-tenant-id");
+  const tenantName = hdrs.get("x-mw-tenant-name");
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">

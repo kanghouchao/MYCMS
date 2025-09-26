@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
-export default function Home() {
-  const cookieStore = cookies();
+export default async function Home() {
+  const cookieStore = await cookies();
   const role = cookieStore.get("x-mw-role")?.value;
 
   console.log("🏠 Home page - Role from cookie:", role);
