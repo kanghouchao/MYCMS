@@ -1,14 +1,14 @@
 
 # CMS Project Makefile
 # ======================
+env ?= development
+service ?=
 
 help: ## ヘルプ情報を表示
 	@echo "Oli CMS プロジェクト管理コマンド:"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 	@echo ""
-
-.PHONY: help build test up down ps logs exec clean restart
 
 build: ## Dockerイメージをビルド
 ifdef service
@@ -59,31 +59,30 @@ endif
 
 up: ## サービスを起動
 	@echo "🚀 サービスを起動中..."
-	@docker-compose up -d --timestamps --wait
+	@make -C environment/$(env) up
 
 down: ## サービスを停止
 	@echo "🛑 サービスを停止中..."
-	@docker-compose down
+	@make -C environment/$(env) down
 
 ps: ## サービスの状態を表示
-	@docker-compose ps
+	@make -C environment/$(env) ps
 
 logs: ## すべてのサービスのログを表示
 ifndef service
-	@docker-compose logs -f;
+	@make -C environment/$(env) logs
 else
 	echo "📜 $(service)サービスのログを表示中...";
-	@docker-compose logs -f $(service);
+	@make -C environment/$(env) logs service=$(service);
 endif
 
 exec: ## サービスコンテナに入る
 ifdef service
-	@docker-compose exec $(service) sh
+	@make -C environment/$(env) exec service=$(service);
 endif
 
 clean: ## 未使用のイメージとコンテナをクリーンアップ
 ifndef service
-	@docker compose down --volumes --remove-orphans
 	@make -C backend clean
 	@make -C frontend clean
 	@docker system prune -f
@@ -94,8 +93,10 @@ endif
 restart: ## サービスを再起動
 ifndef service
 	@echo "🔄 すべてのサービスを再起動中..."
-	@docker-compose restart;
+	@make -C environment/$(env) restart
 else
 	@echo "🔄 $(service)サービスを再起動中..."
-	@docker-compose restart $(service)
+	@make -C environment/$(env) restart service=$(service)
 endif
+
+.PHONY: help build test up down ps logs exec clean restart

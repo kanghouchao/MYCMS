@@ -18,3 +18,5 @@ junit.xml
 .env
 
 next-env.d.ts
+
+.tsconfig.tsbuildinfo

@@ -2,14 +2,5 @@
 .DS_Store
 Thumbs.db
 
-# environment variables
-.env*
-!.env.example
-
 # vscode settings
 .vscode/
-
-.tsconfig.tsbuildinfo
-
-reports/**
-!reports/index.html
