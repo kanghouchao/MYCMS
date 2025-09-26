@@ -47,7 +47,7 @@ Below are the actual frameworks and key dependency versions used in this reposit
 | Styling | Tailwind CSS | ^3.4.1
 | HTTP client | axios | ^1.6.0
 | Containers / Local orchestration | Docker, Docker Compose | see `docker-compose.yml`
-| Reverse proxy | Traefik | configured under `traefik/`
+| Reverse proxy | Traefik | configured under `environment/` (Traefik configs)
 | Testing | JUnit/Jacoco (backend), Jest (frontend) | see `backend/build.gradle` and `frontend/package.json`
 
 Note: references to other frameworks (e.g. Micronaut, Quarkus) were removed from the table — they are not used in this repository.
@@ -118,15 +118,15 @@ make build up
 
 4. Map local domains (for admin/tenant switching)
 
-Add the following lines to `/etc/hosts`:
+Add the following lines to `/etc/hosts` (example using the repo default):
 
 ```text
-127.0.0.1 cms.com
+127.0.0.1 my-cms.test
 ```
 
 5. Access
 
-- Central (admin UI): [cms.com](http://cms.com)
+- Central (admin UI): [my-cms.test](http://my-cms.test) (or your configured admin domain)
 
 6. You can find password in [5.central-001-admin.yaml](./backend/src/main/resources/db/changelog/changes/5.central-001-admin.yaml)
 
@@ -151,7 +151,7 @@ Add the following lines to `/etc/hosts`:
 MYCMS/
 ├── backend/                     # Backend Spring Boot API
 ├── frontend/                    # Frontend Next.js app
-├── traefik/                     # Traefik config
+├── environment/                 # Traefik / environment config
 ├── .env.example                 # Example env file
 ├── docker-compose.yml
 └── Makefile
