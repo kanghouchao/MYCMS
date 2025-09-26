@@ -8,7 +8,9 @@
         "lint": "next lint",
         "lint:fix": "next lint --fix",
         "test": "jest",
-        "test:watch": "jest --watch"
+        "test:watch": "jest --watch",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
     },
     "dependencies": {
         "@headlessui/react": "2.2.8",
@@ -40,6 +42,7 @@
         "eslint-config-next": "15.5.3",
         "postcss": "8.5.6",
         "tailwindcss": "4.1.13",
-        "typescript": "5.4.5"
+        "typescript": "5.4.5",
+        "prettier": "3.6.2"
     }
 }
