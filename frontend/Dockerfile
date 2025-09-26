@@ -13,6 +13,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
 RUN --mount=type=cache,target=/root/.npm \
     --mount=type=cache,target=/root/.cache \
+    npm run format:check && \
     npm run lint
 
 FROM deps AS test
