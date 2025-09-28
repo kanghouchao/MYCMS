@@ -60,6 +60,23 @@ spring:
       thread-name-prefix: task-cms-
 
 management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include:
+            - readinessState
+            - db
+            - redis
+  health:
+    db:
+      enabled: true
+    redis:
+      enabled: true
   endpoints:
     web:
       exposure:

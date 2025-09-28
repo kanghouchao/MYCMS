@@ -1,38 +1,31 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `backend/` Spring Boot API (Java 21); sources in `src/main/java`, resources in `src/main/resources`.
-- `backend/src/test/java` houses domain-aligned suites (`config`, `listener`, `service`).
-- `frontend/` Next.js + TypeScript; app code under `src/`, static assets in `public/`.
-- Shared outputs accumulate in `reports/`; Docker Compose stacks live in `environment/<env>/` with Traefik routes.
+- `backend/` contains the Spring Boot API (Java 21). Source lives in `src/main/java`, configuration in `src/main/resources`, and domain-aligned tests under `src/test/java` (`config`, `listener`, `service`). Multi-stage Docker builds (`backend/Dockerfile`) provide lint, test, and runtime targets.
+- `frontend/` houses the Next.js app (TypeScript). Feature code resides in `src/`, colocated unit specs end with `.test.ts(x)`, and static assets live in `public/`. The Docker recipe mirrors the backend and exposes a standalone Next server.
+- `environment/<env>/` offers Docker Compose harnesses (`development`, `release`) with helper Makefiles for `up`, `down`, `logs`, and `exec`. Shared CI artefacts are published to `reports/`.
 
 ## Build, Test, and Development Commands
-- `make build` builds everything; add `service=backend` or `service=frontend` to scope.
-- Run `./gradlew bootRun` for the API and `npm run dev` inside `frontend/` for the UI.
-- `make lint` triggers Spotless and ESLint; `make format service=frontend` applies Prettier + ESLint fixes.
-- `make test` (or `service=<name>`) executes suites and uploads artifacts to `reports/<service>/`.
-- Spin up integration stacks via `make up env=development`; stop with `make down env=development`.
+- `make build [service=backend|frontend]` builds Docker images using the staged Dockerfiles.
+- `./gradlew bootRun` and `npm run dev` run the API and UI locally; both honour hot reload.
+- `make lint` runs Spotless or ESLint via service Makefiles; `make format service=frontend` + `./gradlew spotlessApply` apply fixes.
+- `make test [service=…]` executes unit suites inside Docker, copying results to `reports/<service>/`. For direct runs, use `./gradlew test jacocoTestReport` and `npm test -- --coverage`.
+- `make up env=development` spins up the full stack with Traefik, PostgreSQL, Redis; `make logs service=backend` tails individual containers.
 
 ## Coding Style & Naming Conventions
-- Prettier (2-space indent, single quotes) and rules in `eslint.config.mjs` govern the frontend.
-- React components, contexts, and pages use `PascalCase`; hooks start with `use` and live in `frontend/src/hooks`.
-- Spotless enforces Google Java Format; keep Lombok annotations and Spring stereotypes consistent.
-- Java packages remain lowercase (`com.cms.<module>`), and payload types end with `Dto` or `Request`.
+- Java code follows Google Java Format (Spotless); packages stay lowercase (`com.cms.<module>`), DTO/Request suffixes describe payloads, and Lombok/Spring annotations mirror existing patterns.
+- Frontend uses Prettier (2-space, single quotes) plus `eslint.config.mjs`; React components/pages are `PascalCase`, hooks begin with `use`, and service clients belong in `frontend/src/services`.
 
 ## Testing Guidelines
-- Frontend tests run with Jest + Testing Library (`npm run test` or `make test service=frontend`); store specs as `*.test.tsx` beside the unit.
-- Backend tests use JUnit Platform and the bundled H2 profile (`./gradlew test`).
-- Jacoco requires ≥70% line coverage; expand suites whenever production logic changes.
-- Do not commit build outputs from `frontend/coverage` or `backend/build`.
+- Backend tests run on JUnit with the embedded H2 profile; Jacoco enforces ≥70% line coverage. Run through Docker (`make test service=backend`) or locally (`./gradlew test jacocoTestCoverageVerification`).
+- Frontend uses Jest + Testing Library; colocate specs and keep coverage ≥70% to satisfy Jest thresholds.
+- Prefer contract tests for middleware and API clients, especially when manipulating tenant routing or cookies.
 
 ## Commit & Pull Request Guidelines
-- Follow Conventional Commits (`type(scope): summary`), e.g., `fix(auth): tighten token expiry`.
-- Keep subjects under 70 characters and record behavioural notes or migrations in the body.
-- Reference issues with `Fixes #<id>` when applicable and mention manual test steps.
-- PRs should detail what changed, why, UI screenshots when relevant, and confirmation that `make lint` + `make test` passed.
+- Adhere to Conventional Commits (`type(scope): summary`) under 70 chars. Reference issues with `Fixes #<id>` and capture manual validation (e.g., `make lint`, `make test`, screenshots for UI changes).
+- PRs must summarize purpose and impact, list key files touched, link generated reports, and call out follow-up tasks. Keep changes focused; separate infra tweaks from feature work.
 
-## Security & Configuration Tips
-- Use `environment/docker-compose.example.yml` as the template for secrets; never commit real `.env` files.
-- Update Traefik rules under `environment/*/traefik` when exposing ports, and avoid opening extras.
-- Keep sensitive Spring settings in `application-*.yml` overrides, not hard-coded constants.
-- Coordinate authentication tweaks with security owners and log final decisions in `SECURITY.md`.
+## Security, Observability & Configuration
+- Start from `environment/docker-compose.example.yml` for secrets; never commit real `.env` files. Spring overrides belong in `application-*.yml` profiles.
+- Health probes are exposed at `/actuator/health`, `/actuator/health/liveness`, and `/actuator/health/readiness`; retain DB/Redis checks in readiness.
+- Every response propagates `X-Request-ID`; backend logs render `req=<id>` and `tenant=<role>`—include these when adding log lines or middleware.

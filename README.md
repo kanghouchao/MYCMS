@@ -145,6 +145,11 @@ Add the following lines to `/etc/hosts` (example using the repo default):
  - `make lint` or `make lint service=frontend|backend` — run linters for all or specified service
  - `make format` or `make format service=frontend|backend` — run code formatters (Spotless for backend, eslint fixes for frontend)
 
+### Observability quick reference
+
+- Backend Actuator exposes `/actuator/health`, `/actuator/health/liveness`, and `/actuator/health/readiness`; the readiness probe includes database and Redis checks.
+- Backend responses include an `X-Request-ID` header. Logs render `req=<id>` and `tenant=<value>` from the same correlation ID to make tracing requests across services easier.
+
 ## Project Structure
 
 ```text
