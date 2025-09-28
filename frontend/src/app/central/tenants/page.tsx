@@ -1,20 +1,18 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useCallback } from "react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useRouter } from "next/navigation";
-import { centralApi } from "@/services/central/api";
-import { Tenant, PaginatedResponse } from "@/types/api";
-import toast from "react-hot-toast";
+import { useEffect, useState, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
+import { centralApi } from '@/services/central/api';
+import { Tenant, PaginatedResponse } from '@/types/api';
+import toast from 'react-hot-toast';
 
 export default function TenantsPage() {
   const { logout } = useAuth();
   const router = useRouter();
-  const [tenants, setTenants] = useState<PaginatedResponse<Tenant> | null>(
-    null
-  );
+  const [tenants, setTenants] = useState<PaginatedResponse<Tenant> | null>(null);
   const [loadingTenants, setLoadingTenants] = useState(true);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
 
   const loadTenants = useCallback(async () => {
@@ -28,7 +26,7 @@ export default function TenantsPage() {
 
       setTenants(tenants);
     } catch (error) {
-      toast.error("店舗一覧の読み込みに失敗しました");
+      toast.error('店舗一覧の読み込みに失敗しました');
     } finally {
       setLoadingTenants(false);
     }
@@ -51,10 +49,10 @@ export default function TenantsPage() {
 
     try {
       await centralApi.delete(id);
-      toast.success("店舗を削除しました");
+      toast.success('店舗を削除しました');
       loadTenants();
     } catch (error) {
-      toast.error("店舗の削除に失敗しました");
+      toast.error('店舗の削除に失敗しました');
     }
   };
 
@@ -66,7 +64,7 @@ export default function TenantsPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push("/central/dashboard")}
+                onClick={() => router.push('/central/dashboard')}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
               >
                 ← ダッシュボードへ戻る
@@ -74,9 +72,7 @@ export default function TenantsPage() {
               <h1 className="text-xl font-semibold text-gray-900">店舗管理</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
-                ようこそ、someone さん
-              </span>
+              <span className="text-sm text-gray-700">ようこそ、someone さん</span>
               <button
                 onClick={logout}
                 className="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
@@ -97,13 +93,11 @@ export default function TenantsPage() {
               <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
                 店舗一覧
               </h2>
-              <p className="mt-1 text-sm text-gray-500">
-                システム内の全ての店舗を管理します
-              </p>
+              <p className="mt-1 text-sm text-gray-500">システム内の全ての店舗を管理します</p>
             </div>
             <div className="mt-4 flex md:mt-0 md:ml-4">
               <button
-                onClick={() => router.push("/central/tenants/create")}
+                onClick={() => router.push('/central/tenants/create')}
                 className="ml-3 inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               >
                 <svg
@@ -137,7 +131,7 @@ export default function TenantsPage() {
                     name="search"
                     id="search"
                     value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
+                    onChange={e => setSearchTerm(e.target.value)}
                     className="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md"
                     placeholder="店舗名またはドメインで検索..."
                   />
@@ -152,7 +146,7 @@ export default function TenantsPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      setSearchTerm("");
+                      setSearchTerm('');
                       setCurrentPage(1);
                     }}
                     className="mt-3 w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 shadow-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
@@ -174,7 +168,7 @@ export default function TenantsPage() {
             ) : tenants && tenants.data.length > 0 ? (
               <>
                 <ul className="divide-y divide-gray-200">
-                  {tenants.data.map((tenant) => (
+                  {tenants.data.map(tenant => (
                     <li key={tenant.id} className="px-4 py-4 hover:bg-gray-50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center min-w-0 flex-1">
@@ -193,36 +187,28 @@ export default function TenantsPage() {
                               <span
                                 className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                                   tenant.is_active
-                                    ? "bg-green-100 text-green-800"
-                                    : "bg-red-100 text-red-800"
+                                    ? 'bg-green-100 text-green-800'
+                                    : 'bg-red-100 text-red-800'
                                 }`}
                               >
-                                {tenant.is_active ? "有効" : "無効"}
+                                {tenant.is_active ? '有効' : '無効'}
                               </span>
                             </div>
                           </div>
                         </div>
                         <div className="flex items-center space-x-2">
                           <span className="text-sm text-gray-500">
-                            {new Date(tenant.created_at).toLocaleDateString(
-                              "ja-JP"
-                            )}
+                            {new Date(tenant.created_at).toLocaleDateString('ja-JP')}
                           </span>
                           <div className="flex space-x-2">
                             <button
-                              onClick={() =>
-                                router.push(
-                                  `/central/tenants/${tenant.id}/edit`
-                                )
-                              }
+                              onClick={() => router.push(`/central/tenants/${tenant.id}/edit`)}
                               className="inline-flex items-center px-3 py-1 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                             >
                               編集
                             </button>
                             <button
-                              onClick={() =>
-                                handleDeleteTenant(tenant.id, tenant.name)
-                              }
+                              onClick={() => handleDeleteTenant(tenant.id, tenant.name)}
                               className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                             >
                               削除
@@ -256,8 +242,7 @@ export default function TenantsPage() {
                     <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                       <div>
                         <p className="text-sm text-gray-700">
-                          {tenants.total} 件中 {tenants.from}-{tenants.to}{" "}
-                          を表示
+                          {tenants.total} 件中 {tenants.from}-{tenants.to} を表示
                         </p>
                       </div>
                       <div>
@@ -267,11 +252,7 @@ export default function TenantsPage() {
                             disabled={currentPage <= 1}
                             className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <svg
-                              className="h-5 w-5"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
+                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
                                 d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
@@ -281,36 +262,29 @@ export default function TenantsPage() {
                           </button>
 
                           {/* ページ番号ボタン */}
-                          {Array.from(
-                            { length: Math.min(5, tenants.last_page) },
-                            (_, i) => {
-                              const page = i + 1;
-                              return (
-                                <button
-                                  key={page}
-                                  onClick={() => setCurrentPage(page)}
-                                  className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                                    page === currentPage
-                                      ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
-                                      : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                                  }`}
-                                >
-                                  {page}
-                                </button>
-                              );
-                            }
-                          )}
+                          {Array.from({ length: Math.min(5, tenants.last_page) }, (_, i) => {
+                            const page = i + 1;
+                            return (
+                              <button
+                                key={page}
+                                onClick={() => setCurrentPage(page)}
+                                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                                  page === currentPage
+                                    ? 'z-10 bg-indigo-50 border-indigo-500 text-indigo-600'
+                                    : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                                }`}
+                              >
+                                {page}
+                              </button>
+                            );
+                          })}
 
                           <button
                             onClick={() => setCurrentPage(currentPage + 1)}
                             disabled={currentPage >= tenants.last_page}
                             className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            <svg
-                              className="h-5 w-5"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
+                            <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                               <path
                                 fillRule="evenodd"
                                 d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
@@ -339,17 +313,13 @@ export default function TenantsPage() {
                     d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                   />
                 </svg>
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
-                  店舗がありません
-                </h3>
+                <h3 className="mt-2 text-sm font-medium text-gray-900">店舗がありません</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {searchTerm
-                    ? "該当する店舗が見つかりません"
-                    : "最初の店舗を作成しましょう"}
+                  {searchTerm ? '該当する店舗が見つかりません' : '最初の店舗を作成しましょう'}
                 </p>
                 <div className="mt-6">
                   <button
-                    onClick={() => router.push("/central/tenants/create")}
+                    onClick={() => router.push('/central/tenants/create')}
                     className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                   >
                     <svg

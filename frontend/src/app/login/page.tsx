@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
-import { authApi as centralAuthApi } from "@/services/central/api";
-import { authApi as tenantAuthApi } from "@/services/tenant/api";
-import toast from "react-hot-toast";
-import { getCentralDomain, isTenantDomain } from "@/lib/config";
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Cookies from 'js-cookie';
+import { authApi as centralAuthApi } from '@/services/central/api';
+import { authApi as tenantAuthApi } from '@/services/tenant/api';
+import toast from 'react-hot-toast';
+import { getCentralDomain, isTenantDomain } from '@/lib/config';
 
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
 }
 
 export default function AdminLogin() {
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
@@ -25,15 +25,13 @@ export default function AdminLogin() {
     try {
       const response = await getAuthApi().login({ username, password });
       if (response.token && response.expires_at) {
-        Cookies.set("token", response.token, { expires: response.expires_at });
+        Cookies.set('token', response.token, { expires: response.expires_at });
         const isTenant = isTenantDomain();
-        router.push(
-          isTenant ? "/central/dashboard/tenant" : "/central/dashboard/central"
-        );
+        router.push(isTenant ? '/central/dashboard/tenant' : '/central/dashboard/central');
       }
     } catch (error) {
-      console.error("Login failed:", error);
-      toast.error("ログインに失敗しました。しばらくしてから再度お試しください");
+      console.error('Login failed:', error);
+      toast.error('ログインに失敗しました。しばらくしてから再度お試しください');
     } finally {
       setIsLoading(false);
     }
@@ -58,9 +56,7 @@ export default function AdminLogin() {
               />
             </svg>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            管理者ログイン
-          </h2>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">管理者ログイン</h2>
           <p className="mt-2 text-center text-sm text-gray-600">
             管理者アカウントでログインしてください
           </p>
@@ -79,7 +75,7 @@ export default function AdminLogin() {
                 autoComplete="username"
                 required
                 value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={e => setUsername(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="ログイン名"
               />
@@ -95,7 +91,7 @@ export default function AdminLogin() {
                 autoComplete="current-password"
                 required
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={e => setPassword(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="パスワード"
               />
@@ -109,13 +105,10 @@ export default function AdminLogin() {
                 name="remember-me"
                 type="checkbox"
                 checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
+                onChange={e => setRememberMe(e.target.checked)}
                 className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
               />
-              <label
-                htmlFor="remember-me"
-                className="ml-2 block text-sm text-gray-900"
-              >
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
                 ログイン状態を保持
               </label>
             </div>
@@ -140,7 +133,7 @@ export default function AdminLogin() {
                   />
                 </svg>
               </span>
-              {isLoading ? "ログイン中..." : "ログイン"}
+              {isLoading ? 'ログイン中...' : 'ログイン'}
             </button>
           </div>
 

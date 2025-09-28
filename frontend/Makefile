@@ -26,6 +26,7 @@ lint: ## ESLint を実行（Docker lint ステージ経由）
 format: ## ESLint の自動修正をローカルで実行
 	@echo "✍️  ESLint の自動修正を実行中..."
 	@if [ ! -d node_modules ]; then echo "📦 依存をインストール中..."; npm ci || npm install; fi
+	@npm run format
 	@npm run lint:fix
 
 test: ## Docker コンテナ内でユニットテストを実行し、artifacts/ にレポートを収集
@@ -44,5 +45,6 @@ clean: ## Dockerイメージを削除
 	@echo "🗑️  フロントエンドDockerイメージを削除中..."
 	@docker rmi $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null || echo "イメージが存在しないか、既に削除されています"
 	@docker rmi $(DOCKER_IMAGE)-test:$(DOCKER_TAG) 2>/dev/null || echo "テストイメージが存在しないか、既に削除されています"
+	@docker rmi $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) 2>/dev/null || echo "Lintイメージが存在しないか、既に削除されています"
 
 .PHONY: help build test clean

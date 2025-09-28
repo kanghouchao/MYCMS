@@ -1,0 +1,122 @@
+# docker-compose.yml
+name: oli-cms
+
+services:
+  # Traefik: The reverse proxy
+  traefik:
+    image: "traefik:v3.5.0"
+    container_name: "oli-cms-traefik"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/:/etc/traefik/:ro"
+    networks:
+      - oli-cms-network
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 30s
+      timeout: 3s
+      start_period: 10s
+      retries: 3
+
+  # Database: PostgreSQL
+  database:
+    image: postgres:16-alpine
+    container_name: oli-cms-database
+    environment:
+      POSTGRES_DB: ${DB_NAME:-cms}
+      POSTGRES_USER: ${DB_USERNAME:-cms}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - oli-cms-db-data:/var/lib/postgresql/data
+    networks:
+      - oli-cms-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-cms} -d ${DB_NAME:-cms}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Cache: Redis
+  redis:
+    image: redis:8.2.0-alpine3.22
+    container_name: oli-cms-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-password}
+    volumes:
+      - oli-cms-redis-data:/data
+    networks:
+      - oli-cms-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend: Java Spring Boot
+  backend:
+    image: cms-backend:latest
+    container_name: oli-cms-backend
+    networks:
+      - oli-cms-network
+    env_file:
+      - .env
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=web"
+      - "traefik.http.routers.backend.middlewares=backend-strip@docker"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.backend-strip.stripPrefix.prefixes=/api"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      start_period: 15s
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    restart: on-failure:3
+
+  # Frontend: next.js
+  frontend:
+    image: cms-frontend:latest
+    container_name: oli-cms-frontend
+    networks:
+      - oli-cms-network
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`) && !PathPrefix(`/api`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:3000/health || exit 1"]
+      start_period: 20s
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: on-failure:3
+
+networks:
+  oli-cms-network:
+    driver: bridge
+
+volumes:
+  oli-cms-db-data:
+    driver: local
+  oli-cms-redis-data:
+    driver: local

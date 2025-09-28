@@ -3,6 +3,7 @@ package com.cms.config;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import org.apache.logging.log4j.ThreadContext;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
@@ -43,21 +44,27 @@ public class TenantInterceptor implements HandlerInterceptor {
         return false;
       }
       tenantContext.setTenantId(tenantId);
+      ThreadContext.put("tenantId", tenantId);
       return true;
     }
 
     if (uri != null && uri.startsWith("/central")) {
+      if (!StringUtils.hasText(roleLower)) {
+        roleLower = "central";
+      }
       if (!"central".equals(roleLower)) {
         response.sendError(
             HttpServletResponse.SC_BAD_REQUEST, "X-Role must be 'central' for /central endpoints");
         return false;
       }
       tenantContext.clear();
+      ThreadContext.put("tenantId", "central");
       return true;
     }
 
     // Other paths: default to central context (no tenant)
     tenantContext.clear();
+    ThreadContext.put("tenantId", "public");
     return true;
   }
 
@@ -68,5 +75,6 @@ public class TenantInterceptor implements HandlerInterceptor {
       @NonNull Object handler,
       @Nullable Exception ex) {
     tenantContext.clear();
+    ThreadContext.remove("tenantId");
   }
 }

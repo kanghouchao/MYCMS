@@ -1,0 +1,6 @@
+# Certificates
+/traefik/acme.json
+
+# environment variables
+.env*
+!.env.example

@@ -2,7 +2,7 @@
 
 The goal of this document is to make contributions safe, reviewable, and fast to ship. The emphasis is on clear human-reviewed changes and high-quality code.
 
-Keep changes small and focused. If a change touches more than one area (frontend/backend/infra), prefer separate pull requests.
+Keep changes small and focused. If a change touches more than one area (frontend/backend/environment), prefer separate pull requests.
 
 ## Quick checklist (before opening a PR)
 
@@ -14,44 +14,21 @@ Keep changes small and focused. If a change touches more than one area (frontend
 
 ## Try locally (minimal reproducible steps)
 
+You should install Docker and Docker Buildx to run the full stack locally. The Makefile provides common commands.
+
 Before opening a PR it's helpful to run a minimal local validation to save reviewers time. Example quick steps (copy/paste):
 
-- Backend build & tests (uses Gradle wrapper):
+- Build & tests:
 
 ```bash
-cd backend
-./gradlew clean test jacocoTestReport
-```
-
-Notes for Windows users:
-
-- PowerShell: run the wrapper batch script from the `backend` directory:
-
-```powershell
-cd backend
-gradlew.bat clean test jacocoTestReport
-```
-
-- Alternatively use WSL (Windows Subsystem for Linux) and run the POSIX commands shown above (`./gradlew ...`).
-
-- Frontend tests & lint:
-
-```bash
-cd frontend
-npm ci
-npm run lint
-npm test
+make test build
 ```
 
 - Start full stack for manual smoke checks (requires Docker/Buildx):
 
 ```bash
-make build
 make up
-# open http://cms.com (or configured host) and verify basic flows
 ```
-
-When run locally, test artifacts are generated to `frontend/coverage` (Jest) and `backend/reports/jacoco` + `backend/reports/junit` (Gradle/Jacoco).
 
 ## Local development & useful commands
 

@@ -18,7 +18,7 @@ export interface Admin {
   id: number;
   name: string;
   email: string;
-  role: "super_admin" | "admin";
+  role: 'super_admin' | 'admin';
   is_active: boolean;
   created_at: string;
   updated_at?: string;
