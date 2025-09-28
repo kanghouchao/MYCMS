@@ -49,6 +49,9 @@ public class TenantInterceptor implements HandlerInterceptor {
     }
 
     if (uri != null && uri.startsWith("/central")) {
+      if (!StringUtils.hasText(roleLower)) {
+        roleLower = "central";
+      }
       if (!"central".equals(roleLower)) {
         response.sendError(
             HttpServletResponse.SC_BAD_REQUEST, "X-Role must be 'central' for /central endpoints");
