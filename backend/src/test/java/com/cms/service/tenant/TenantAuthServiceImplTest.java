@@ -66,7 +66,7 @@ class TenantAuthServiceImplTest {
     req.setEmail("admin@example.com");
     req.setPassword("secret");
 
-    service.register(123L, req);
+    Tenant result = service.register(123L, req);
 
     verify(userRepository).save(userCaptor.capture());
     TenantUser saved = userCaptor.getValue();
@@ -74,5 +74,6 @@ class TenantAuthServiceImplTest {
     assertThat(saved.getEmail()).isEqualTo("admin@example.com");
     assertThat(saved.getPassword()).isEqualTo("enc-secret");
     assertThat(saved.getNickname()).isEqualTo("admin");
+    assertThat(result).isEqualTo(tenant);
   }
 }

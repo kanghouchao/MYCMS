@@ -2,6 +2,7 @@ package com.cms.service.tenant;
 
 import com.cms.dto.auth.Token;
 import com.cms.dto.tenant.TenantRegisterRequest;
+import com.cms.model.central.tenant.Tenant;
 
 /** Authentication service interface. */
 public interface TenantAuthService {
@@ -21,5 +22,5 @@ public interface TenantAuthService {
    * @param tenantId the tenant ID
    * @param tenant the tenant user request
    */
-  void register(Long tenantId, TenantRegisterRequest tenant);
+  Tenant register(Long tenantId, TenantRegisterRequest tenant);
 }

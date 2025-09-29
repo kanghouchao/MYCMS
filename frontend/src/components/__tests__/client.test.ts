@@ -8,7 +8,7 @@ describe('apiClient request interceptor', () => {
     jest.clearAllMocks();
   });
 
-  it('adds Authorization when token exists', async () => {
+  it('adds Authorization and CSRF header when cookies exist', async () => {
     (Cookies.get as jest.Mock).mockReturnValue('abc123');
     const original = apiClient.defaults.adapter as any;
     apiClient.defaults.adapter = (async (config: any) => ({
@@ -21,6 +21,7 @@ describe('apiClient request interceptor', () => {
 
     const res = await apiClient.get('/central/me');
     expect(res.config.headers?.Authorization).toBe('Bearer abc123');
+    expect((res.config.headers as any)['X-XSRF-TOKEN']).toBe('abc123');
 
     apiClient.defaults.adapter = original;
   });
@@ -45,6 +46,7 @@ describe('apiClient request interceptor', () => {
     const res = await apiClient.get('/tenant/me');
     expect((res.config.headers as any)['X-Role']).toBe('tenant');
     expect((res.config.headers as any)['X-Tenant-ID']).toBe('42');
+    expect((res.config.headers as any)['X-XSRF-TOKEN']).toBeUndefined();
 
     apiClient.defaults.adapter = original;
   });

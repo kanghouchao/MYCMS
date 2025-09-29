@@ -20,6 +20,7 @@ function RegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [redirectUrl, setRedirectUrl] = useState<string | null>(null);
   const [token, setToken] = useState<string>('');
   const [email, setEmail] = useState<string>('');
 
@@ -31,6 +32,7 @@ function RegisterForm() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+    setRedirectUrl(null);
     if (!token) {
       setError(
         'リンクが無効、またはトークンが不足しています。メールのリンクから再度アクセスしてください。'
@@ -46,11 +48,30 @@ function RegisterForm() {
       return;
     }
     try {
-      await authApi.register({ token, email, password });
-      setSuccess('登録が完了しました。管理画面にログインしてください。');
-      setTimeout(() => router.push('/login'), 2000);
+      const response = await authApi.register({ token, email, password });
+      const tenantLabel = response.tenantName || response.tenantDomain || '店舗';
+      const nextUrl = response.loginUrl || '';
+      setRedirectUrl(nextUrl || null);
+      setSuccess(`${tenantLabel} のログインページへリダイレクトします。数秒お待ちください。`);
+      const fallback = () => router.push('/login');
+      const navigate = () => {
+        if (nextUrl) {
+          try {
+            window.location.assign(nextUrl);
+            return;
+          } catch (navigationError) {
+            console.error('Failed to redirect to tenant login', navigationError);
+          }
+        }
+        fallback();
+      };
+      setTimeout(navigate, 1500);
     } catch (err) {
-      setError('ネットワークエラーが発生しました');
+      console.error('Tenant registration failed', err);
+      const message =
+        (err as any)?.response?.data?.message ||
+        '登録に失敗しました。リンクの有効期限や入力内容をご確認のうえ、必要に応じてサポートへご連絡ください。';
+      setError(message);
     }
   };
 
@@ -127,7 +148,20 @@ function RegisterForm() {
           </button>
         </form>
         {error && <div className="text-red-500 mt-4 text-center">{error}</div>}
-        {success && <div className="text-green-600 mt-4 text-center">{success}</div>}
+        {success && (
+          <div className="text-green-600 mt-4 text-center space-y-2">
+            <div>{success}</div>
+            {redirectUrl && (
+              <button
+                type="button"
+                className="text-sm text-blue-600 hover:underline"
+                onClick={() => window.location.assign(redirectUrl)}
+              >
+                すぐにログインページへ移動する
+              </button>
+            )}
+          </div>
+        )}
         <div className="mt-8 text-xs text-gray-400 text-center">
           ご不明点はOli-CMSサポートまでご連絡ください
         </div>
