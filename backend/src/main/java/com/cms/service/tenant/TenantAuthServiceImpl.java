@@ -1,5 +1,6 @@
 package com.cms.service.tenant;
 
+import com.cms.config.TenantContext;
 import com.cms.dto.auth.Token;
 import com.cms.dto.tenant.TenantRegisterRequest;
 import com.cms.model.central.tenant.Tenant;
@@ -27,6 +28,7 @@ public class TenantAuthServiceImpl implements TenantAuthService {
   private final JwtUtil jwtUtil;
   private final TenantUserRepository userRepository;
   private final TenantRepository tenantRepository;
+  private final TenantContext tenantContext;
 
   @Override
   @Transactional(readOnly = true)
@@ -35,10 +37,15 @@ public class TenantAuthServiceImpl implements TenantAuthService {
     Authentication auth =
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(username, password));
-    return jwtUtil.generateToken(
-        auth.getName(),
-        "TenantAuth",
-        Map.of("authorities", auth.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
+    String tenantId = tenantContext.getTenantId();
+    Map<String, Object> claims =
+        new java.util.HashMap<>(
+            Map.of(
+                "authorities", auth.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
+    if (tenantId != null) {
+      claims.put("tenantId", tenantId);
+    }
+    return jwtUtil.generateToken(auth.getName(), "TenantAuth", claims);
   }
 
   @Override
