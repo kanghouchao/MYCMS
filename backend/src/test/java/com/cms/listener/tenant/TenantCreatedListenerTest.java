@@ -1,5 +1,6 @@
 package com.cms.listener.tenant;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -11,6 +12,7 @@ import com.cms.service.mail.MailService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -57,7 +59,12 @@ class TenantCreatedListenerTest {
     listener.onTenantCreated(new TenantCreatedEvent(t));
 
     verify(registrationService).createToken(20L);
-    verify(mailService).send(eq("owner@example.com"), anyString(), anyString());
+    ArgumentCaptor<String> bodyCaptor = ArgumentCaptor.forClass(String.class);
+    verify(mailService).send(eq("owner@example.com"), anyString(), bodyCaptor.capture());
+
+    assertThat(bodyCaptor.getValue())
+        .contains("http://acme.example/register?token=tok123")
+        .contains("Acme");
   }
 
   @Test

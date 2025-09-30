@@ -60,21 +60,9 @@ export default function CreateTenantPage() {
     setIsSubmitting(true);
 
     try {
-      const created = await centralApi.create(formData);
-      toast.success('店舗を作成しました。店舗サイトへ移動します…');
-
-      // Prefer the explicit domain from payload; fallback to first in domains list
-      const targetDomain = created?.domain || created?.domains?.[0] || formData.domain;
-      if (targetDomain) {
-        // Give the toast a brief moment to show before redirecting cross-domain
-        setTimeout(() => {
-          const protocol = typeof window !== 'undefined' ? window.location.protocol : 'https:';
-          window.location.assign(`${protocol}//${targetDomain}`);
-        }, 600);
-      } else {
-        // Fallback to tenants list if domain is not available
-        router.push('/central/tenants');
-      }
+      await centralApi.create(formData);
+      toast.success('店舗を作成しました。店舗一覧に戻ります');
+      router.push('/central/tenants');
     } catch (error: any) {
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
