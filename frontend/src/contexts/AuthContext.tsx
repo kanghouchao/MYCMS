@@ -31,8 +31,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const checkAuth = async () => {
+      if (typeof window === 'undefined') {
+        return;
+      }
+
       const token = Cookies.get('token');
-      if (!token) {
+      const publicRoutes = ['/login', '/register'];
+      const currentPath = window.location.pathname;
+
+      if (!token && !publicRoutes.includes(currentPath)) {
         router.push('/login');
       }
     };
