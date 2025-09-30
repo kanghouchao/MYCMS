@@ -1,5 +1,6 @@
 package com.cms.config;
 
+import com.cms.constants.RequestContextKeys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -26,8 +27,27 @@ public class TenantInterceptor implements HandlerInterceptor {
       @NonNull HttpServletResponse response,
       @NonNull Object handler)
       throws Exception {
-    String role = request.getHeader("X-Role");
-    String tenantId = request.getHeader("X-Tenant-ID");
+    String role = request.getHeader(RequestContextKeys.HEADER_ROLE);
+    String tenantId = request.getHeader(RequestContextKeys.HEADER_TENANT_ID);
+
+    if (!StringUtils.hasText(role) || !StringUtils.hasText(tenantId)) {
+      var cookies = request.getCookies();
+      if (cookies != null) {
+        for (var cookie : cookies) {
+          if (!StringUtils.hasText(role)
+              && RequestContextKeys.COOKIE_ROLE.equalsIgnoreCase(cookie.getName())
+              && StringUtils.hasText(cookie.getValue())) {
+            role = cookie.getValue();
+          }
+          if (!StringUtils.hasText(tenantId)
+              && RequestContextKeys.COOKIE_TENANT_ID.equalsIgnoreCase(cookie.getName())
+              && StringUtils.hasText(cookie.getValue())) {
+            tenantId = cookie.getValue();
+          }
+        }
+      }
+    }
+
     log.debug("Incoming request role: {}, tenant: {}", role, tenantId);
     String uri = request.getRequestURI();
     String roleLower = role == null ? null : role.toLowerCase();
