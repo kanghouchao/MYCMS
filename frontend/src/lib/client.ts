@@ -19,6 +19,10 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+    const csrfToken = Cookies.get('XSRF-TOKEN') || Cookies.get('X-CSRF-TOKEN');
+    if (csrfToken) {
+      (config.headers as any)['X-XSRF-TOKEN'] = csrfToken;
+    }
     // Attach role and tenant context from middleware cookies
     try {
       const role = Cookies.get('x-mw-role');

@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const ADMIN_DOMAINS = new Set(['oli-cms.test']);
 
 export const config = {
-  // 匹配所有路径，除了静态资源和 API
+  // Match all paths except static assets and API routes
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
@@ -18,7 +18,7 @@ export const config = {
 };
 
 export async function middleware(request: NextRequest) {
-  // 强制输出到错误日志
+  // Log every invocation for visibility during debugging
   console.error('🔄 MIDDLEWARE CALLED! Path:', request.nextUrl.pathname);
 
   const rawHost =
@@ -30,10 +30,19 @@ export async function middleware(request: NextRequest) {
   console.error('🌐 Raw host:', rawHost);
   console.error('🏠 Processed hostname:', hostname);
 
+  const isHttps = request.nextUrl.protocol === 'https:';
+
+  const baseCookieOptions = {
+    httpOnly: false,
+    sameSite: 'lax' as const,
+    secure: isHttps,
+    path: '/',
+  };
+
   if (ADMIN_DOMAINS.has(hostname)) {
     console.error('👑 Admin domain detected');
     const res = NextResponse.next();
-    res.cookies.set('x-mw-role', 'central');
+    res.cookies.set('x-mw-role', 'central', baseCookieOptions);
     return res;
   }
 
@@ -49,7 +58,7 @@ export async function middleware(request: NextRequest) {
     console.error('📡 Tenant validation response:', data);
 
     const nextRes = NextResponse.next();
-    nextRes.cookies.set('x-mw-role', 'tenant');
+    nextRes.cookies.set('x-mw-role', 'tenant', baseCookieOptions);
     // Accept both legacy shape { valid, template_key, tenant_id, tenant_name }
     // and current shape { id, name, domain, email }
     if (data && typeof data === 'object') {
@@ -61,9 +70,13 @@ export async function middleware(request: NextRequest) {
       const isValid = Boolean(tenantId || tenantName || data.domain);
 
       if (isValid) {
-        nextRes.cookies.set('x-mw-tenant-template', templateKey);
-        nextRes.cookies.set('x-mw-tenant-id', tenantId);
-        nextRes.cookies.set('x-mw-tenant-name', tenantName);
+        nextRes.cookies.set('x-mw-tenant-template', templateKey, baseCookieOptions);
+        if (tenantId) {
+          nextRes.cookies.set('x-mw-tenant-id', tenantId, baseCookieOptions);
+        }
+        if (tenantName) {
+          nextRes.cookies.set('x-mw-tenant-name', tenantName, baseCookieOptions);
+        }
         console.error('✅ Tenant recognized, cookies set');
       } else {
         console.error('❌ Tenant payload lacked required identifiers');

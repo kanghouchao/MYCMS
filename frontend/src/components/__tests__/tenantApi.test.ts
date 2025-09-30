@@ -5,18 +5,32 @@ jest.mock('@/lib/client', () => ({
   default: {
     get: jest.fn(async (url: string) => ({ data: { ok: true, url } })),
     post: jest.fn(async (url: string, _data?: any) => ({
-      data: { ok: true, url },
+      data:
+        url === '/tenant/register'
+          ? {
+              tenantDomain: 'tenant.example.com',
+              loginUrl: 'https://tenant.example.com/login',
+              tenantName: 'Tenant Example',
+            }
+          : url === '/tenant/login'
+            ? { token: 'jwt-token', expires_at: 123 }
+            : { ok: true, url },
     })),
   },
 }));
 
 describe('tenant api', () => {
-  it('register calls /tenant/register', async () => {
-    await expect(authApi.register({} as any)).resolves.toBeUndefined();
+  it('register returns data from /tenant/register', async () => {
+    const res = await authApi.register({} as any);
+    expect(res).toEqual({
+      tenantDomain: 'tenant.example.com',
+      loginUrl: 'https://tenant.example.com/login',
+      tenantName: 'Tenant Example',
+    });
   });
   it('login returns data from /tenant/login', async () => {
     const res = await authApi.login({} as any);
-    expect(res).toEqual({ ok: true, url: '/tenant/login' });
+    expect(res).toEqual({ token: 'jwt-token', expires_at: 123 });
   });
   it('me calls /tenant/me', async () => {
     const res = await authApi.me();

@@ -83,3 +83,9 @@ export interface RegisterRequest {
   email: string;
   password: string;
 }
+
+export interface RegisterResponse {
+  tenantDomain: string;
+  loginUrl: string;
+  tenantName?: string;
+}

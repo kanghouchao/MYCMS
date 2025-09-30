@@ -29,6 +29,7 @@ describe('AuthProvider', () => {
     jest.clearAllMocks();
     (Cookies.get as jest.Mock).mockReset?.();
     (isTenantDomain as jest.Mock).mockReset?.();
+    window.history.replaceState({}, '', '/');
   });
 
   it('redirects to login if no token on mount', async () => {
@@ -58,5 +59,19 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(authApi.logout).toHaveBeenCalled());
     expect(removeSpy).toHaveBeenCalledWith('token');
     expect(mockPush).toHaveBeenCalledWith('/login');
+  });
+
+  it('does not redirect on public register route', () => {
+    (isTenantDomain as jest.Mock).mockReturnValue(false);
+    (Cookies.get as jest.Mock).mockReturnValue(undefined);
+    window.history.replaceState({}, '', '/register');
+
+    render(
+      <AuthProvider>
+        <div />
+      </AuthProvider>
+    );
+
+    expect(mockPush).not.toHaveBeenCalled();
   });
 });

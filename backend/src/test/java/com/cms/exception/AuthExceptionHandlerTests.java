@@ -39,6 +39,7 @@ public class AuthExceptionHandlerTests {
 
     ResponseEntity<Map<String, Object>> resp = handler.handleValidation(ex);
     assertThat(resp.getStatusCode().value()).isEqualTo(400);
+    assertThat(resp.getBody()).isNotNull();
     Map<String, Object> body = Objects.requireNonNull(resp.getBody());
     assertThat(body.get("error")).isEqualTo("validation_failed");
     assertThat(body.get("details")).isInstanceOf(Map.class);

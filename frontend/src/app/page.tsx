@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 export default async function Home() {
   const cookieStore = await cookies();
@@ -8,7 +8,7 @@ export default async function Home() {
   console.log('🏠 Home page - Role from cookie:', role);
 
   if (role === 'central') {
-    redirect('/central/dashboard');
+    redirect('/central/tenants');
   }
 
   if (role === 'tenant') {
@@ -19,9 +19,9 @@ export default async function Home() {
       return <TemplateComponent />;
     } catch (e) {
       console.error('Template not found:', e);
-      redirect('/404');
+      notFound();
     }
   }
 
-  redirect('/404');
+  notFound();
 }

@@ -43,7 +43,7 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional
-  public void register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
+  public Tenant register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
     Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
     TenantUser entity = new TenantUser();
     // Derive a default nickname from email local-part instead of using the
@@ -56,5 +56,6 @@ public class TenantAuthServiceImpl implements TenantAuthService {
     entity.setEmail(email);
     entity.setPassword(passwordEncoder.encode(tenantRegisterRequest.getPassword()));
     userRepository.save(entity);
+    return tenant;
   }
 }

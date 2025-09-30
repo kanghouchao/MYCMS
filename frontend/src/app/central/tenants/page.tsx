@@ -64,7 +64,7 @@ export default function TenantsPage() {
           <div className="flex justify-between h-16">
             <div className="flex items-center space-x-4">
               <button
-                onClick={() => router.push('/central/dashboard')}
+                onClick={() => router.push('/')}
                 className="text-indigo-600 hover:text-indigo-800 text-sm font-medium"
               >
                 ← ダッシュボードへ戻る
