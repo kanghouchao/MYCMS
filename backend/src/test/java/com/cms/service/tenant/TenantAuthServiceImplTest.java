@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cms.config.TenantContext;
 import com.cms.dto.auth.Token;
 import com.cms.dto.tenant.TenantRegisterRequest;
 import com.cms.model.central.tenant.Tenant;
@@ -13,6 +14,7 @@ import com.cms.repository.central.TenantRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import com.cms.utils.JwtUtil;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +38,7 @@ class TenantAuthServiceImplTest {
   @Mock TenantUserRepository userRepository;
   @Mock TenantRepository tenantRepository;
   @Mock Authentication authentication;
+  @Mock TenantContext tenantContext;
 
   @Captor ArgumentCaptor<TenantUser> userCaptor;
 
@@ -50,9 +53,16 @@ class TenantAuthServiceImplTest {
         .thenAnswer(inv -> List.<GrantedAuthority>of(() -> "ROLE_USER"));
     when(jwtUtil.generateToken(any(), any(), any()))
         .thenReturn(new Token("jwt-t", System.currentTimeMillis() + 1000));
+    when(tenantContext.getTenantId()).thenReturn("42");
 
     Token t = service.login("bob", "pwd");
     assertThat(t.token()).isEqualTo("jwt-t");
+    @SuppressWarnings("unchecked")
+    ArgumentCaptor<Map<String, Object>> mapCaptor =
+        ArgumentCaptor.forClass((Class<Map<String, Object>>) (Class<?>) Map.class);
+    verify(jwtUtil).generateToken(any(), any(), mapCaptor.capture());
+    Map<String, Object> captured = mapCaptor.getValue();
+    assertThat(captured).containsEntry("tenantId", "42");
   }
 
   @Test

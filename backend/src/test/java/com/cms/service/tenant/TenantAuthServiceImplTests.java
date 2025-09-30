@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cms.config.TenantContext;
 import com.cms.dto.tenant.TenantRegisterRequest;
 import com.cms.model.central.tenant.Tenant;
 import com.cms.model.tenant.security.TenantUser;
@@ -27,6 +28,7 @@ class TenantAuthServiceImplTests {
   @Mock private JwtUtil jwtUtil;
   @Mock private TenantUserRepository userRepository;
   @Mock private TenantRepository tenantRepository;
+  @Mock private TenantContext tenantContext;
 
   @InjectMocks private TenantAuthServiceImpl service;
 
