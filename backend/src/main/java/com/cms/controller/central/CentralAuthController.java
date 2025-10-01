@@ -1,10 +1,13 @@
 package com.cms.controller.central;
 
 import com.cms.dto.auth.LoginRequest;
+import com.cms.dto.auth.LoginResponse;
 import com.cms.dto.auth.Token;
 import com.cms.dto.central.AdminDto;
 import com.cms.model.central.security.CentralUser;
 import com.cms.repository.central.CentralUserRepository;
+import com.cms.security.TokenIntrospector;
+import com.cms.security.TokenIntrospector.TokenDetails;
 import com.cms.service.central.auth.CentralAuthService;
 import com.cms.utils.JwtUtil;
 import jakarta.annotation.security.PermitAll;
@@ -37,11 +40,29 @@ public class CentralAuthController {
   private final CentralUserRepository userRepository;
   private final RedisTemplate<String, Object> redisTemplate;
   private final JwtUtil jwtUtil;
+  private final TokenIntrospector tokenIntrospector;
 
   @PostMapping("/login")
   @PermitAll
-  public ResponseEntity<Token> login(@Valid @RequestBody LoginRequest req) {
-    return ResponseEntity.ok(authService.login(req.getUsername(), req.getPassword()));
+  public ResponseEntity<LoginResponse> login(
+      @Valid @RequestBody LoginRequest req, jakarta.servlet.http.HttpServletRequest request) {
+    var tokenDetails = tokenIntrospector.introspect(request);
+    if (tokenDetails.isPresent()) {
+      return ResponseEntity.ok(buildResponseForExistingToken(tokenDetails.get()));
+    }
+    Token issued = authService.login(req.getUsername(), req.getPassword());
+    return ResponseEntity.ok(new LoginResponse(issued, "central", "/central/tenants"));
+  }
+
+  private LoginResponse buildResponseForExistingToken(TokenDetails details) {
+    String issuer = details.issuer();
+    if ("CentralAuth".equals(issuer)) {
+      return new LoginResponse(details.asToken(), "central", "/central/tenants");
+    }
+    if ("TenantAuth".equals(issuer)) {
+      return new LoginResponse(details.asToken(), "tenant", "/");
+    }
+    return new LoginResponse(details.asToken(), issuer, "/");
   }
 
   @GetMapping("/me")

@@ -87,6 +87,25 @@ class TenantInterceptorTest {
   }
 
   @Test
+  void preHandle_tenantLogin_allowsMismatchAndKeepsHeaderTenant() throws Exception {
+    Claims claims = org.mockito.Mockito.mock(Claims.class);
+    when(claims.get("tenantId", String.class)).thenReturn("100");
+    var auth = new PreAuthenticatedAuthenticationToken("user", "tok", java.util.List.of());
+    auth.setDetails(claims);
+    SecurityContextHolder.getContext().setAuthentication(auth);
+
+    when(req.getHeader("X-Role")).thenReturn("tenant");
+    when(req.getHeader("X-Tenant-ID")).thenReturn("101");
+    when(req.getRequestURI()).thenReturn("/tenant/login");
+
+    boolean ok = interceptor.preHandle(req, resp, new Object());
+
+    assertTrue(ok);
+    verify(resp, never()).sendError(anyInt(), anyString());
+    verify(tenantContext).setTenantId("101");
+  }
+
+  @Test
   void preHandle_tenantPath_wrongRole_sendsError() throws Exception {
     when(req.getHeader("X-Role")).thenReturn("central");
     when(req.getRequestURI()).thenReturn("/tenant/foo");

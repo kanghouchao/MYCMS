@@ -58,6 +58,9 @@ public class TenantInterceptor implements HandlerInterceptor {
       }
     }
 
+    String uri = request.getRequestURI();
+    boolean isTenantLogin = "/tenant/login".equals(uri);
+
     if (!StringUtils.hasText(tenantId) && StringUtils.hasText(claimedTenantId)) {
       tenantId = claimedTenantId;
     }
@@ -67,7 +70,6 @@ public class TenantInterceptor implements HandlerInterceptor {
         role,
         tenantId,
         claimedTenantId);
-    String uri = request.getRequestURI();
     String roleLower = role == null ? null : role.toLowerCase();
 
     // Enforce role/path alignment
@@ -81,12 +83,13 @@ public class TenantInterceptor implements HandlerInterceptor {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing X-Tenant-ID header");
         return false;
       }
-      if (StringUtils.hasText(claimedTenantId)) {
-        if (!java.util.Objects.equals(claimedTenantId, tenantId)) {
-          response.sendError(
-              HttpServletResponse.SC_FORBIDDEN, "Tenant scope mismatch between token and request");
-          return false;
-        }
+      boolean tenantMismatch =
+          StringUtils.hasText(claimedTenantId)
+              && !java.util.Objects.equals(claimedTenantId, tenantId);
+      if (tenantMismatch && !isTenantLogin) {
+        response.sendError(
+            HttpServletResponse.SC_FORBIDDEN, "Tenant scope mismatch between token and request");
+        return false;
       }
       tenantContext.setTenantId(tenantId);
       ThreadContext.put("tenantId", tenantId);
