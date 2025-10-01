@@ -39,12 +39,14 @@ public class TenantEmployeeServiceImpl implements TenantEmployeeService {
   @Transactional
   public EmployeeResponse create(EmployeeCreateRequest request) {
     Long tenantId = resolveTenantId();
-    Tenant tenant = tenantRepository
-        .findById(tenantId)
-        .orElseThrow(
-            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
+    Tenant tenant =
+        tenantRepository
+            .findById(tenantId)
+            .orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
 
-    String normalizedEmail = StringUtils.hasText(request.getEmail()) ? request.getEmail().trim() : null;
+    String normalizedEmail =
+        StringUtils.hasText(request.getEmail()) ? request.getEmail().trim() : null;
 
     if (normalizedEmail != null) {
       employeeRepository
