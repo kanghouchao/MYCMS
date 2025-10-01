@@ -17,7 +17,6 @@ public class EmployeeCreateRequest {
   private String name;
 
   @Email
-  @NotBlank
   @Size(max = 255)
   private String email;
 

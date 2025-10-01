@@ -39,24 +39,27 @@ public class TenantEmployeeServiceImpl implements TenantEmployeeService {
   @Transactional
   public EmployeeResponse create(EmployeeCreateRequest request) {
     Long tenantId = resolveTenantId();
-    Tenant tenant =
-        tenantRepository
-            .findById(tenantId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
+    Tenant tenant = tenantRepository
+        .findById(tenantId)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
 
-    employeeRepository
-        .findByTenant_IdAndEmailIgnoreCase(tenantId, request.getEmail())
-        .ifPresent(
-            existing -> {
-              throw new ResponseStatusException(
-                  HttpStatus.CONFLICT, "Employee with email already exists");
-            });
+    String normalizedEmail = StringUtils.hasText(request.getEmail()) ? request.getEmail().trim() : null;
+
+    if (normalizedEmail != null) {
+      employeeRepository
+          .findByTenant_IdAndEmailIgnoreCase(tenantId, normalizedEmail)
+          .ifPresent(
+              existing -> {
+                throw new ResponseStatusException(
+                    HttpStatus.CONFLICT, "Employee with email already exists");
+              });
+    }
 
     Employee employee = new Employee();
     employee.setTenant(tenant);
     employee.setName(request.getName());
-    employee.setEmail(request.getEmail());
+    employee.setEmail(normalizedEmail);
     employee.setPhone(request.getPhone());
     employee.setPosition(request.getPosition());
     employee.setActive(Boolean.TRUE);

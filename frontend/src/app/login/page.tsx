@@ -25,7 +25,15 @@ export default function AdminLogin() {
     try {
       const response = await getAuthApi().login({ username, password });
       if (response.token) {
-        const expiresAt = response.expires_at ? new Date(response.expires_at) : undefined;
+        const expiresAt = (() => {
+          if (typeof response.expires_at !== 'number') {
+            return undefined;
+          }
+          const raw = response.expires_at;
+          const milliseconds = raw > 9999999999 ? raw : raw * 1000;
+          const date = new Date(milliseconds);
+          return Number.isNaN(date.getTime()) ? undefined : date;
+        })();
         if (expiresAt && !Number.isNaN(expiresAt.getTime())) {
           Cookies.set('token', response.token, { expires: expiresAt });
         } else {

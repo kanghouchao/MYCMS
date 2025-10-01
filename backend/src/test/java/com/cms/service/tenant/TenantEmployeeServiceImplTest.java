@@ -3,6 +3,8 @@ package com.cms.service.tenant;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -28,11 +30,15 @@ import org.springframework.web.server.ResponseStatusException;
 @ExtendWith(MockitoExtension.class)
 class TenantEmployeeServiceImplTest {
 
-  @Mock private TenantContext tenantContext;
-  @Mock private TenantRepository tenantRepository;
-  @Mock private EmployeeRepository employeeRepository;
+  @Mock
+  private TenantContext tenantContext;
+  @Mock
+  private TenantRepository tenantRepository;
+  @Mock
+  private EmployeeRepository employeeRepository;
 
-  @InjectMocks private TenantEmployeeServiceImpl service;
+  @InjectMocks
+  private TenantEmployeeServiceImpl service;
 
   @BeforeEach
   void setup() {
@@ -119,6 +125,33 @@ class TenantEmployeeServiceImplTest {
     assertThatThrownBy(() -> service.create(request))
         .isInstanceOf(ResponseStatusException.class)
         .hasMessageContaining("already exists");
+  }
+
+  @Test
+  void createAllowsEmployeeWithoutEmail() {
+    Tenant tenant = new Tenant();
+    tenant.setId(42L);
+    tenant.setName("Demo Store");
+
+    when(tenantRepository.findById(42L)).thenReturn(Optional.of(tenant));
+    when(employeeRepository.save(any(Employee.class)))
+        .thenAnswer(
+            invocation -> {
+              Employee toSave = invocation.getArgument(0, Employee.class);
+              toSave.setId("emp-3");
+              OffsetDateTime now = OffsetDateTime.now();
+              toSave.setCreatedAt(now);
+              toSave.setUpdatedAt(now);
+              return toSave;
+            });
+
+    EmployeeCreateRequest request = new EmployeeCreateRequest();
+    request.setName("No Email Staff");
+
+    EmployeeResponse response = service.create(request);
+
+    verify(employeeRepository, never()).findByTenant_IdAndEmailIgnoreCase(anyLong(), any());
+    assertThat(response.getEmail()).isNull();
   }
 
   @Test
