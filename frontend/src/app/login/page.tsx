@@ -24,10 +24,16 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       const response = await getAuthApi().login({ username, password });
-      if (response.token && response.expires_at) {
-        Cookies.set('token', response.token, { expires: response.expires_at });
-        const isTenant = isTenantDomain();
-        router.push(isTenant ? '/' : '/central/tenants');
+      if (response.token) {
+        const expiresAt = response.expires_at ? new Date(response.expires_at) : undefined;
+        if (expiresAt && !Number.isNaN(expiresAt.getTime())) {
+          Cookies.set('token', response.token, { expires: expiresAt });
+        } else {
+          Cookies.set('token', response.token);
+        }
+        const fallbackPath = isTenantDomain() ? '/' : '/central/tenants';
+        const nextPath = response.redirect_path ?? fallbackPath;
+        router.push(nextPath);
       }
     } catch (error) {
       console.error('Login failed:', error);
