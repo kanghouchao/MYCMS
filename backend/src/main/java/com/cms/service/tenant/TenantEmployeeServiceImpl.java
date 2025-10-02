@@ -39,14 +39,12 @@ public class TenantEmployeeServiceImpl implements TenantEmployeeService {
   @Transactional
   public EmployeeResponse create(EmployeeCreateRequest request) {
     Long tenantId = resolveTenantId();
-    Tenant tenant =
-        tenantRepository
-            .findById(tenantId)
-            .orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
+    Tenant tenant = tenantRepository
+        .findById(tenantId)
+        .orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tenant not found"));
 
-    String normalizedEmail =
-        StringUtils.hasText(request.getEmail()) ? request.getEmail().trim() : null;
+    String normalizedEmail = StringUtils.hasText(request.getEmail()) ? request.getEmail().trim() : null;
 
     if (normalizedEmail != null) {
       employeeRepository
@@ -79,7 +77,7 @@ public class TenantEmployeeServiceImpl implements TenantEmployeeService {
     try {
       return Long.valueOf(tenantIdValue);
     } catch (NumberFormatException ex) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tenant id context");
+      throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid tenant ID context");
     }
   }
 

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import java.util.Objects;
+
 @Log4j2
 @Component
 public class TenantInterceptor implements HandlerInterceptor {
@@ -83,9 +85,8 @@ public class TenantInterceptor implements HandlerInterceptor {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing X-Tenant-ID header");
         return false;
       }
-      boolean tenantMismatch =
-          StringUtils.hasText(claimedTenantId)
-              && !java.util.Objects.equals(claimedTenantId, tenantId);
+      boolean tenantMismatch = StringUtils.hasText(claimedTenantId)
+          && !Objects.equals(claimedTenantId, tenantId);
       if (tenantMismatch && !isTenantLogin) {
         response.sendError(
             HttpServletResponse.SC_FORBIDDEN, "Tenant scope mismatch between token and request");

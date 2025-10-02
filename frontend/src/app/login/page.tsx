@@ -6,11 +6,13 @@ import Cookies from 'js-cookie';
 import { authApi as centralAuthApi } from '@/services/central/api';
 import { authApi as tenantAuthApi } from '@/services/tenant/api';
 import toast from 'react-hot-toast';
-import { getCentralDomain, isTenantDomain } from '@/lib/config';
+import { isTenantDomain } from '@/lib/config';
 
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
 }
+
+const UNIX_TIMESTAMP_THRESHOLD = 9999999999;
 
 export default function AdminLogin() {
   const [username, setUsername] = useState<string>('');
@@ -30,7 +32,7 @@ export default function AdminLogin() {
             return undefined;
           }
           const raw = response.expires_at;
-          const milliseconds = raw > 9999999999 ? raw : raw * 1000;
+          const milliseconds = raw > UNIX_TIMESTAMP_THRESHOLD ? raw : raw * 1000;
           const date = new Date(milliseconds);
           return Number.isNaN(date.getTime()) ? undefined : date;
         })();
