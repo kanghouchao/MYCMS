@@ -2,6 +2,16 @@
 
 The goal of this document is to make contributions safe, reviewable, and fast to ship. The emphasis is on clear human-reviewed changes and high-quality code.
 
+**IMPORTANT**: This project follows a formal constitution (`.specify/memory/constitution.md` v1.0.0) that defines mandatory development principles including:
+- Architecture best practices and SOLID principles
+- Test-First Development (TDD) with Red-Green-Refactor cycle
+- Performance targets (API <200ms p95, Frontend TTI <3s)
+- 70% minimum test coverage enforced
+- Comprehensive testing strategy (unit, integration, contract, smoke tests)
+- Observability requirements (structured logging, health checks, correlation IDs)
+
+All contributions MUST comply with constitutional principles. Review the constitution before making changes.
+
 Keep changes small and focused. If a change touches more than one area (frontend/backend/environment), prefer separate pull requests.
 
 ## Quick checklist (before opening a PR)

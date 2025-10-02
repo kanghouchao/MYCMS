@@ -1,5 +1,7 @@
 # Repository Guidelines
 
+**NOTE**: This project follows the principles defined in `.specify/memory/constitution.md` (v1.0.0). All code changes MUST comply with the constitution's core principles: Architecture Best Practices, SOLID Principles, Test-First Development, Consistent User Experience, Performance Excellence, Comprehensive Testing Strategy, and Observability. Review the constitution before making changes.
+
 ## Project Structure & Module Organization
 - `backend/` hosts the Spring Boot API (Java 21); source lives in `src/main/java`, configs in `src/main/resources`, and targeted tests in `src/test/java` (`config`, `listener`, `service`). Multi-stage builds live in `backend/Dockerfile`.
 - `frontend/` contains the Next.js app; feature code sits in `src/`, colocated specs end with `.test.ts(x)`, and static assets reside in `public/`.

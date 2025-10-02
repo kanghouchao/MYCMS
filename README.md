@@ -24,9 +24,19 @@ We follow a Spec-Driven Development (API-first) approach. The living API specifi
 
 Source / inspiration: GitHub Spec Kit — https://github.com/github/spec-kit
 
+## Project Constitution
+
+This project adheres to a formal constitution defining core development principles. See `.specify/memory/constitution.md` (v1.0.0) for:
+- Architecture best practices and SOLID principles
+- Test-First Development (TDD) requirements
+- Performance and user experience standards
+- Quality gates and governance processes
+
+All contributions MUST comply with constitutional principles.
+
 ## AI assistant configuration note
 
-This repository includes AI assistant configuration specific to GitHub. See `.github/copilot-instructions.md` for the current GitHub AI assistant guidance.
+This repository includes AI assistant configuration. See `AGENTS.md` for current AI assistant guidance and `.github/prompts/` for specialized prompt instructions.
 
 ## Tech Stack
 

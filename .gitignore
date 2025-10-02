@@ -5,4 +5,6 @@ Thumbs.db
 # vscode settings
 .vscode/
 
-package-lock.json
+# spec kit files
+.specify/
+.github/prompts
