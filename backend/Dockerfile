@@ -9,13 +9,13 @@ RUN --mount=type=cache,target=/home/gradle/.gradle \
 	--mount=type=cache,target=/app/.gradle \
 	./gradlew dependencies --configuration runtimeClasspath --no-daemon
 
-# Lint stage: run Checkstyle analysis
+# Lint stage: run Spotless check
 FROM dependencies AS lint
 WORKDIR /app
 COPY src src
 RUN --mount=type=cache,target=/home/gradle/.gradle \
 	--mount=type=cache,target=/app/.gradle \
-	./gradlew --no-daemon --info checkstyleMain checkstyleTest
+	./gradlew --no-daemon --info spotlessCheck
 
 # 2. Run tests
 FROM dependencies AS test
