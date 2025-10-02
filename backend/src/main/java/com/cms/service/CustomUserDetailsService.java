@@ -38,29 +38,26 @@ public class CustomUserDetailsService implements UserDetailsService {
       try {
         tenantIdLong = Long.valueOf(tenantId);
       } catch (NumberFormatException ex) {
-        throw new UsernameNotFoundException("Invalid tenant id format: " + tenantId);
+        throw new UsernameNotFoundException("Invalid tenant ID format: " + tenantId);
       }
       return tenantUserRepository
           .findByTenant_IdAndEmail(tenantIdLong, username)
           .map(
               u -> {
-                List<SimpleGrantedAuthority> authorities =
-                    buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                List<SimpleGrantedAuthority> authorities = buildAuthorities(
+                    u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
                 return buildUser(u.getEmail(), u.getPassword(), u.getEnabled(), authorities);
               })
           .orElseThrow(
-              () ->
-                  new UsernameNotFoundException(
-                      "User not found (tenant): " + username + " @ tenant=" + tenantId));
+              () -> new UsernameNotFoundException(
+                  "User not found (tenant): " + username + " @ tenant=" + tenantId));
     } else {
       return centralUserRepository
           .findByUsername(username)
           .map(
               u -> {
-                List<SimpleGrantedAuthority> authorities =
-                    buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                List<SimpleGrantedAuthority> authorities = buildAuthorities(
+                    u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
                 return buildUser(u.getUsername(), u.getPassword(), u.getEnabled(), authorities);
               })
           .orElseThrow(
@@ -82,22 +79,18 @@ public class CustomUserDetailsService implements UserDetailsService {
         .flatMap(
             r -> {
               String roleName = roleNameExtractor.apply(r);
-              Stream<String> roleAuth =
-                  Stream.of("ROLE_" + (roleName == null ? "" : roleName.toUpperCase()));
+              Stream<String> roleAuth = Stream.of("ROLE_" + (roleName == null ? "" : roleName.toUpperCase()));
 
               Collection<P> perms = permExtractor.apply(r);
-              Stream<String> permOriginal =
-                  perms == null ? Stream.empty() : perms.stream().map(permNameExtractor);
-              Stream<String> permWithPrefix =
-                  perms == null
-                      ? Stream.empty()
-                      : perms.stream()
-                          .map(
-                              p ->
-                                  "PERM_"
-                                      + (permNameExtractor.apply(p) == null
-                                          ? ""
-                                          : permNameExtractor.apply(p).toUpperCase()));
+              Stream<String> permOriginal = perms == null ? Stream.empty() : perms.stream().map(permNameExtractor);
+              Stream<String> permWithPrefix = perms == null
+                  ? Stream.empty()
+                  : perms.stream()
+                      .map(
+                          p -> "PERM_"
+                              + (permNameExtractor.apply(p) == null
+                                  ? ""
+                                  : permNameExtractor.apply(p).toUpperCase()));
 
               return Stream.concat(roleAuth, Stream.concat(permOriginal, permWithPrefix));
             })
