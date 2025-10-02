@@ -3,11 +3,11 @@ spring:
     active:
     - ${SPRING_PROFILE:dev}
   application:
-    name: ${APP_NAME:OliCMS}
+    name: ${APP_NAME:CMS}
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:oli_cms}?sslmode=${DB_SSLMODE:disable}
-    username: ${DB_USERNAME:oli_user}
-    password: ${DB_PASSWORD:change_me}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cms}?sslmode=${DB_SSLMODE:disable}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:KIDYpWwxi}
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: ${DB_HIKARI_MINIMUM_IDLE:2}
