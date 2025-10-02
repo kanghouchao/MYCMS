@@ -1,8 +1,8 @@
 package com.cms.dto.auth;
 
-public record LoginResponse(String token, long expiresAt, String role, String redirectPath) {
+public record LoginResponse(String token, long expiresAt) {
 
-  public LoginResponse(Token token, String role, String redirectPath) {
-    this(token.token(), token.expiresAt(), role, redirectPath);
+  public LoginResponse(Token token) {
+    this(token.token(), token.expiresAt());
   }
 }

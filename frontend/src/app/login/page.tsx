@@ -8,11 +8,6 @@ import { authApi as tenantAuthApi } from '@/services/tenant/api';
 import toast from 'react-hot-toast';
 import { isTenantDomain } from '@/lib/config';
 
-// UNIX_TIMESTAMP_THRESHOLD represents the boundary between Unix timestamps in seconds and milliseconds.
-// Timestamps greater than this value are assumed to be in milliseconds, while those less are in seconds.
-// The value corresponds to Sep 9, 2001.
-const UNIX_TIMESTAMP_THRESHOLD = 9999999999;
-
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
 }
@@ -34,18 +29,17 @@ export default function AdminLogin() {
           if (typeof response.expires_at !== 'number') {
             return undefined;
           }
-          const raw = response.expires_at;
-          const milliseconds = raw > UNIX_TIMESTAMP_THRESHOLD ? raw : raw * 1000;
-          const date = new Date(milliseconds);
+          const date = new Date(response.expires_at);
           return Number.isNaN(date.getTime()) ? undefined : date;
         })();
-        if (expiresAt && !Number.isNaN(expiresAt.getTime())) {
+        if (expiresAt) {
           Cookies.set('token', response.token, { expires: expiresAt });
         } else {
           Cookies.set('token', response.token);
         }
-        const fallbackPath = isTenantDomain() ? '/' : '/central/tenants';
-        const nextPath = response.redirect_path ?? fallbackPath;
+        const nextPath = isTenantDomain()
+          ? '/central/dashboard/central'
+          : '/central/dashboard/tenants';
         router.push(nextPath);
       }
     } catch (error) {

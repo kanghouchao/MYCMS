@@ -28,13 +28,13 @@ public class SecurityConfig {
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
   private static final RequestMatcher[] CSRF_IGNORED_MATCHERS = {
-    PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
-    PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
-    PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
-    request -> {
-      String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-      return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
-    }
+      PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
+      PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
+      PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
+      request -> {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
+      }
   };
 
   public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
@@ -44,33 +44,29 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-    RequestMatcher tenantDomainLookupMatcher =
-        request ->
-            HttpMethod.GET.matches(request.getMethod())
-                && "/central/tenants".equals(request.getRequestURI())
-                && StringUtils.hasText(request.getParameter("domain"));
+    RequestMatcher tenantDomainLookupMatcher = request -> HttpMethod.GET.matches(request.getMethod())
+        && "/central/tenants".equals(request.getRequestURI())
+        && StringUtils.hasText(request.getParameter("domain"));
 
     http.csrf(
-            csrf ->
-                csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        csrf -> csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
+            .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/central/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/register")
-                    .permitAll()
-                    .requestMatchers("/actuator/health", "/actuator/health/**")
-                    .permitAll()
-                    .requestMatchers(tenantDomainLookupMatcher)
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
+            auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/central/login")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/tenant/login")
+                .permitAll()
+                .requestMatchers(HttpMethod.POST, "/tenant/register")
+                .permitAll()
+                .requestMatchers("/actuator/health", "/actuator/health/**")
+                .permitAll()
+                .requestMatchers(tenantDomainLookupMatcher)
+                .permitAll()
+                .anyRequest()
+                .authenticated())
         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     return http.build();
   }
