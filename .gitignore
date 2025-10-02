@@ -8,3 +8,4 @@ Thumbs.db
 # spec kit files
 .specify/
 .github/prompts
+specs/

@@ -8,11 +8,14 @@ import { authApi as tenantAuthApi } from '@/services/tenant/api';
 import toast from 'react-hot-toast';
 import { isTenantDomain } from '@/lib/config';
 
+// UNIX_TIMESTAMP_THRESHOLD represents the boundary between Unix timestamps in seconds and milliseconds.
+// Timestamps greater than this value are assumed to be in milliseconds, while those less are in seconds.
+// The value corresponds to Sep 9, 2001.
+const UNIX_TIMESTAMP_THRESHOLD = 9999999999;
+
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
 }
-
-const UNIX_TIMESTAMP_THRESHOLD = 9999999999;
 
 export default function AdminLogin() {
   const [username, setUsername] = useState<string>('');

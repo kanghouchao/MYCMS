@@ -4,7 +4,6 @@ import com.cms.dto.auth.LoginRequest;
 import com.cms.dto.auth.LoginResponse;
 import com.cms.dto.auth.Token;
 import com.cms.security.TokenIntrospector;
-import com.cms.security.TokenIntrospector.TokenDetails;
 import com.cms.service.tenant.TenantAuthService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
@@ -29,20 +28,10 @@ public class TenantAuthController {
       @Valid @RequestBody LoginRequest req, jakarta.servlet.http.HttpServletRequest request) {
     var tokenDetails = tokenIntrospector.introspect(request);
     if (tokenDetails.isPresent()) {
-      return ResponseEntity.ok(buildResponseForExistingToken(tokenDetails.get()));
+      return ResponseEntity.ok(new LoginResponse(tokenDetails.get().asToken(), "tenant", "/central/dashboard/central"));
     }
     Token issued = authService.login(req.getUsername(), req.getPassword());
     return ResponseEntity.ok(new LoginResponse(issued, "tenant", "/"));
   }
 
-  private LoginResponse buildResponseForExistingToken(TokenDetails details) {
-    String issuer = details.issuer();
-    if ("TenantAuth".equals(issuer)) {
-      return new LoginResponse(details.asToken(), "tenant", "/");
-    }
-    if ("CentralAuth".equals(issuer)) {
-      return new LoginResponse(details.asToken(), "central", "/central/tenants");
-    }
-    return new LoginResponse(details.asToken(), issuer, "/");
-  }
 }

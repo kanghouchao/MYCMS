@@ -84,8 +84,7 @@ public class TenantInterceptor implements HandlerInterceptor {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing X-Tenant-ID header");
         return false;
       }
-      boolean tenantMismatch =
-          StringUtils.hasText(claimedTenantId) && !Objects.equals(claimedTenantId, tenantId);
+      boolean tenantMismatch = !Objects.equals(claimedTenantId, tenantId);
       if (tenantMismatch && !isTenantLogin) {
         response.sendError(
             HttpServletResponse.SC_FORBIDDEN, "Tenant scope mismatch between token and request");
