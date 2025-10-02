@@ -30,15 +30,11 @@ import org.springframework.web.server.ResponseStatusException;
 @ExtendWith(MockitoExtension.class)
 class TenantEmployeeServiceImplTest {
 
-  @Mock
-  private TenantContext tenantContext;
-  @Mock
-  private TenantRepository tenantRepository;
-  @Mock
-  private EmployeeRepository employeeRepository;
+  @Mock private TenantContext tenantContext;
+  @Mock private TenantRepository tenantRepository;
+  @Mock private EmployeeRepository employeeRepository;
 
-  @InjectMocks
-  private TenantEmployeeServiceImpl service;
+  @InjectMocks private TenantEmployeeServiceImpl service;
 
   @BeforeEach
   void setup() {
