@@ -6,8 +6,8 @@ spring:
     name: ${APP_NAME:CMS}
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cms}?sslmode=${DB_SSLMODE:disable}
-    username: ${DB_USERNAME:admin}
-    password: ${DB_PASSWORD:KIDYpWwxi}
+    username: ${DB_USERNAME:cms}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: ${DB_HIKARI_MINIMUM_IDLE:2}

@@ -6,6 +6,7 @@
 DOCKER_IMAGE ?= cms-backend
 DOCKER_TAG ?= latest
 REPORT_DIR ?= ../reports/
+POSTGRES_PASSWORD ?=
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -22,10 +23,15 @@ help: ## ヘルプ情報を表示
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 database: ## データベースコンテナを起動
+	@if [ -z "$(POSTGRES_PASSWORD)" ]; then \
+		echo "❗️ 環境変数 POSTGRES_PASSWORD が設定されていません。"; \
+		echo "   例: export POSTGRES_PASSWORD='your_password'"; \
+		exit 1; \
+	fi
 	@echo "🚀  データベースコンテナを起動中..."
-	@docker run -d --name cms-local-db -e POSTGRES_USER=admin -e POSTGRES_PASSWORD=KIDYpWwxi -e POSTGRES_DB=cms -p 5432:5432 postgres:16-alpine
+	@docker run -d --name cms-local-db -e POSTGRES_USER=cms -e POSTGRES_PASSWORD=$(POSTGRES_PASSWORD) -e POSTGRES_DB=cms -p 5432:5432 postgres:16-alpine
 	@echo "データベースコンテナが起動しました。"
-	@echo "接続情報: host=localhost port=5432 dbname=cms user=admin password=KIDYpWwxi"
+	@echo "接続情報: host=localhost port=5432 dbname=cms user=cms password=$(POSTGRES_PASSWORD)"
 	@echo "🚀  Redisコンテナを起動中..."
 	@docker run -d --name cms-local-redis -p 6379:6379 redis:8.2.0-alpine3.22
 	@echo "Redisコンテナが起動しました。"
