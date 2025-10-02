@@ -36,12 +36,13 @@ stop-database: ## データベースコンテナを停止・削除
 	@docker rm -f cms-local-db 2>/dev/null || echo "データベースコンテナが存在しないか、既に停止されています"
 	@docker rm -f cms-local-redis 2>/dev/null || echo "Redisコンテナが存在しないか、既に停止されています"
 
-lint: ## コードスタイルを検査（Docker lint ステージ経由 - Checkstyle）
-	@echo "🧹 Docker lint ステージで Checkstyle を実行中..."
+lint: ## コードスタイルを検査（Docker lint ステージ経由）
+	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
 	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
 
-format: ## 自動整形はサポート外（Checkstyle only）
-	@echo "ℹ️  Checkstyle は整形を行いません。IDE等で手動整形してください。"
+format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
+	@echo "✍️  Spotless で自動整形を実行中..."
+	@$(GRADLEW) --no-daemon --warning-mode=all spotlessApply
 
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."

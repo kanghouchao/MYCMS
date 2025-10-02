@@ -54,8 +54,7 @@ public class CentralAuthController {
       return ResponseEntity.status(401).build();
     }
     CentralUser user = userRepository.findByUsername(principal.getName()).orElse(null);
-    if (user == null)
-      return ResponseEntity.status(404).build();
+    if (user == null) return ResponseEntity.status(404).build();
     return ResponseEntity.ok(new AdminDto(user.getId(), user.getUsername(), user.getUsername()));
   }
 

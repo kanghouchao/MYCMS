@@ -26,15 +26,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 @ExtendWith(MockitoExtension.class)
 class JwtAuthenticationFilterTest {
 
-  @Mock
-  private JwtUtil jwtUtil;
-  @Mock
-  private RedisTemplate<String, Object> redisTemplate;
-  @Mock
-  private FilterChain filterChain;
+  @Mock private JwtUtil jwtUtil;
+  @Mock private RedisTemplate<String, Object> redisTemplate;
+  @Mock private FilterChain filterChain;
 
-  @InjectMocks
-  private JwtAuthenticationFilter filter;
+  @InjectMocks private JwtAuthenticationFilter filter;
 
   @AfterEach
   void tearDown() {
