@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { authApi as centralAuthApi } from '@/services/central/api';
 import { authApi as tenantAuthApi } from '@/services/tenant/api';
 import toast from 'react-hot-toast';
-import { getCentralDomain, isTenantDomain } from '@/lib/config';
+import { isTenantDomain } from '@/lib/config';
 
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
@@ -24,10 +24,23 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       const response = await getAuthApi().login({ username, password });
-      if (response.token && response.expires_at) {
-        Cookies.set('token', response.token, { expires: response.expires_at });
-        const isTenant = isTenantDomain();
-        router.push(isTenant ? '/' : '/central/tenants');
+      if (response.token) {
+        const expiresAt = (() => {
+          if (typeof response.expires_at !== 'number') {
+            return undefined;
+          }
+          const date = new Date(response.expires_at);
+          return Number.isNaN(date.getTime()) ? undefined : date;
+        })();
+        if (expiresAt) {
+          Cookies.set('token', response.token, { expires: expiresAt });
+        } else {
+          Cookies.set('token', response.token);
+        }
+        const nextPath = isTenantDomain()
+          ? '/central/dashboard/central'
+          : '/central/dashboard/tenants';
+        router.push(nextPath);
       }
     } catch (error) {
       console.error('Login failed:', error);

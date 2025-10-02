@@ -1,0 +1,57 @@
+databaseChangeLog:
+  - changeSet:
+      id: tenant-004-create-employees
+      author: codex
+      changes:
+        - createTable:
+            tableName: t_employees
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_t_employees
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: phone
+                  type: VARCHAR(30)
+              - column:
+                  name: position
+                  type: VARCHAR(120)
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+                  defaultValueBoolean: true
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP
+        - addUniqueConstraint:
+            tableName: t_employees
+            columnNames: tenant_id,email
+            constraintName: uq_t_employees_tenant_email
+        - addForeignKeyConstraint:
+            baseTableName: t_employees
+            baseColumnNames: tenant_id
+            constraintName: fk_t_employees_central_tenant
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: RESTRICT

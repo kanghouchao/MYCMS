@@ -28,6 +28,8 @@ export interface Admin {
 export interface LoginResponse {
   token: string;
   expires_at: number;
+  role?: 'tenant' | 'central' | string;
+  redirect_path?: string;
 }
 
 // テナント
@@ -88,4 +90,23 @@ export interface RegisterResponse {
   tenantDomain: string;
   loginUrl: string;
   tenantName?: string;
+}
+
+// テナント従業員
+export interface Employee {
+  id: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  position?: string | null;
+  active: boolean;
+  created_at?: string | null;
+  updated_at?: string | null;
+}
+
+export interface CreateEmployeeRequest {
+  name: string;
+  email?: string;
+  phone?: string;
+  position?: string;
 }

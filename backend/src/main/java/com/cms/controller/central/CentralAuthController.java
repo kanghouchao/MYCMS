@@ -1,6 +1,7 @@
 package com.cms.controller.central;
 
 import com.cms.dto.auth.LoginRequest;
+import com.cms.dto.auth.LoginResponse;
 import com.cms.dto.auth.Token;
 import com.cms.dto.central.AdminDto;
 import com.cms.model.central.security.CentralUser;
@@ -40,8 +41,10 @@ public class CentralAuthController {
 
   @PostMapping("/login")
   @PermitAll
-  public ResponseEntity<Token> login(@Valid @RequestBody LoginRequest req) {
-    return ResponseEntity.ok(authService.login(req.getUsername(), req.getPassword()));
+  public ResponseEntity<LoginResponse> login(
+      @Valid @RequestBody LoginRequest req, jakarta.servlet.http.HttpServletRequest request) {
+    Token issued = authService.login(req.getUsername(), req.getPassword());
+    return ResponseEntity.ok(new LoginResponse(issued));
   }
 
   @GetMapping("/me")

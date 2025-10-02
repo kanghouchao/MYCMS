@@ -35,6 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       @NonNull HttpServletResponse response,
       @NonNull FilterChain filterChain)
       throws ServletException, IOException {
+    String requestUri = request.getRequestURI();
+    if (requestUri != null
+        && (requestUri.equals("/central/login") || requestUri.equals("/tenant/login"))) {
+      filterChain.doFilter(request, response);
+      return;
+    }
     String authHeader = request.getHeader("Authorization");
     if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);

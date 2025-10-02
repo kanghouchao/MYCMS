@@ -1,6 +1,8 @@
 package com.cms.controller.tenant;
 
 import com.cms.dto.auth.LoginRequest;
+import com.cms.dto.auth.LoginResponse;
+import com.cms.dto.auth.Token;
 import com.cms.service.tenant.TenantAuthService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;
@@ -20,7 +22,9 @@ public class TenantAuthController {
 
   @PostMapping("/login")
   @PermitAll
-  public ResponseEntity<?> login(@Valid @RequestBody LoginRequest req) {
-    return ResponseEntity.ok(authService.login(req.getUsername(), req.getPassword()));
+  public ResponseEntity<LoginResponse> login(
+      @Valid @RequestBody LoginRequest req, jakarta.servlet.http.HttpServletRequest request) {
+    Token issued = authService.login(req.getUsername(), req.getPassword());
+    return ResponseEntity.ok(new LoginResponse(issued));
   }
 }

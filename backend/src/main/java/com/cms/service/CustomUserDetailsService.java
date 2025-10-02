@@ -38,7 +38,7 @@ public class CustomUserDetailsService implements UserDetailsService {
       try {
         tenantIdLong = Long.valueOf(tenantId);
       } catch (NumberFormatException ex) {
-        throw new UsernameNotFoundException("Invalid tenant id format: " + tenantId);
+        throw new UsernameNotFoundException("Invalid tenant ID format: " + tenantId);
       }
       return tenantUserRepository
           .findByTenant_IdAndEmail(tenantIdLong, username)

@@ -1,5 +1,6 @@
 package com.cms.config;
 
+import com.cms.config.jackson.TrimStringModule;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -17,7 +18,7 @@ public class JacksonConfig {
   public Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
     return builder -> {
       builder.propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-      builder.modules(new JavaTimeModule());
+      builder.modules(new JavaTimeModule(), new TrimStringModule());
       builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
       builder.featuresToDisable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
       builder.serializationInclusion(JsonInclude.Include.NON_NULL);

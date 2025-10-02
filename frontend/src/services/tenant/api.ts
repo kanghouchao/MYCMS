@@ -1,5 +1,12 @@
 import apiClient from '@/lib/client';
-import { RegisterRequest, RegisterResponse, LoginRequest, LoginResponse } from '@/types/api';
+import {
+  RegisterRequest,
+  RegisterResponse,
+  LoginRequest,
+  LoginResponse,
+  Employee,
+  CreateEmployeeRequest,
+} from '@/types/api';
 
 export const authApi = {
   register: async (data: RegisterRequest): Promise<RegisterResponse> => {
@@ -15,6 +22,17 @@ export const authApi = {
   },
   me: async (): Promise<any> => {
     const response = await apiClient.get('/tenant/me');
+    return response.data;
+  },
+};
+
+export const employeeApi = {
+  list: async (): Promise<Employee[]> => {
+    const response = await apiClient.get('/tenant/employees');
+    return response.data;
+  },
+  create: async (data: CreateEmployeeRequest): Promise<Employee> => {
+    const response = await apiClient.post('/tenant/employees', data);
     return response.data;
   },
 };

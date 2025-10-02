@@ -49,6 +49,21 @@ class JwtAuthenticationFilterTest {
   }
 
   @Test
+  void doFilter_loginEndpointBypassesTokenProcessing() throws Exception {
+    MockHttpServletRequest request = new MockHttpServletRequest();
+    request.addHeader("Authorization", "Bearer existing");
+    request.setRequestURI("/tenant/login");
+
+    MockHttpServletResponse response = new MockHttpServletResponse();
+
+    filter.doFilter(request, response, filterChain);
+
+    verify(filterChain).doFilter(request, response);
+    verify(jwtUtil, never()).getClaims(any());
+    assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+  }
+
+  @Test
   void doFilter_rejectsBlacklistedToken() throws Exception {
     MockHttpServletRequest request = new MockHttpServletRequest();
     request.addHeader("Authorization", "Bearer token-123");
