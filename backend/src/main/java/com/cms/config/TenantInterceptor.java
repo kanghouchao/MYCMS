@@ -4,6 +4,7 @@ import com.cms.constants.RequestContextKeys;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.Objects;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.ThreadContext;
 import org.springframework.lang.NonNull;
@@ -13,8 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.Objects;
 
 @Log4j2
 @Component
@@ -85,8 +84,8 @@ public class TenantInterceptor implements HandlerInterceptor {
         response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Missing X-Tenant-ID header");
         return false;
       }
-      boolean tenantMismatch = StringUtils.hasText(claimedTenantId)
-          && !Objects.equals(claimedTenantId, tenantId);
+      boolean tenantMismatch =
+          StringUtils.hasText(claimedTenantId) && !Objects.equals(claimedTenantId, tenantId);
       if (tenantMismatch && !isTenantLogin) {
         response.sendError(
             HttpServletResponse.SC_FORBIDDEN, "Tenant scope mismatch between token and request");
