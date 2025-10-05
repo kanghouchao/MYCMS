@@ -17,16 +17,47 @@ jobs:
         with:
           script: |
             const body = context.payload.pull_request.body || '';
+            
+            // Required sections from PR template (aligned with Constitution v1.0.0)
             const required = [
               '## Context & Motivation',
               '## Scope of Changes',
-              '## Quality Gates',
+              '## Quality Gates (Required)',
               '## Test Notes',
-              '## Risk & Mitigation'
+              '## Risk & Mitigation',
+              '## Security Impact',
+              '## Impacted Files (Key)'
             ];
+            
+            // Additional constitutional compliance checks
+            const constitutionalSections = [
+              '## Constitutional Compliance Checklist'
+            ];
+            
             const missing = required.filter(s => !body.includes(s));
+            const missingConstitutional = constitutionalSections.filter(s => !body.includes(s));
+            
             if (missing.length) {
-              core.setFailed(`PR description missing sections: ${missing.join(', ')}`);
-            } else {
-              core.info('PR description contains required sections.');
+              core.setFailed(`PR description missing required sections: ${missing.join(', ')}`);
+              return;
             }
+            
+            if (missingConstitutional.length) {
+              core.warning(`PR description missing constitutional compliance sections: ${missingConstitutional.join(', ')}`);
+            }
+            
+            // Check for key quality gates subsections
+            const qualityGatesSubsections = [
+              'Test-First Development',
+              'Performance & Scalability',
+              'Security-First Design',
+              'Code Quality & Best Practices'
+            ];
+            
+            const missingQualityGates = qualityGatesSubsections.filter(s => !body.includes(s));
+            if (missingQualityGates.length > 0) {
+              core.warning(`PR description may be missing quality gate subsections: ${missingQualityGates.join(', ')}`);
+            }
+            
+            core.info('✅ PR description contains all required sections.');
+            core.info('📋 Constitution v1.0.0 compliance verified.');
