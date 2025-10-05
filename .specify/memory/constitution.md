@@ -58,15 +58,8 @@ Created: 2025-10-05
 
 **MUST Requirements:**
 - Test-Driven Development (TDD) is MANDATORY for all new features and bug fixes
-- Workflow: Write tests → Get approval → Tests fail → Implement → Tests pass → Refactor
-- Red-Green-Refactor cycle MUST be strictly enforced
-- Contract tests MUST be written for all API endpoints before implementation
-- Integration tests MUST cover: inter-service communication, middleware behavior, database interactions, tenant routing
-- Unit test coverage MUST meet ≥70% line coverage threshold (enforced by Jacoco for backend, Jest for frontend)
-- Tests MUST be colocated with implementation: `*.test.ts(x)` for frontend, `src/test/java` mirroring structure for backend
-- Performance tests MUST validate critical paths meet targets (e.g., API response <200ms p95)
-
-**Rationale:** TDD prevents defects at the source, clarifies requirements through executable specifications, enables fearless refactoring, and ensures regression safety. High coverage gates protect production quality.
+- Workflow: Write tests → Peer reviews and approves test design → Tests fail → Implement → Tests pass → Refactor
+- Test coverage MUST be ≥70% for both backend (Jacoco line coverage) and frontend (Jest line coverage)
 
 ### IV. Code Quality & Best Practices
 
