@@ -7,14 +7,6 @@ DOCKER_IMAGE ?= cms-backend
 DOCKER_TAG ?= latest
 REPORT_DIR ?= ../reports/
 
-# Cache configuration (only enabled when USE_CACHE_EXPORT=1, for CI)
-USE_CACHE_EXPORT ?= 0
-CACHE_DIR ?= /tmp/.buildx-cache-backend
-CACHE_ARGS =
-ifeq ($(USE_CACHE_EXPORT),1)
-	CACHE_ARGS = --cache-from=type=local,src=$(CACHE_DIR) --cache-to=type=local,dest=$(CACHE_DIR),mode=max
-endif
-
 # デフォルトターゲット
 .DEFAULT_GOAL := help
 
@@ -31,9 +23,7 @@ help: ## ヘルプ情報を表示
 
 lint: ## コードスタイルを検査（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
-	@docker buildx build --load --target lint \
-		$(CACHE_ARGS) \
-		-t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
+	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
 
 format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
 	@echo "✍️  Spotless で自動整形を実行中..."
@@ -41,9 +31,7 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
-	@docker buildx build --load --target test \
-		$(CACHE_ARGS) \
-		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
+	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
 	@$(MAKE) test-copy-artifacts
 
 test-copy-artifacts: ## テスト成果物を REPORT_DIR/backend にコピー
