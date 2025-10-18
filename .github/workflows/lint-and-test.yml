@@ -17,27 +17,34 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3.11.1
+        with:
+          driver-opts: |
+            image=moby/buildkit:latest
+            network=host
 
-      - name: Cache Gradle packages
+      - name: Cache Docker layers for backend
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('backend/**/*.gradle*', 'backend/**/gradle-wrapper.properties') }}
+          path: /tmp/.buildx-cache-backend
+          key: ${{ runner.os }}-buildx-backend-${{ hashFiles('backend/Dockerfile', 'backend/build.gradle', 'backend/settings.gradle') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-buildx-backend-
 
-      - name: Cache npm dependencies
+      - name: Cache Docker layers for frontend
         uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-npm-${{ hashFiles('frontend/package.json') }}
+          path: /tmp/.buildx-cache-frontend
+          key: ${{ runner.os }}-buildx-frontend-${{ hashFiles('frontend/Dockerfile', 'frontend/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-npm-
+            ${{ runner.os }}-buildx-frontend-
+
+      - name: Create cache directories
+        run: |
+          mkdir -p /tmp/.buildx-cache-backend
+          mkdir -p /tmp/.buildx-cache-frontend
 
       - name: Lint & Test (via Docker stage; collects reports)
-        run: make lint test
+        run: make lint test USE_CACHE_EXPORT=1
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain

@@ -3,6 +3,7 @@
 # ======================
 env ?= development
 service ?=
+USE_CACHE_EXPORT ?= 0
 
 help: ## ヘルプ情報を表示
 	@echo "Oli CMS プロジェクト管理コマンド:"
@@ -21,26 +22,26 @@ endif
 lint: ## すべてのサービスのLintを実行（service=frontend|backend で個別指定可）
 ifdef service
 	@echo "🧹 $(service) の Lint を実行中..."
-	@make -C $(service) lint
+	@make -C $(service) lint USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 else
 	@echo "🧹 すべてのサービスの Lint を実行中..."
 	@echo "🧹 Frontend lint..."
-	@make -C frontend lint
+	@make -C frontend lint USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 	@echo "🧹 Backend lint..."
-	@make -C backend lint
+	@make -C backend lint USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 	@echo "✅ Lint 完了"
 endif
 
 test: ## すべてのサービスのテストを実行（frontend/coverage & backend/reports に収集）
 ifdef service
 	@echo "🔍 $(service)サービスのテストを実行中..."
-	@make -C $(service) test
+	@make -C $(service) test USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 else
 	@echo "🔍 すべてのサービスのテストを実行中..."
 	@echo "🧪 Frontend tests..."
-	@make -C frontend test
+	@make -C frontend test USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 	@echo "🧪 Backend tests..."
-	@make -C backend test
+	@make -C backend test USE_CACHE_EXPORT=$(USE_CACHE_EXPORT)
 	@echo "✅ Done. frontend/coverage と backend/reports を参照してください。"
 endif
 
