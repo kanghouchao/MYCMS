@@ -51,15 +51,6 @@ Notes:
 	- On Windows PowerShell use `gradlew.bat build` or `gradlew.bat test`.
 	- Alternatively use WSL for a POSIX-like environment and run `./gradlew ...` there.
 
-Spec Kit branch naming rule
--------------------------
-
-If you use Spec Kit tooling (the repository ships specs under `.specs/` or `.specify/`), follow the feature-branch naming convention enforced by the Spec Kit helper function `check_feature_branch` located in `.specify/scripts/bash/common.sh`.
-
-Concretely: feature branches MUST begin with a three-digit numeric prefix followed by a hyphen, for example `001-my-feature` or `123-add-auth`. The helper validates branch names with the regexp `^[0-9]{3}-` and will print an error and exit if the branch name doesn't match. If you don't follow this rule, Spec Kit scripts (or other automation that relies on the helper) will fail during execution.
-
-When creating a new feature branch, ensure your branch name matches the pattern and run `git status --porcelain` to ensure your working tree is clean before running Spec Kit scripts.
-
 ## Code quality and style
 
 High-quality code is essential. Follow these conventions:

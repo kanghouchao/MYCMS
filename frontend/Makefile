@@ -7,7 +7,6 @@ DOCKER_IMAGE ?= cms-frontend
 DOCKER_TAG ?= latest
 COVERAGE_DIR ?= ../reports/
 
-
 # デフォルトターゲット
 .DEFAULT_GOAL := help
 
