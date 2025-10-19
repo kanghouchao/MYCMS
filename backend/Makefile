@@ -34,7 +34,7 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
-		@docker buildx build \
+	@docker buildx build \
 		--target test \
 		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
 		--load \
