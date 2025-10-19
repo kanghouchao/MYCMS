@@ -38,6 +38,7 @@ test: ## Docker コンテナ内でユニットテストを実行し、artifacts/
 	@docker buildx build \
 		--target test \
 		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
+		--load \
 		.
 
 test-copy-artifacts: ## テスト成果物を COVERAGE_DIR/frontend にコピー

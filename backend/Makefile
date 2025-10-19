@@ -37,6 +37,7 @@ test: ## バックエンドの全テストを実行し、reports/backend に収�
 		@docker buildx build \
 		--target test \
 		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
+		--load \
 		.
 
 test-copy-artifacts: ## テスト成果物を REPORT_DIR/backend にコピー
