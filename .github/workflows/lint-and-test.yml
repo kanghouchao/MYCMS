@@ -32,7 +32,6 @@ jobs:
             ${{ runner.os }}-cms-
 
       - name: Load cached base images
-        if: steps.cms-cache.outputs.cache-hit == 'true'
         run: |
           if [ -f /tmp/docker-images/base-images.tar.gz ]; then
             echo "📦 Loading cached base images..."
