@@ -23,7 +23,8 @@ jobs:
             network=host
 
       - name: Cache base Docker images
-        uses: actions/cache@v4
+        uses: actions/cache@v4.3.0
+        id: docker-cache
         with:
           path: /tmp/docker-images
           key: ${{ runner.os }}-docker-images-${{ hashFiles('**/Dockerfile') }}
@@ -31,6 +32,7 @@ jobs:
             ${{ runner.os }}-docker-images-
 
       - name: Load cached base images
+        if: steps.docker-cache.outputs.cache-hit == 'true'
         run: |
           if [ -f /tmp/docker-images/base-images.tar.gz ]; then
             echo "📦 Loading cached base images..."
@@ -46,11 +48,11 @@ jobs:
           BUILDKIT_PROGRESS: plain
 
       - name: Save base images to cache
-        if: always()
+        if: steps.docker-cache.outputs.cache-hit == 'true'
         run: |
           mkdir -p /tmp/docker-images
           echo "💾 Saving base images to cache..."
-          BASE_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "(gradle|node|eclipse-temurin)" || echo "")
+          BASE_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "(cms-backend|cms-frontend)" || echo "")
           if [ -n "$BASE_IMAGES" ]; then
             echo "Found images: $BASE_IMAGES"
             echo "$BASE_IMAGES" | xargs docker save | gzip > /tmp/docker-images/base-images.tar.gz
@@ -60,7 +62,6 @@ jobs:
           fi
 
       - name: Inject report metadata (branch & PR)
-        if: always()
         env:
           BRANCH_NAME: ${{ github.head_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number || 'N/A' }}
@@ -68,7 +69,6 @@ jobs:
           bash ./.github/scripts/inject-report-metadata.sh
 
       - name: Upload Pages artifact (from test/)
-        if: always()
         uses: actions/upload-pages-artifact@v4
         with:
           name: backend-test-reports
