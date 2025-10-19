@@ -22,11 +22,21 @@ jobs:
             image=moby/buildkit:latest
             network=host
 
-      - name: Lint & Test (via Docker stage; collects reports)
-        run: make lint test reports
+      - name: Lint
+        run: make lint
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
+
+      - name: Test
+        run: make test
+        env:
+          DOCKER_BUILDKIT: 1
+          BUILDKIT_PROGRESS: plain
+      
+      - name: Create reports directory
+        if: always()
+        run: make reports
 
       - name: Inject report metadata (branch & PR)
         if: always()
