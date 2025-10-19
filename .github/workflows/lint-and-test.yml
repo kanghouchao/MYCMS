@@ -23,16 +23,10 @@ jobs:
             network=host
 
       - name: Lint & Test (via Docker stage; collects reports)
-        run: |
-          set -eux
-          echo "CACHE_FROM=${CACHE_FROM}"
-          echo "CACHE_TO=${CACHE_TO}"
-          make lint test reports
+        run: make lint test reports
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
-          CACHE_FROM: type=gha,scope=cms-ci
-          CACHE_TO: type=gha,mode=max,scope=cms-ci
 
       - name: Inject report metadata (branch & PR)
         if: always()

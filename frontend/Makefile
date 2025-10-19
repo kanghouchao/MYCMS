@@ -23,9 +23,7 @@ build: ## フロントエンドDockerイメージをビルド
 lint: ## ESLint を実行（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージで ESLint を実行中..."
 	@docker buildx build \
-		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
-		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
-		--load \
+		--target lint \
 		--output type=cacheonly \
 		.
 
@@ -38,10 +36,7 @@ format: ## ESLint の自動修正をローカルで実行
 test: ## Docker コンテナ内でユニットテストを実行し、artifacts/ にレポートを収集
 	@echo "Docker 上でテストを実行しています..."
 	@docker buildx build \
-		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
-		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
 		--target test \
-		--load \
 		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
 		.
 

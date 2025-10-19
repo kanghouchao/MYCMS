@@ -6,8 +6,6 @@
 DOCKER_IMAGE ?= cms-backend
 DOCKER_TAG ?= latest
 REPORT_DIR ?= ../reports/
-CACHE_FROM?=
-CACHE_TO?=
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -26,8 +24,6 @@ help: ## ヘルプ情報を表示
 lint: ## コードスタイルを検査（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
 	@docker buildx build \
-		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
-		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
 		--target lint \
 		--output type=cacheonly \
 		.
@@ -39,10 +35,7 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
 		@docker buildx build \
-		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
-		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
 		--target test \
-		--load \
 		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
 		.
 

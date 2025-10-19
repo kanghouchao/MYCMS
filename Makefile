@@ -112,4 +112,4 @@ else
 	@make -C environment/$(env) restart service=$(service)
 endif
 
-.PHONY: help build test up down ps logs exec clean restart
+.PHONY: help build test reports up down ps logs exec clean restart
