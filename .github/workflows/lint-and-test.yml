@@ -21,40 +21,6 @@ jobs:
           driver-opts: |
             image=moby/buildkit:latest
             network=host
-            env.ACTIONS_CACHE_URL=${{ env.ACTIONS_CACHE_URL }}
-            env.ACTIONS_RUNTIME_TOKEN=${{ env.ACTIONS_RUNTIME_TOKEN }}
-          buildkitd-flags: --debug
-
-      # 🔍 诊断步骤：验证 GHA 缓存是否可用
-      - name: Debug - Print cache environment variables
-        run: |
-          echo "ACTIONS_CACHE_URL=${ACTIONS_CACHE_URL:-'NOT SET'}"
-          echo "ACTIONS_RUNTIME_TOKEN=${ACTIONS_RUNTIME_TOKEN:0:20}... (truncated)"
-          docker buildx ls
-
-      # 🔍 诊断步骤：最小化测试 GHA 缓存读写
-      - name: Debug - Test GHA cache with minimal build
-        run: |
-          cat > Dockerfile.test <<'EOF'
-          FROM alpine:3.19
-          RUN --mount=type=cache,id=test-cache,target=/cache \
-              echo "Testing cache..." && \
-              date > /cache/timestamp.txt && \
-              cat /cache/timestamp.txt
-          EOF
-          
-          echo "=== First build (should export cache) ==="
-          docker buildx build \
-            --progress=plain \
-            --cache-to=type=gha,mode=max,scope=test-minimal \
-            -f Dockerfile.test .
-          
-          echo "=== Second build (should import cache) ==="
-          docker buildx build \
-            --progress=plain \
-            --cache-from=type=gha,scope=test-minimal \
-            --cache-to=type=gha,mode=max,scope=test-minimal \
-            -f Dockerfile.test .
 
       - name: Lint & Test (via Docker stage; collects reports)
         run: |

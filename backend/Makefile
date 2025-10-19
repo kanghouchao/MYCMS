@@ -26,10 +26,10 @@ help: ## ヘルプ情報を表示
 lint: ## コードスタイルを検査（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
 	@docker buildx build \
-		--load \
-		--target lint \
 		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
 		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
+		--target lint \
+		--output type=cacheonly \
 		.
 
 format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
@@ -39,11 +39,11 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
 		@docker buildx build \
-		--load \
-		--target test \
-		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
 		$(if $(CACHE_FROM),--cache-from=$(CACHE_FROM)) \
 		$(if $(CACHE_TO),--cache-to=$(CACHE_TO)) \
+		--target test \
+		--load \
+		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
 		.
 
 test-copy-artifacts: ## テスト成果物を REPORT_DIR/backend にコピー
