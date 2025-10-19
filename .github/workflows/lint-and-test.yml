@@ -61,6 +61,7 @@ jobs:
           fi
 
       - name: Inject report metadata (branch & PR)
+        if: always()
         env:
           BRANCH_NAME: ${{ github.head_ref }}
           PR_NUMBER: ${{ github.event.pull_request.number || 'N/A' }}
@@ -68,6 +69,7 @@ jobs:
           bash ./.github/scripts/inject-report-metadata.sh
 
       - name: Upload Pages artifact (from test/)
+        if: always()
         uses: actions/upload-pages-artifact@v4
         with:
           name: backend-test-reports
