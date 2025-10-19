@@ -5,33 +5,28 @@ COPY build.gradle settings.gradle ./
 COPY gradlew gradlew
 COPY gradle gradle
 RUN chmod +x gradlew
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-	--mount=type=cache,target=/app/.gradle \
+RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,uid=1000,gid=1000 \
 	./gradlew dependencies --configuration runtimeClasspath --no-daemon
 
 # Lint stage: run Spotless check
 FROM dependencies AS lint
 WORKDIR /app
 COPY src src
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-	--mount=type=cache,target=/app/.gradle \
+RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,uid=1000,gid=1000 \
 	./gradlew --no-daemon --info spotlessCheck
 
 # 2. Run tests
 FROM dependencies AS test
 WORKDIR /app
 COPY src src
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-	--mount=type=cache,target=/app/.gradle \
-	# Run unit tests, generate Jacoco reports, and enforce coverage thresholds
+RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,uid=1000,gid=1000 \
 	./gradlew clean test jacocoTestReport jacocoTestCoverageVerification --no-daemon --info
 
 # 3. Build artifacts
 FROM dependencies AS build
 WORKDIR /app
 COPY src src
-RUN --mount=type=cache,target=/home/gradle/.gradle \
-	--mount=type=cache,target=/app/.gradle \
+RUN --mount=type=cache,id=gradle-cache,target=/home/gradle/.gradle,uid=1000,gid=1000 \
 	./gradlew build --no-daemon --info -x test
 
 # 4. Create runtime image
