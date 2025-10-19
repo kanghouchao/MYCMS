@@ -23,7 +23,10 @@ help: ## ヘルプ情報を表示
 
 lint: ## コードスタイルを検査（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージでコードスタイル検査を実行中..."
-	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
+	@docker buildx build \
+		--target lint \
+		--output type=cacheonly \
+		.
 
 format: ## コードスタイルを自動修正（Spotless apply; ローカルで gradlew 実行）
 	@echo "✍️  Spotless で自動整形を実行中..."
@@ -31,8 +34,11 @@ format: ## コードスタイルを自動修正（Spotless apply; ローカル�
 
 test: ## バックエンドの全テストを実行し、reports/backend に収集
 	@echo "🧪  バックエンドのテストを実行中..."
-	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
-	@$(MAKE) test-copy-artifacts
+	@docker buildx build \
+		--target test \
+		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
+		--load \
+		.
 
 test-copy-artifacts: ## テスト成果物を REPORT_DIR/backend にコピー
 	@rm -rf $(REPORT_DIR)/backend

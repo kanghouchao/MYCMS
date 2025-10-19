@@ -3,16 +3,14 @@
 FROM node:24.7.0-alpine3.22 AS deps
 WORKDIR /app
 COPY package.json ./
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm,uid=1000,gid=1000,sharing=locked \
     npm install --no-audit --no-fund
 
 FROM deps AS lint
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm,uid=1000,gid=1000,sharing=locked \
     npm run format:check && \
     npm run lint
 
@@ -21,16 +19,14 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ENV JEST_JUNIT_OUTPUT=/app/junit.xml
 WORKDIR /app
 COPY . .
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm,uid=1000,gid=1000,sharing=locked \
     npm run test -- --ci --reporters=default --reporters=jest-junit
 
 FROM deps AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY . .
-RUN --mount=type=cache,target=/root/.npm \
-    --mount=type=cache,target=/root/.cache \
+RUN --mount=type=cache,id=npm-cache,target=/root/.npm,uid=1000,gid=1000,sharing=locked \
     npm run build
 
 FROM node:24.7.0-alpine3.22 AS runner

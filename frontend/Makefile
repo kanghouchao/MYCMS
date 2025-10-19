@@ -6,7 +6,8 @@
 DOCKER_IMAGE ?= cms-frontend
 DOCKER_TAG ?= latest
 COVERAGE_DIR ?= ../reports/
-
+CACHE_FROM?=
+CACHE_TO?=
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -21,7 +22,10 @@ build: ## フロントエンドDockerイメージをビルド
 
 lint: ## ESLint を実行（Docker lint ステージ経由）
 	@echo "🧹 Docker の lint ステージで ESLint を実行中..."
-	@docker buildx build --load --target lint -t $(DOCKER_IMAGE)-lint:$(DOCKER_TAG) .
+	@docker buildx build \
+		--target lint \
+		--output type=cacheonly \
+		.
 
 format: ## ESLint の自動修正をローカルで実行
 	@echo "✍️  ESLint の自動修正を実行中..."
@@ -31,8 +35,11 @@ format: ## ESLint の自動修正をローカルで実行
 
 test: ## Docker コンテナ内でユニットテストを実行し、artifacts/ にレポートを収集
 	@echo "Docker 上でテストを実行しています..."
-	@docker buildx build --load --target test -t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) .
-	@$(MAKE) test-copy-artifacts
+	@docker buildx build \
+		--target test \
+		-t $(DOCKER_IMAGE)-test:$(DOCKER_TAG) \
+		--load \
+		.
 
 test-copy-artifacts: ## テスト成果物を COVERAGE_DIR/frontend にコピー
 	@rm -rf $(COVERAGE_DIR)/frontend

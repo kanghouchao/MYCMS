@@ -18,16 +18,6 @@ Oli CMS is a modern, multi-tenant Content Management System built with a split a
 - Responsive UI with Tailwind CSS
 - Container-first: easy local dev and ops via Make + Docker compose
 
-## Spec-Driven Development (SDD)
-
-We follow a Spec-Driven Development (API-first) approach. The living API specifications are maintained under `docs/specs/`. See the specs directory for the current OpenAPI files and development guidance.
-
-Source / inspiration: GitHub Spec Kit — https://github.com/github/spec-kit
-
-## AI assistant configuration note
-
-This repository includes AI assistant configuration specific to GitHub. See `.github/copilot-instructions.md` for the current GitHub AI assistant guidance.
-
 ## Tech Stack
 
 Below are the actual frameworks and key dependency versions used in this repository (extracted from `backend/build.gradle` and `frontend/package.json`). If you upgrade any of these in the project, please update this table accordingly.
