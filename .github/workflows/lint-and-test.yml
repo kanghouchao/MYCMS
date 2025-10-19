@@ -24,15 +24,15 @@ jobs:
 
       - name: Cache base Docker images
         uses: actions/cache@v4.3.0
-        id: docker-cache
+        id: cms-cache
         with:
           path: /tmp/docker-images
-          key: ${{ runner.os }}-docker-images-${{ hashFiles('**/Dockerfile') }}
+          key: ${{ runner.os }}-cms-${{ hashFiles('backend/Dockerfile', 'backend/build.gradle', 'frontend/Dockerfile', 'frontend/package.json') }}
           restore-keys: |
-            ${{ runner.os }}-docker-images-
+            ${{ runner.os }}-cms-
 
       - name: Load cached base images
-        if: steps.docker-cache.outputs.cache-hit == 'true'
+        if: steps.cms-cache.outputs.cache-hit == 'true'
         run: |
           if [ -f /tmp/docker-images/base-images.tar.gz ]; then
             echo "📦 Loading cached base images..."
@@ -48,7 +48,7 @@ jobs:
           BUILDKIT_PROGRESS: plain
 
       - name: Save base images to cache
-        if: steps.docker-cache.outputs.cache-hit == 'true'
+        if: steps.cms-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p /tmp/docker-images
           echo "💾 Saving base images to cache..."
