@@ -21,12 +21,21 @@ jobs:
           driver-opts: |
             image=moby/buildkit:latest
             network=host
+            env.ACTIONS_CACHE_URL=${{ env.ACTIONS_CACHE_URL }}
+            env.ACTIONS_RUNTIME_TOKEN=${{ env.ACTIONS_RUNTIME_TOKEN }}
+          buildkitd-flags: --debug
 
       - name: Lint & Test (via Docker stage; collects reports)
-        run: CACHE_FROM=type=gha CACHE_TO=type=gha,mode=max make lint test reports
+        run: |
+          set -eux
+          echo "CACHE_FROM=${CACHE_FROM}"
+          echo "CACHE_TO=${CACHE_TO}"
+          make lint test reports
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
+          CACHE_FROM: type=gha,scope=cms-ci
+          CACHE_TO: type=gha,mode=max,scope=cms-ci
 
       - name: Inject report metadata (branch & PR)
         if: always()
