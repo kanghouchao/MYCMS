@@ -41,7 +41,20 @@ else
 	@make -C frontend test
 	@echo "🧪 Backend tests..."
 	@make -C backend test
-	@echo "✅ Done. frontend/coverage と backend/reports を参照してください。"
+	@echo "✅テスト完了"
+endif
+
+reports:
+ifdef service
+	@echo "📂 $(service)サービスのレポートを収集中..."
+	@make -C $(service) test-copy-artifacts
+else
+	@echo "📂 すべてのサービスのレポートを収集中..."
+	@echo "📂 Frontend reports..."
+	@make -C frontend test-copy-artifacts
+	@echo "📂 Backend reports..."
+	@make -C backend test-copy-artifacts
+	@echo "✅ レポート収集完了"
 endif
 
 format: ## すべてのサービスのフォーマットを実行（service=frontend|backend で個別指定可）

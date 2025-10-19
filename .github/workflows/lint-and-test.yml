@@ -22,43 +22,11 @@ jobs:
             image=moby/buildkit:latest
             network=host
 
-      - name: Cache base Docker images
-        uses: actions/cache@v4.3.0
-        id: cms-cache
-        with:
-          path: /tmp/docker-images
-          key: ${{ runner.os }}-cms-${{ hashFiles('backend/Dockerfile', 'backend/build.gradle', 'frontend/Dockerfile', 'frontend/package.json') }}
-          restore-keys: |
-            ${{ runner.os }}-cms-
-
-      - name: Load cached base images
-        run: |
-          if [ -f /tmp/docker-images/base-images.tar.gz ]; then
-            echo "📦 Loading cached base images..."
-            gunzip -c /tmp/docker-images/base-images.tar.gz | docker load
-          else
-            echo "⚠️  No cached images found, will pull from registry"
-          fi
-
       - name: Lint & Test (via Docker stage; collects reports)
-        run: make lint test
+        run: CACHE_FROM=type=gha CACHE_TO=type=gha,mode=max make lint test reports
         env:
           DOCKER_BUILDKIT: 1
           BUILDKIT_PROGRESS: plain
-
-      - name: Save base images to cache
-        if: steps.cms-cache.outputs.cache-hit != 'true'
-        run: |
-          mkdir -p /tmp/docker-images
-          echo "💾 Saving base images to cache..."
-          BASE_IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep -E "(cms-backend|cms-frontend)" || echo "")
-          if [ -n "$BASE_IMAGES" ]; then
-            echo "Found images: $BASE_IMAGES"
-            echo "$BASE_IMAGES" | xargs docker save | gzip > /tmp/docker-images/base-images.tar.gz
-            echo "✅ Saved $(du -h /tmp/docker-images/base-images.tar.gz | cut -f1)"
-          else
-            echo "⚠️  No base images found to cache"
-          fi
 
       - name: Inject report metadata (branch & PR)
         if: always()
