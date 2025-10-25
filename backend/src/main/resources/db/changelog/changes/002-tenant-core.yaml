@@ -2,6 +2,9 @@ databaseChangeLog:
   - changeSet:
       id: tenant-001-create-core-tables
       author: kanghouchao
+      preConditions:
+        - dbms:
+            type: postgresql
       changes:
         - createTable:
             tableName: t_users
@@ -310,7 +313,7 @@ databaseChangeLog:
               - column:
                   name: status
                   type: VARCHAR(32)
-                  defaultValue: DRAFT
+                  defaultValue: "'DRAFT'"
                   constraints:
                     nullable: false
               - column:
@@ -375,7 +378,7 @@ databaseChangeLog:
               - column:
                   name: status
                   type: VARCHAR(32)
-                  defaultValue: DRAFT
+                  defaultValue: "'DRAFT'"
                   constraints:
                     nullable: false
               - column:
@@ -402,7 +405,7 @@ databaseChangeLog:
               - column:
                   name: sharing_scope
                   type: VARCHAR(32)
-                  defaultValue: TENANT_ONLY
+                  defaultValue: "'TENANT_ONLY'"
                   constraints:
                     nullable: false
               - column:
@@ -613,6 +616,7 @@ databaseChangeLog:
             tableName: t_resource_versions
             columnNames: resource_id,version_number
             constraintName: uq_t_resource_versions_resource_version
+# Mutually exclusive scope constraints ensure exactly one of tenant_id or group_id is set.
         - sql:
             dbms: postgresql
             splitStatements: false
@@ -631,7 +635,6 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             sql: |
-              -- Exactly one of tenant_id or group_id must be set (non-null), not both or neither
               ALTER TABLE t_resource_schemas
               ADD CONSTRAINT ck_t_resource_schemas_scope
               CHECK (
@@ -644,7 +647,6 @@ databaseChangeLog:
             splitStatements: false
             stripComments: true
             sql: |
-              -- Exactly one of tenant_id or group_id must be set (non-null), not both or neither
               ALTER TABLE t_resource_tags
               ADD CONSTRAINT ck_t_resource_tags_scope
               CHECK (

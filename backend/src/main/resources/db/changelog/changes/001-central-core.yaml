@@ -175,7 +175,7 @@ databaseChangeLog:
               - column:
                   name: status
                   type: VARCHAR(32)
-                  defaultValue: ACTIVE
+                  defaultValue: "'ACTIVE'"
                   constraints:
                     nullable: false
               - column:
