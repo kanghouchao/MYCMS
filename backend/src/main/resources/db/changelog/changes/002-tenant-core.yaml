@@ -1,0 +1,716 @@
+databaseChangeLog:
+  - changeSet:
+      id: tenant-001-create-core-tables
+      author: kanghouchao
+      changes:
+        - createTable:
+            tableName: t_users
+            remarks: 租户侧用户账户
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_users
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nickname
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_roles
+            remarks: 租户侧角色
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_roles
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_permissions
+            remarks: 租户侧权限
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_permissions
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_pages
+            remarks: 租户页面内容
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_pages
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: slug
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_user_roles
+            remarks: 租户用户角色关联
+            columns:
+              - column:
+                  name: user_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: assigned_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_role_permissions
+            remarks: 租户角色权限关联
+            columns:
+              - column:
+                  name: role_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permission_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: assigned_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resource_types
+            remarks: 资源类型定义（租户或租户组级别）
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_resource_types
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(500)
+              - column:
+                  name: schema_json
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metadata_json
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resources
+            remarks: 资源实例
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_resources
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: type_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  defaultValue: DRAFT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: summary
+                  type: TEXT
+              - column:
+                  name: attributes_json
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metadata_json
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sharing_scope
+                  type: VARCHAR(32)
+                  defaultValue: TENANT_ONLY
+                  constraints:
+                    nullable: false
+              - column:
+                  name: published_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resource_tenant_access
+            remarks: 资源对特定租户的共享授权
+            columns:
+              - column:
+                  name: resource_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: granted_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resource_tags
+            remarks: 资源标签
+            columns:
+              - column:
+                  name: id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_resource_tags
+              - column:
+                  name: tenant_id
+                  type: BIGINT
+              - column:
+                  name: group_id
+                  type: BIGINT
+              - column:
+                  name: code
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color
+                  type: VARCHAR(32)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resource_tag_links
+            remarks: 资源与标签关联
+            columns:
+              - column:
+                  name: resource_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: tag_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: t_resource_versions
+            remarks: 资源版本历史
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_t_resource_versions
+              - column:
+                  name: resource_id
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version_number
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+              - column:
+                  name: change_summary
+                  type: VARCHAR(500)
+              - column:
+                  name: attributes_snapshot
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: metadata_snapshot
+                  type: JSONB
+                  defaultValueComputed: "'{}'::jsonb"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_by
+                  type: VARCHAR(64)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: t_users
+            columnNames: tenant_id,email
+            constraintName: uq_t_users_tenant_email
+        - addUniqueConstraint:
+            tableName: t_users
+            columnNames: tenant_id,nickname
+            constraintName: uq_t_users_tenant_nickname
+        - addUniqueConstraint:
+            tableName: t_roles
+            columnNames: tenant_id,name
+            constraintName: uq_t_roles_tenant_name
+        - addUniqueConstraint:
+            tableName: t_permissions
+            columnNames: tenant_id,name
+            constraintName: uq_t_permissions_tenant_name
+        - addUniqueConstraint:
+            tableName: t_pages
+            columnNames: tenant_id,slug
+            constraintName: uq_t_pages_tenant_slug
+        - addUniqueConstraint:
+            tableName: t_resources
+            columnNames: tenant_id,code
+            constraintName: uq_t_resources_tenant_code
+        - addUniqueConstraint:
+            tableName: t_resource_types
+            columnNames: tenant_id,code
+            constraintName: uq_t_resource_types_tenant_code
+        - addUniqueConstraint:
+            tableName: t_resource_types
+            columnNames: group_id,code
+            constraintName: uq_t_resource_types_group_code
+        - addUniqueConstraint:
+            tableName: t_resource_tags
+            columnNames: tenant_id,code
+            constraintName: uq_t_resource_tags_tenant_code
+        - addUniqueConstraint:
+            tableName: t_resource_tags
+            columnNames: group_id,code
+            constraintName: uq_t_resource_tags_group_code
+        - addUniqueConstraint:
+            tableName: t_resource_versions
+            columnNames: resource_id,version_number
+            constraintName: uq_t_resource_versions_resource_version
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            stripComments: true
+            sql: |
+              ALTER TABLE t_resource_types
+              ADD CONSTRAINT ck_t_resource_types_scope
+              CHECK ((tenant_id IS NOT NULL) <> (group_id IS NOT NULL));
+        - sql:
+            dbms: postgresql
+            splitStatements: false
+            stripComments: true
+            sql: |
+              ALTER TABLE t_resource_tags
+              ADD CONSTRAINT ck_t_resource_tags_scope
+              CHECK ((tenant_id IS NOT NULL) <> (group_id IS NOT NULL));
+        - addPrimaryKey:
+            tableName: t_user_roles
+            columnNames: user_id,role_id
+            constraintName: pk_t_user_roles
+        - addPrimaryKey:
+            tableName: t_role_permissions
+            columnNames: role_id,permission_id
+            constraintName: pk_t_role_permissions
+        - addPrimaryKey:
+            tableName: t_resource_tenant_access
+            columnNames: resource_id,tenant_id
+            constraintName: pk_t_resource_tenant_access
+        - addPrimaryKey:
+            tableName: t_resource_tag_links
+            columnNames: resource_id,tag_id
+            constraintName: pk_t_resource_tag_links
+        - addForeignKeyConstraint:
+            constraintName: fk_t_users_tenant
+            baseTableName: t_users
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_roles_tenant
+            baseTableName: t_roles
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_permissions_tenant
+            baseTableName: t_permissions
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_pages_tenant
+            baseTableName: t_pages
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_user_roles_user
+            baseTableName: t_user_roles
+            baseColumnNames: user_id
+            referencedTableName: t_users
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_user_roles_role
+            baseTableName: t_user_roles
+            baseColumnNames: role_id
+            referencedTableName: t_roles
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_role_permissions_role
+            baseTableName: t_role_permissions
+            baseColumnNames: role_id
+            referencedTableName: t_roles
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_role_permissions_permission
+            baseTableName: t_role_permissions
+            baseColumnNames: permission_id
+            referencedTableName: t_permissions
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_types_tenant
+            baseTableName: t_resource_types
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_types_group
+            baseTableName: t_resource_types
+            baseColumnNames: group_id
+            referencedTableName: central_groups
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resources_tenant
+            baseTableName: t_resources
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resources_group
+            baseTableName: t_resources
+            baseColumnNames: group_id
+            referencedTableName: central_groups
+            referencedColumnNames: id
+            onDelete: SET NULL
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resources_type
+            baseTableName: t_resources
+            baseColumnNames: type_id
+            referencedTableName: t_resource_types
+            referencedColumnNames: id
+            onDelete: RESTRICT
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tenant_access_resource
+            baseTableName: t_resource_tenant_access
+            baseColumnNames: resource_id
+            referencedTableName: t_resources
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tenant_access_tenant
+            baseTableName: t_resource_tenant_access
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tags_tenant
+            baseTableName: t_resource_tags
+            baseColumnNames: tenant_id
+            referencedTableName: central_tenants
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tags_group
+            baseTableName: t_resource_tags
+            baseColumnNames: group_id
+            referencedTableName: central_groups
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tag_links_resource
+            baseTableName: t_resource_tag_links
+            baseColumnNames: resource_id
+            referencedTableName: t_resources
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_tag_links_tag
+            baseTableName: t_resource_tag_links
+            baseColumnNames: tag_id
+            referencedTableName: t_resource_tags
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            constraintName: fk_t_resource_versions_resource
+            baseTableName: t_resource_versions
+            baseColumnNames: resource_id
+            referencedTableName: t_resources
+            referencedColumnNames: id
+            onDelete: CASCADE
+        - createIndex:
+            indexName: idx_t_resource_types_tenant
+            tableName: t_resource_types
+            columns:
+              - column:
+                  name: tenant_id
+        - createIndex:
+            indexName: idx_t_resource_types_group
+            tableName: t_resource_types
+            columns:
+              - column:
+                  name: group_id
+        - createIndex:
+            indexName: idx_t_resources_tenant_type
+            tableName: t_resources
+            columns:
+              - column:
+                  name: tenant_id
+              - column:
+                  name: type_id
+        - createIndex:
+            indexName: idx_t_resources_group_scope
+            tableName: t_resources
+            columns:
+              - column:
+                  name: group_id
+              - column:
+                  name: sharing_scope
+        - createIndex:
+            indexName: idx_t_resource_tenant_access_tenant
+            tableName: t_resource_tenant_access
+            columns:
+              - column:
+                  name: tenant_id
+        - createIndex:
+            indexName: idx_t_resource_tags_tenant
+            tableName: t_resource_tags
+            columns:
+              - column:
+                  name: tenant_id
+        - createIndex:
+            indexName: idx_t_resource_tags_group
+            tableName: t_resource_tags
+            columns:
+              - column:
+                  name: group_id
