@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
-      id: central-001-insert-admin
-      author: copilot
+      id: central-002-seed-admin
+      author: kanghouchao
       changes:
         - insert:
             tableName: central_roles
@@ -13,6 +13,24 @@ databaseChangeLog:
                   name: name
                   value: ADMIN
         - insert:
+            tableName: central_permissions
+            columns:
+              - column:
+                  name: id
+                  valueNumeric: 1
+              - column:
+                  name: name
+                  value: TENANT_MANAGE
+        - insert:
+            tableName: central_role_permissions
+            columns:
+              - column:
+                  name: role_id
+                  valueNumeric: 1
+              - column:
+                  name: permission_id
+                  valueNumeric: 1
+        - insert:
             tableName: central_users
             columns:
               - column:
@@ -23,7 +41,7 @@ databaseChangeLog:
                   value: admin
               - column:
                   name: password
-                  value: "$2a$10$TAnVD5vZNlATP5wayRg1SOo8UKP7m9TpzbaLJejOplq55OJxRhPnS" # admin1234
+                  value: "$2a$10$TAnVD5vZNlATP5wayRg1SOo8UKP7m9TpzbaLJejOplq55OJxRhPnS"
               - column:
                   name: enabled
                   valueBoolean: true

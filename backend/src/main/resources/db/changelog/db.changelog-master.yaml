@@ -1,3 +1,10 @@
 databaseChangeLog:
-  - includeAll:
-      path: classpath:/db/changelog/changes
+  - include:
+      file: changes/001-central-core.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/002-tenant-core.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changes/003-initial-data.yaml
+      relativeToChangelogFile: true
