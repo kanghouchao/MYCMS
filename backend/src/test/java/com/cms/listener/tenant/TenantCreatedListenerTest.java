@@ -30,8 +30,7 @@ class TenantCreatedListenerTest {
 
   @BeforeEach
   void setUp() {
-    // lenient in case some tests don't evaluate the URL
-    lenient().when(appProperties.getUrl()).thenReturn("http://example.com");
+    lenient().when(appProperties.getScheme()).thenReturn("http");
   }
 
   @Test
@@ -63,8 +62,22 @@ class TenantCreatedListenerTest {
     verify(mailService).send(eq("owner@example.com"), anyString(), bodyCaptor.capture());
 
     assertThat(bodyCaptor.getValue())
-        .contains("http://acme.example/register?token=tok123")
+        .contains("http://acme.example/central/register?token=tok123")
         .contains("Acme");
+  }
+
+  @Test
+  void onTenantCreated_skipsWhenNoDomain() {
+    Tenant tenant = new Tenant();
+    tenant.setId(21L);
+    tenant.setName("NoDomain");
+    tenant.setEmail("owner@example.com");
+    tenant.setDomain("   ");
+
+    listener.onTenantCreated(new TenantCreatedEvent(tenant));
+
+    verifyNoInteractions(registrationService);
+    verifyNoInteractions(mailService);
   }
 
   @Test

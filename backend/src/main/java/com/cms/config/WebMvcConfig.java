@@ -7,9 +7,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
-  private final com.cms.config.TenantInterceptor tenantInterceptor;
+  private final TenantInterceptor tenantInterceptor;
 
-  public WebMvcConfig(com.cms.config.TenantInterceptor tenantInterceptor) {
+  public WebMvcConfig(TenantInterceptor tenantInterceptor) {
     this.tenantInterceptor = tenantInterceptor;
   }
 

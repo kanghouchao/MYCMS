@@ -11,8 +11,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app")
 public class AppProperties {
 
-  /** Application base URL (for links in notifications, etc.) */
-  private String url;
+  private Scheme scheme = Scheme.HTTP;
+
+  private String domain;
 
   /** app.jwt.* */
   private Jwt jwt = new Jwt();
@@ -22,6 +23,25 @@ public class AppProperties {
   public static class Jwt {
     private String secret;
     private long expiration;
+  }
+
+  public enum Scheme {
+    HTTP("http"),
+    HTTPS("https");
+
+    private final String name;
+
+    Scheme(String name) {
+      this.name = name;
+    }
+
+    public String getName() {
+      return name;
+    }
+  }
+
+  public String getScheme() {
+    return scheme != null ? scheme.getName() : null;
   }
 
   public String getJwtSecret() {

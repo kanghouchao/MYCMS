@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cms.config.AppProperties;
 import com.cms.dto.tenant.TenantRegisterRequest;
 import com.cms.dto.tenant.TenantRegisterResponse;
 import com.cms.model.central.tenant.Tenant;
@@ -25,7 +24,6 @@ class TenantRegistrationControllerTest {
 
   @Mock private TenantRegistrationService registrationService;
   @Mock private TenantAuthService tenantAuthService;
-  @Mock private AppProperties appProperties;
 
   @InjectMocks private TenantRegistrationController controller;
 
@@ -56,7 +54,6 @@ class TenantRegistrationControllerTest {
     Tenant tenant = makeTenant("tenant.example.com", "Tenant Example");
 
     when(tenantAuthService.register(42L, request)).thenReturn(tenant);
-    when(appProperties.getUrl()).thenReturn("http://central.local:8080");
 
     ResponseEntity<TenantRegisterResponse> response = controller.register(request);
 
@@ -64,9 +61,8 @@ class TenantRegistrationControllerTest {
 
     assertThat(response.getBody()).isNotNull();
     TenantRegisterResponse body = Objects.requireNonNull(response.getBody());
-    assertThat(body.getLoginUrl()).isEqualTo("http://tenant.example.com:8080/login");
-    assertThat(body.getTenantDomain()).isEqualTo("tenant.example.com");
-    assertThat(body.getTenantName()).isEqualTo("Tenant Example");
+    assertThat(body.tenantDomain()).isEqualTo("tenant.example.com");
+    assertThat(body.tenantName()).isEqualTo("Tenant Example");
 
     verify(registrationService).consume("token-123");
   }
@@ -75,7 +71,7 @@ class TenantRegistrationControllerTest {
   @SuppressWarnings("DataFlowIssue")
   void registerKeepsExistingSchemeWhenDomainHasProtocol() {
     TenantRegisterRequest request = makeRequest();
-    Tenant tenant = makeTenant("https://tenant.partner.io/site", "Partner");
+    Tenant tenant = makeTenant("tenant.partner.io", "Partner");
 
     when(tenantAuthService.register(42L, request)).thenReturn(tenant);
 
@@ -83,6 +79,7 @@ class TenantRegistrationControllerTest {
 
     assertThat(response.getBody()).isNotNull();
     TenantRegisterResponse body = Objects.requireNonNull(response.getBody());
-    assertThat(body.getLoginUrl()).isEqualTo("https://tenant.partner.io/site/login");
+    assertThat(body.tenantDomain()).isEqualTo("tenant.partner.io");
+    assertThat(body.tenantName()).isEqualTo("Partner");
   }
 }

@@ -39,25 +39,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
       String token = authHeader.substring(7);
       Claims claims = jwtUtil.getClaims(token);
-      if (Boolean.TRUE.equals(redisTemplate.hasKey("blacklist:tokens:" + token))) {
+      if (redisTemplate.hasKey("blacklist:tokens:" + token)) {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token is revoked");
         return;
       }
       if (new Date().before(claims.getExpiration())) {
         // Scope/issuer check based on request path, do NOT trust client-provided
-        // headers
-        String issuer = claims.getIssuer();
-        String path = request.getRequestURI();
-        boolean isTenantPath =
-            path != null && (path.startsWith("/tenant/") || path.equals("/tenant"));
-        boolean isCentralPath =
-            path != null && (path.startsWith("/central/") || path.equals("/central"));
-        boolean scopeOk =
-            (isTenantPath && "TenantAuth".equals(issuer))
-                || (isCentralPath && "CentralAuth".equals(issuer))
-                ||
-                // allow non-namespaced endpoints when issuer exists
-                (!isTenantPath && !isCentralPath);
+        boolean scopeOk = isScopeOk(request, claims);
         if (!scopeOk) {
           response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token scope for role");
           return;
@@ -79,5 +67,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       }
     }
     filterChain.doFilter(request, response);
+  }
+
+  private static boolean isScopeOk(HttpServletRequest request, Claims claims) {
+    String issuer = claims.getIssuer();
+    String path = request.getRequestURI();
+    boolean isTenantPath = path != null && (path.startsWith("/tenant/") || path.equals("/tenant"));
+    boolean isCentralPath =
+        path != null && (path.startsWith("/central/") || path.equals("/central"));
+    return (isTenantPath && "TenantAuth".equals(issuer))
+        || (isCentralPath && "CentralAuth".equals(issuer))
+        || (!isTenantPath && !isCentralPath);
   }
 }
