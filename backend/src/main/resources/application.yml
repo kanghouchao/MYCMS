@@ -84,4 +84,4 @@ app:
   scheme: ${APP_SCHEME:http}
   jwt:
     expiration: ${APP_JWT_EXPIRATION_MS:3600000}
-    secret: ${APP_JWT_SECRET:ChangeThisSecretKey}
+    secret: ${APP_JWT_SECRET}

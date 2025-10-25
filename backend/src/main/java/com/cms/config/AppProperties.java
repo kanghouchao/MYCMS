@@ -25,7 +25,7 @@ public class AppProperties {
     private long expiration;
   }
 
-  public static enum Scheme {
+  public enum Scheme {
     HTTP("http"),
     HTTPS("https");
 
@@ -35,7 +35,7 @@ public class AppProperties {
       this.name = name;
     }
 
-    String getName() {
+    public String getName() {
       return name;
     }
   }
