@@ -15,7 +15,7 @@ public class AppProperties {
 
   private String domain;
 
-  /** app.jwt.**/
+  /** app.jwt.* */
   private Jwt jwt = new Jwt();
 
   @Getter
