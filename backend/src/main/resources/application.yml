@@ -3,11 +3,11 @@ spring:
     active:
     - ${SPRING_PROFILE:dev}
   application:
-    name: ${APP_NAME:OliCMS}
+    name: ${APP_NAME:CMS}
   datasource:
-    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:oli_cms}?sslmode=${DB_SSLMODE:disable}
-    username: ${DB_USERNAME:oli_user}
-    password: ${DB_PASSWORD:change_me}
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:cms}?sslmode=${DB_SSLMODE:disable}
+    username: ${DB_USERNAME:cms}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: ${DB_HIKARI_MINIMUM_IDLE:2}
@@ -21,8 +21,6 @@ spring:
       connection-test-query: SELECT 1
       data-source-properties:
         ssl: ${DB_SSL:false}
-        sslmode: ${DB_SSLMODE:require}
-        sslrootcert: ${DB_SSLROOTCERT:}
   jpa:
     show-sql: ${SPRING_JPA_SHOW_SQL:true}
     open-in-view: ${SPRING_JPA_OPEN_IN_VIEW:false}
@@ -32,7 +30,7 @@ spring:
       time-to-live: ${REDIS_CACHE_TTL_MS:600000}
       cache-null-values: ${REDIS_CACHE_NULL_VALUES:false}
       use-key-prefix: ${REDIS_CACHE_USE_KEY_PREFIX:true}
-      key-prefix: ${REDIS_CACHE_KEY_PREFIX:oli:cache:}
+      key-prefix: ${REDIS_CACHE_KEY_PREFIX:cms:cache:}
 
   data:
     redis:
@@ -81,3 +79,9 @@ management:
     web:
       exposure:
         include: health
+app:
+  domain: ${APP_DOMAIN:localhost}
+  scheme: ${APP_SCHEME:http}
+  jwt:
+    expiration: ${APP_JWT_EXPIRATION_MS:3600000}
+    secret: ${APP_JWT_SECRET:ChangeThisSecretKey}
