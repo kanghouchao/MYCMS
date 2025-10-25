@@ -128,7 +128,6 @@ databaseChangeLog:
                   name: domain
                   type: VARCHAR(128)
                   constraints:
-                    nullable: false
                     unique: true
                     uniqueConstraintName: uq_central_tenants_domain
               - column:
