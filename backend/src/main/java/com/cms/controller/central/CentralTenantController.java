@@ -48,13 +48,13 @@ public class CentralTenantController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-    /**
-     * Get tenant by domain
-     * - Accessible to all (no authentication required)
-     * - It is for frontend to get tenant info in middleware
-     * @param domain the domain of the tenant
-     * @return TenantDto
-     */
+  /**
+   * Get tenant by domain - Accessible to all (no authentication required) - It is for frontend to
+   * get tenant info in middleware
+   *
+   * @param domain the domain of the tenant
+   * @return TenantDto
+   */
   @GetMapping(value = "tenant", params = "domain")
   @PermitAll
   public ResponseEntity<TenantDto> getByDomain(@RequestParam String domain) {
