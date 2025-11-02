@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Log4j2
 @RestController
-@RequestMapping("/central/tenants")
+@RequestMapping("/central")
 @RequiredArgsConstructor
 public class CentralTenantController {
 
   private final CentralTenantService tenantService;
 
-  @GetMapping
+  @GetMapping("tenants")
   @RolesAllowed("ADMIN")
   public ResponseEntity<PaginatedResponse<TenantDto>> list(
       @RequestParam(defaultValue = "1") int page,
@@ -39,7 +39,7 @@ public class CentralTenantController {
     return ResponseEntity.ok(tenantService.list(page, perPage, search));
   }
 
-  @GetMapping("/{id}")
+  @GetMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<TenantDto> getById(@PathVariable String id) {
     return tenantService
@@ -48,7 +48,14 @@ public class CentralTenantController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @GetMapping(params = "domain")
+  /**
+   * Get tenant by domain - Accessible to all (no authentication required) - It is for frontend to
+   * get tenant info in middleware
+   *
+   * @param domain the domain of the tenant
+   * @return TenantDto
+   */
+  @GetMapping(value = "tenant", params = "domain")
   @PermitAll
   public ResponseEntity<TenantDto> getByDomain(@RequestParam String domain) {
     return tenantService
@@ -57,14 +64,14 @@ public class CentralTenantController {
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @PostMapping
+  @PostMapping("tenant")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> create(@Valid @RequestBody CreateTenantRequest req) {
     tenantService.create(req);
     return ResponseEntity.noContent().build();
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> update(
       @PathVariable String id, @RequestBody UpdateTenantRequest req) {
@@ -72,14 +79,14 @@ public class CentralTenantController {
     return ResponseEntity.noContent().build();
   }
 
-  @DeleteMapping("/{id}")
+  @DeleteMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
   public ResponseEntity<Void> delete(@PathVariable String id) {
     tenantService.delete(id);
     return ResponseEntity.noContent().build();
   }
 
-  @GetMapping("/stats")
+  @GetMapping("tenants/stats")
   @RolesAllowed("ADMIN")
   public ResponseEntity<TenantStats> stats() {
     return ResponseEntity.ok(tenantService.stats());
