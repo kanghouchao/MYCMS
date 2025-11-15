@@ -14,11 +14,8 @@ out/
 *.tmp
 *.bak
 *.pid
-*.lock
 .env
 .DS_Store
 
 # Temporary files
-*.tmp
-**/*.log
 reports/
