@@ -3,6 +3,8 @@ package com.cms.service.central.tenant;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Base64;
+
+import com.cms.exception.ServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -34,12 +36,12 @@ public class TenantRegistrationServiceImpl implements TenantRegistrationService 
     String key = keyFor(token);
     String val = redisTemplate.opsForValue().get(key);
     if (val == null) {
-      return null;
+      throw new ServiceException("Invalid or expired token");
     }
     try {
       return Long.valueOf(val);
     } catch (NumberFormatException e) {
-      return null;
+      throw new RuntimeException(e);
     }
   }
 

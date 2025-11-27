@@ -1,7 +1,7 @@
 package com.cms.utils;
 
 import com.cms.config.AppProperties;
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

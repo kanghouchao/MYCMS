@@ -5,7 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import com.cms.utils.JwtUtil;
 import java.util.List;
 import java.util.Map;

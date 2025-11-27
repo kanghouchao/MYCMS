@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 import com.cms.config.AppProperties;
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import io.jsonwebtoken.Claims;
 import java.util.HashMap;
 import java.util.Map;

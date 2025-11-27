@@ -1,6 +1,10 @@
 package com.cms.service;
 
-import com.cms.config.TenantContext;
+import com.cms.config.interceptor.TenantContext;
+import com.cms.model.entity.central.security.CentralPermission;
+import com.cms.model.entity.central.security.CentralRole;
+import com.cms.model.entity.tenant.security.TenantPermission;
+import com.cms.model.entity.tenant.security.TenantRole;
 import com.cms.repository.central.CentralUserRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import io.jsonwebtoken.lang.Collections;
@@ -9,6 +13,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -28,31 +33,20 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
     if (tenantContext.isTenant()) {
-      String tenantId = tenantContext.getTenantId();
-      if (!org.springframework.util.StringUtils.hasText(tenantId)) {
-        throw new UsernameNotFoundException("Missing tenant context");
-      }
-      Long tenantIdLong;
-      try {
-        tenantIdLong = Long.valueOf(tenantId);
-      } catch (NumberFormatException ex) {
-        throw new UsernameNotFoundException("Invalid tenant id format: " + tenantId);
-      }
       return tenantUserRepository
-          .findByTenant_IdAndEmail(tenantIdLong, username)
+          .findByEmail(username)
           .map(
               u -> {
                 List<SimpleGrantedAuthority> authorities =
                     buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                        u.getRoles(), TenantRole::getName, TenantRole::getPermissions, TenantPermission::getName);
                 return buildUser(u.getEmail(), u.getPassword(), u.getEnabled(), authorities);
               })
           .orElseThrow(
               () ->
-                  new UsernameNotFoundException(
-                      "User not found (tenant): " + username + " @ tenant=" + tenantId));
+                  new UsernameNotFoundException("User not found (tenant): " + username));
     } else {
       return centralUserRepository
           .findByUsername(username)
@@ -60,7 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
               u -> {
                 List<SimpleGrantedAuthority> authorities =
                     buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                        u.getRoles(), CentralRole::getName, CentralRole::getPermissions, CentralPermission::getName);
                 return buildUser(u.getUsername(), u.getPassword(), u.getEnabled(), authorities);
               })
           .orElseThrow(

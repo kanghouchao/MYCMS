@@ -5,8 +5,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import com.cms.config.AppProperties;
-import com.cms.event.tenant.TenantCreatedEvent;
-import com.cms.model.central.tenant.Tenant;
+import com.cms.config.listener.event.TenantCreatedEvent;
+import com.cms.config.listener.TenantCreatedListener;
+import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.service.central.tenant.TenantRegistrationService;
 import com.cms.service.mail.MailService;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +27,8 @@ class TenantCreatedListenerTest {
 
   @Mock AppProperties appProperties;
 
-  @InjectMocks TenantCreatedListener listener;
+  @InjectMocks
+  TenantCreatedListener listener;
 
   @BeforeEach
   void setUp() {

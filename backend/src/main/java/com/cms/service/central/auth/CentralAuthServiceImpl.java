@@ -1,6 +1,6 @@
 package com.cms.service.central.auth;
 
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import com.cms.utils.JwtUtil;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

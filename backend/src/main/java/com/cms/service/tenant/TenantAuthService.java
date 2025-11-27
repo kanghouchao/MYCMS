@@ -1,8 +1,8 @@
 package com.cms.service.tenant;
 
-import com.cms.dto.auth.Token;
-import com.cms.dto.tenant.TenantRegisterRequest;
-import com.cms.model.central.tenant.Tenant;
+import com.cms.model.dto.auth.Token;
+import com.cms.model.dto.tenant.TenantRegisterRequest;
+import com.cms.model.entity.central.tenant.Tenant;
 
 /** Authentication service interface. */
 public interface TenantAuthService {

@@ -3,7 +3,7 @@ package com.cms.service.central.auth;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import com.cms.utils.JwtUtil;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

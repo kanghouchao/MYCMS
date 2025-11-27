@@ -1,6 +1,6 @@
 package com.cms.service.central.auth;
 
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 
 /** Authentication service interface. */
 public interface CentralAuthService {

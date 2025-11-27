@@ -5,10 +5,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cms.config.TenantContext;
-import com.cms.dto.tenant.TenantRegisterRequest;
-import com.cms.model.central.tenant.Tenant;
-import com.cms.model.tenant.security.TenantUser;
+import com.cms.config.interceptor.TenantContext;
+import com.cms.model.dto.tenant.TenantRegisterRequest;
+import com.cms.model.entity.central.tenant.Tenant;
+import com.cms.model.entity.tenant.security.TenantUser;
 import com.cms.repository.central.TenantRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import com.cms.utils.JwtUtil;

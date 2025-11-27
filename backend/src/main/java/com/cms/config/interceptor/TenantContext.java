@@ -1,0 +1,26 @@
+package com.cms.config.interceptor;
+
+import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
+
+@Component
+public class TenantContext {
+  private final ThreadLocal<Long> CURRENT_TENANT = new ThreadLocal<>();
+
+  public boolean isTenant(){
+    Long tenantId = CURRENT_TENANT.get();
+    return tenantId != null && StringUtils.hasText(tenantId.toString());
+  }
+
+  public void setTenantId(Long tenantId) {
+    CURRENT_TENANT.set(tenantId);
+  }
+
+  public Long getTenantId() {
+    return CURRENT_TENANT.get();
+  }
+
+  public void clear() {
+    CURRENT_TENANT.remove();
+  }
+}

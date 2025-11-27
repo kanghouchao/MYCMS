@@ -1,15 +1,15 @@
 package com.cms.config;
 
-import com.cms.filter.JwtAuthenticationFilter;
+import com.cms.config.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,64 +25,42 @@ import org.springframework.util.StringUtils;
 @EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 
-  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-  private static final RequestMatcher[] CSRF_IGNORED_MATCHERS = {
-    PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
-    PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
-    PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
-    request -> {
-      String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-      return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
+    private static final RequestMatcher[] CSRF_IGNORED_MATCHERS = {
+            PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
+            PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
+            PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
+            request -> {
+                String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+                return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
+            }
+    };
+
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-  };
 
-  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-  }
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf ->
+                        csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
+                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable);
+        return http.build();
+    }
 
-  @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-    RequestMatcher tenantDomainLookupMatcher =
-        request ->
-            HttpMethod.GET.matches(request.getMethod())
-                && "/central/tenants".equals(request.getRequestURI())
-                && StringUtils.hasText(request.getParameter("domain"));
-
-    http.csrf(
-            csrf ->
-                csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
-                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/central/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/register")
-                    .permitAll()
-                    .requestMatchers("/actuator/health", "/actuator/health/**")
-                    .permitAll()
-                    .requestMatchers(tenantDomainLookupMatcher)
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
-    return http.build();
-  }
-
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
-
-  @Bean
-  public AuthenticationManager authenticationManager(
-      AuthenticationConfiguration authenticationConfiguration) throws Exception {
-    return authenticationConfiguration.getAuthenticationManager();
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 }
