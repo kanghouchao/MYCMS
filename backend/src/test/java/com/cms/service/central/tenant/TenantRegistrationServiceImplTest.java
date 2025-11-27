@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.*;
 
+import com.cms.exception.ServiceException;
 import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,23 +57,19 @@ class TenantRegistrationServiceImplTest {
   }
 
   @Test
-  void validate_returnsNull_whenMissing() {
+  void validate_throws_whenMissing() {
     String token = "missing";
     when(valueOps.get("tenant:registration:" + token)).thenReturn(null);
 
-    Long id = svc.validate(token);
-
-    assertNull(id);
+    assertThrows(ServiceException.class, () -> svc.validate(token));
   }
 
   @Test
-  void validate_returnsNull_whenNotNumber() {
+  void validate_throws_whenNotNumber() {
     String token = "bad";
     when(valueOps.get("tenant:registration:" + token)).thenReturn("not-a-number");
 
-    Long id = svc.validate(token);
-
-    assertNull(id);
+    assertThrows(RuntimeException.class, () -> svc.validate(token));
   }
 
   @Test

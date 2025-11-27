@@ -10,6 +10,7 @@ import com.cms.model.dto.central.tenant.TenantCreateDTO;
 import com.cms.model.dto.central.tenant.TenantVO;
 import com.cms.model.dto.central.tenant.TenantUpdateDTO;
 import com.cms.config.listener.event.TenantCreatedEvent;
+import com.cms.exception.ServiceException;
 import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.repository.central.TenantRepository;
 import java.util.List;
@@ -112,7 +113,7 @@ class CentralTenantServiceImplTest {
 
     when(tenantRepository.findById(12L)).thenReturn(Optional.empty());
     assertThatThrownBy(() -> service.update("12", req))
-        .isInstanceOf(IllegalArgumentException.class);
+        .isInstanceOf(ServiceException.class);
   }
 
   @Test
