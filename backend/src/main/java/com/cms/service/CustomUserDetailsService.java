@@ -1,6 +1,10 @@
 package com.cms.service;
 
-import com.cms.config.TenantContext;
+import com.cms.config.interceptor.TenantContext;
+import com.cms.model.entity.central.security.CentralPermission;
+import com.cms.model.entity.central.security.CentralRole;
+import com.cms.model.entity.tenant.security.TenantPermission;
+import com.cms.model.entity.tenant.security.TenantRole;
 import com.cms.repository.central.CentralUserRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import io.jsonwebtoken.lang.Collections;
@@ -10,6 +14,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,39 +34,32 @@ public class CustomUserDetailsService implements UserDetailsService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
     if (tenantContext.isTenant()) {
-      String tenantId = tenantContext.getTenantId();
-      if (!org.springframework.util.StringUtils.hasText(tenantId)) {
-        throw new UsernameNotFoundException("Missing tenant context");
-      }
-      Long tenantIdLong;
-      try {
-        tenantIdLong = Long.valueOf(tenantId);
-      } catch (NumberFormatException ex) {
-        throw new UsernameNotFoundException("Invalid tenant id format: " + tenantId);
-      }
       return tenantUserRepository
-          .findByTenant_IdAndEmail(tenantIdLong, username)
+          .findByEmail(username)
           .map(
               u -> {
-                List<SimpleGrantedAuthority> authorities =
+                List<GrantedAuthority> authorities =
                     buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                        u.getRoles(),
+                        TenantRole::getName,
+                        TenantRole::getPermissions,
+                        TenantPermission::getName);
                 return buildUser(u.getEmail(), u.getPassword(), u.getEnabled(), authorities);
               })
-          .orElseThrow(
-              () ->
-                  new UsernameNotFoundException(
-                      "User not found (tenant): " + username + " @ tenant=" + tenantId));
+          .orElseThrow(() -> new UsernameNotFoundException("User not found (tenant): " + username));
     } else {
       return centralUserRepository
           .findByUsername(username)
           .map(
               u -> {
-                List<SimpleGrantedAuthority> authorities =
+                List<GrantedAuthority> authorities =
                     buildAuthorities(
-                        u.getRoles(), r -> r.getName(), r -> r.getPermissions(), p -> p.getName());
+                        u.getRoles(),
+                        CentralRole::getName,
+                        CentralRole::getPermissions,
+                        CentralPermission::getName);
                 return buildUser(u.getUsername(), u.getPassword(), u.getEnabled(), authorities);
               })
           .orElseThrow(
@@ -68,7 +67,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
   }
 
-  private <R, P> List<SimpleGrantedAuthority> buildAuthorities(
+  private <R, P> List<GrantedAuthority> buildAuthorities(
       Collection<R> roles,
       Function<R, String> roleNameExtractor,
       Function<R, Collection<P>> permExtractor,
@@ -102,12 +101,13 @@ public class CustomUserDetailsService implements UserDetailsService {
               return Stream.concat(roleAuth, Stream.concat(permOriginal, permWithPrefix));
             })
         .distinct()
+        .filter(StringUtils::isNotBlank)
         .map(SimpleGrantedAuthority::new)
         .collect(Collectors.toList());
   }
 
   private UserDetails buildUser(
-      String username, String password, boolean enabled, List<SimpleGrantedAuthority> authorities) {
+      String username, String password, boolean enabled, List<GrantedAuthority> authorities) {
     return User.withUsername(username)
         .password(password)
         .disabled(!enabled)

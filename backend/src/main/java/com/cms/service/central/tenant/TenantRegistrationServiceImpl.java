@@ -1,5 +1,6 @@
 package com.cms.service.central.tenant;
 
+import com.cms.exception.ServiceException;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Base64;
@@ -34,12 +35,12 @@ public class TenantRegistrationServiceImpl implements TenantRegistrationService 
     String key = keyFor(token);
     String val = redisTemplate.opsForValue().get(key);
     if (val == null) {
-      return null;
+      throw new ServiceException("Invalid or expired token");
     }
     try {
       return Long.valueOf(val);
     } catch (NumberFormatException e) {
-      return null;
+      throw new ServiceException(e);
     }
   }
 

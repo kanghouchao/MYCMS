@@ -1,15 +1,15 @@
 package com.cms.config;
 
-import com.cms.filter.JwtAuthenticationFilter;
+import com.cms.config.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,35 +43,14 @@ public class SecurityConfig {
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
-    RequestMatcher tenantDomainLookupMatcher =
-        request ->
-            HttpMethod.GET.matches(request.getMethod())
-                && "/central/tenants".equals(request.getRequestURI())
-                && StringUtils.hasText(request.getParameter("domain"));
-
     http.csrf(
             csrf ->
                 csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
                     .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
         .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-        .authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(HttpMethod.OPTIONS, "/**")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/central/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/login")
-                    .permitAll()
-                    .requestMatchers(HttpMethod.POST, "/tenant/register")
-                    .permitAll()
-                    .requestMatchers("/actuator/health", "/actuator/health/**")
-                    .permitAll()
-                    .requestMatchers(tenantDomainLookupMatcher)
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .formLogin(AbstractHttpConfigurer::disable);
     return http.build();
   }
 

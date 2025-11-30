@@ -1,7 +1,7 @@
 package com.cms.utils;
 
 import com.cms.config.AppProperties;
-import com.cms.dto.auth.Token;
+import com.cms.model.dto.auth.Token;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -23,7 +23,7 @@ public class JwtUtil {
       @NonNull String subject, @Nullable String issuer, @NonNull Map<String, Object> claims) {
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
-    Date exp = new Date(nowMillis + appProperties.getJwtExpiration() * 1000);
+    Date exp = new Date(nowMillis + appProperties.getJwtExpiration());
     Key key = Keys.hmacShaKeyFor(appProperties.getJwtSecret().getBytes());
     String token =
         Jwts.builder()

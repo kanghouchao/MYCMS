@@ -1,19 +1,21 @@
 package com.cms.service.tenant;
 
-import com.cms.config.TenantContext;
-import com.cms.dto.auth.Token;
-import com.cms.dto.tenant.TenantRegisterRequest;
-import com.cms.model.central.tenant.Tenant;
-import com.cms.model.tenant.security.TenantUser;
+import com.cms.config.TenantScoped;
+import com.cms.config.interceptor.TenantContext;
+import com.cms.model.dto.auth.Token;
+import com.cms.model.dto.tenant.TenantRegisterRequest;
+import com.cms.model.entity.tenant.security.TenantUser;
 import com.cms.repository.central.TenantRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import com.cms.utils.JwtUtil;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,16 +34,17 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional(readOnly = true)
+  @TenantScoped
   public Token login(String username, String password) {
-    log.debug("Attempting login for user: {}", username);
     Authentication auth =
         authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(username, password));
-    String tenantId = tenantContext.getTenantId();
+    Long tenantId = tenantContext.getTenantId();
     Map<String, Object> claims =
-        new java.util.HashMap<>(
+        new HashMap<>(
             Map.of(
-                "authorities", auth.getAuthorities().stream().map(a -> a.getAuthority()).toList()));
+                "authorities",
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()));
     if (tenantId != null) {
       claims.put("tenantId", tenantId);
     }
@@ -50,11 +53,11 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional
-  public Tenant register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
-    Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
+  public com.cms.model.entity.central.tenant.Tenant register(
+      Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
+    com.cms.model.entity.central.tenant.Tenant tenant =
+        tenantRepository.findById(tenantId).orElseThrow();
     TenantUser entity = new TenantUser();
-    // Derive a default nickname from email local-part instead of using the
-    // registration token
     String email = tenantRegisterRequest.getEmail();
     String nickname =
         (email != null && email.contains("@")) ? email.substring(0, email.indexOf('@')) : "admin";

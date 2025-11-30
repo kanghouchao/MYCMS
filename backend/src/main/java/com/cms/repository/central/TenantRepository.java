@@ -1,6 +1,6 @@
 package com.cms.repository.central;
 
-import com.cms.model.central.tenant.Tenant;
+import com.cms.model.entity.central.tenant.Tenant;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

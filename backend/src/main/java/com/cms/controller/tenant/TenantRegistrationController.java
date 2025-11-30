@@ -1,8 +1,8 @@
 package com.cms.controller.tenant;
 
-import com.cms.dto.tenant.TenantRegisterRequest;
-import com.cms.dto.tenant.TenantRegisterResponse;
-import com.cms.model.central.tenant.Tenant;
+import com.cms.model.dto.tenant.TenantRegisterRequest;
+import com.cms.model.dto.tenant.TenantRegisterResponse;
+import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.service.central.tenant.TenantRegistrationService;
 import com.cms.service.tenant.TenantAuthService;
 import jakarta.annotation.security.PermitAll;

@@ -1,24 +1,24 @@
 package com.cms.service.central.tenant;
 
-import com.cms.dto.central.tenant.CreateTenantRequest;
-import com.cms.dto.central.tenant.PaginatedResponse;
-import com.cms.dto.central.tenant.TenantDto;
-import com.cms.dto.central.tenant.TenantStats;
-import com.cms.dto.central.tenant.UpdateTenantRequest;
+import com.cms.model.dto.central.tenant.PaginatedTenantVO;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
+import com.cms.model.dto.central.tenant.TenantStatusVO;
+import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
 import java.util.Optional;
 
 public interface CentralTenantService {
-  PaginatedResponse<TenantDto> list(int page, int perPage, String search);
+  PaginatedTenantVO<TenantVO> list(int page, int perPage, String search);
 
-  Optional<TenantDto> getById(String id);
+  Optional<TenantVO> getById(String id);
 
-  Optional<TenantDto> getByDomain(String domain);
+  Optional<TenantVO> getByDomain(String domain);
 
-  void create(CreateTenantRequest req);
+  void create(TenantCreateDTO req);
 
-  void update(String id, UpdateTenantRequest req);
+  void update(String id, TenantUpdateDTO req);
 
   void delete(String id);
 
-  TenantStats stats();
+  TenantStatusVO stats();
 }

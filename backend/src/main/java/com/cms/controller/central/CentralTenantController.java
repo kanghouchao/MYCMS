@@ -1,10 +1,10 @@
 package com.cms.controller.central;
 
-import com.cms.dto.central.tenant.CreateTenantRequest;
-import com.cms.dto.central.tenant.PaginatedResponse;
-import com.cms.dto.central.tenant.TenantDto;
-import com.cms.dto.central.tenant.TenantStats;
-import com.cms.dto.central.tenant.UpdateTenantRequest;
+import com.cms.model.dto.central.tenant.PaginatedTenantVO;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
+import com.cms.model.dto.central.tenant.TenantStatusVO;
+import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
 import com.cms.service.central.tenant.CentralTenantService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -32,7 +32,7 @@ public class CentralTenantController {
 
   @GetMapping("tenants")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<PaginatedResponse<TenantDto>> list(
+  public ResponseEntity<PaginatedTenantVO<TenantVO>> list(
       @RequestParam(defaultValue = "1") int page,
       @RequestParam(name = "per_page", defaultValue = "10") int perPage,
       @RequestParam(required = false) String search) {
@@ -41,7 +41,7 @@ public class CentralTenantController {
 
   @GetMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<TenantDto> getById(@PathVariable String id) {
+  public ResponseEntity<TenantVO> getById(@PathVariable String id) {
     return tenantService
         .getById(id)
         .map(ResponseEntity::ok)
@@ -57,7 +57,7 @@ public class CentralTenantController {
    */
   @GetMapping(value = "tenant", params = "domain")
   @PermitAll
-  public ResponseEntity<TenantDto> getByDomain(@RequestParam String domain) {
+  public ResponseEntity<TenantVO> getByDomain(@RequestParam String domain) {
     return tenantService
         .getByDomain(domain)
         .map(ResponseEntity::ok)
@@ -66,16 +66,15 @@ public class CentralTenantController {
 
   @PostMapping("tenant")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<Void> create(@Valid @RequestBody CreateTenantRequest req) {
-    tenantService.create(req);
+  public ResponseEntity<Void> create(@Valid @RequestBody TenantCreateDTO tenant) {
+    tenantService.create(tenant);
     return ResponseEntity.noContent().build();
   }
 
   @PutMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<Void> update(
-      @PathVariable String id, @RequestBody UpdateTenantRequest req) {
-    tenantService.update(id, req);
+  public ResponseEntity<Void> update(@PathVariable String id, @RequestBody TenantUpdateDTO tenant) {
+    tenantService.update(id, tenant);
     return ResponseEntity.noContent().build();
   }
 
@@ -88,7 +87,7 @@ public class CentralTenantController {
 
   @GetMapping("tenants/stats")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<TenantStats> stats() {
+  public ResponseEntity<TenantStatusVO> stats() {
     return ResponseEntity.ok(tenantService.stats());
   }
 }

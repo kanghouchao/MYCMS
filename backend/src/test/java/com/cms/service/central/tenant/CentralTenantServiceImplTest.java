@@ -6,11 +6,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cms.dto.central.tenant.CreateTenantRequest;
-import com.cms.dto.central.tenant.TenantDto;
-import com.cms.dto.central.tenant.UpdateTenantRequest;
-import com.cms.event.tenant.TenantCreatedEvent;
-import com.cms.model.central.tenant.Tenant;
+import com.cms.config.listener.event.TenantCreatedEvent;
+import com.cms.exception.ServiceException;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
+import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
+import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.repository.central.TenantRepository;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,6 @@ class CentralTenantServiceImplTest {
   @Mock ApplicationEventPublisher publisher;
 
   @Captor ArgumentCaptor<Tenant> tenantCaptor;
-  @Captor ArgumentCaptor<TenantCreatedEvent> eventCaptor;
 
   @InjectMocks CentralTenantServiceImpl service;
 
@@ -55,9 +55,9 @@ class CentralTenantServiceImplTest {
         .thenReturn(page);
 
     var res = service.list(1, 10, "");
-    assertThat(res.getData()).hasSize(2);
-    assertThat(res.getTotal()).isEqualTo(2);
-    assertThat(res.getCurrentPage()).isEqualTo(1);
+    assertThat(res.data()).hasSize(2);
+    assertThat(res.total()).isEqualTo(2);
+    assertThat(res.currentPage()).isEqualTo(1);
   }
 
   @Test
@@ -69,8 +69,8 @@ class CentralTenantServiceImplTest {
     when(tenantRepository.findById(3L)).thenReturn(Optional.of(t));
     when(tenantRepository.findByDomain("c.test")).thenReturn(Optional.of(t));
 
-    Optional<TenantDto> byId = service.getById("3");
-    Optional<TenantDto> byDomain = service.getByDomain("c.test");
+    Optional<TenantVO> byId = service.getById("3");
+    Optional<TenantVO> byDomain = service.getByDomain("c.test");
     assertThat(byId).isPresent();
     assertThat(byDomain).isPresent();
     assertThat(byId.get().getId()).isEqualTo("3");
@@ -78,7 +78,7 @@ class CentralTenantServiceImplTest {
 
   @Test
   void createSavesTenantAndPublishesEvent() {
-    CreateTenantRequest req = new CreateTenantRequest();
+    TenantCreateDTO req = new TenantCreateDTO();
     req.setName("D");
     req.setDomain("d.test");
     req.setEmail("d@x.com");
@@ -99,7 +99,7 @@ class CentralTenantServiceImplTest {
 
   @Test
   void updateModifiesNameOrThrowsWhenMissing() {
-    UpdateTenantRequest req = new UpdateTenantRequest();
+    TenantUpdateDTO req = new TenantUpdateDTO();
     req.setName("E2");
     Tenant existing = new Tenant();
     existing.setId(11L);
@@ -111,8 +111,7 @@ class CentralTenantServiceImplTest {
     assertThat(existing.getName()).isEqualTo("E2");
 
     when(tenantRepository.findById(12L)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> service.update("12", req))
-        .isInstanceOf(IllegalArgumentException.class);
+    assertThatThrownBy(() -> service.update("12", req)).isInstanceOf(ServiceException.class);
   }
 
   @Test
@@ -122,7 +121,7 @@ class CentralTenantServiceImplTest {
 
     when(tenantRepository.count()).thenReturn(5L);
     var stats = service.stats();
-    assertThat(stats.getTotal()).isEqualTo(5);
-    assertThat(stats.getActive()).isEqualTo(5);
+    assertThat(stats.total()).isEqualTo(5);
+    assertThat(stats.active()).isEqualTo(5);
   }
 }

@@ -1,9 +1,9 @@
 package com.cms.controller.central;
 
-import com.cms.dto.auth.LoginRequest;
-import com.cms.dto.auth.Token;
-import com.cms.dto.central.AdminDto;
-import com.cms.model.central.security.CentralUser;
+import com.cms.model.dto.auth.LoginRequest;
+import com.cms.model.dto.auth.Token;
+import com.cms.model.dto.central.AdminDto;
+import com.cms.model.entity.central.security.CentralUser;
 import com.cms.repository.central.CentralUserRepository;
 import com.cms.service.central.auth.CentralAuthService;
 import com.cms.utils.JwtUtil;

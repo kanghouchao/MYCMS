@@ -6,6 +6,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.cms.config.filter.JwtAuthenticationFilter;
 import com.cms.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -62,8 +63,8 @@ class JwtAuthenticationFilterTest {
 
     filter.doFilter(request, response, filterChain);
 
-    assertThat(response.getStatus()).isEqualTo(401);
-    verify(filterChain, never()).doFilter(request, response);
+    verify(filterChain).doFilter(request, response);
+    assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
   }
 
   @Test
@@ -76,7 +77,6 @@ class JwtAuthenticationFilterTest {
     Claims claims = org.mockito.Mockito.mock(Claims.class);
     Date expiry = Date.from(Instant.now().plusSeconds(60));
     when(claims.getExpiration()).thenReturn(expiry);
-    when(claims.getIssuer()).thenReturn("TenantAuth");
     when(claims.getSubject()).thenReturn("alice@example.com");
     when(claims.get("authorities", List.class)).thenReturn(List.of("ROLE_TENANT_ADMIN"));
 

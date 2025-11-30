@@ -1,6 +1,6 @@
 package com.cms.controller.tenant;
 
-import com.cms.dto.auth.LoginRequest;
+import com.cms.model.dto.auth.LoginRequest;
 import com.cms.service.tenant.TenantAuthService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.validation.Valid;

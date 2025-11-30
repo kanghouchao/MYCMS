@@ -2,6 +2,7 @@ package com.cms.model.tenant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.cms.model.entity.tenant.SnowflakeIdGenerator;
 import java.lang.reflect.Field;
 import org.junit.jupiter.api.Test;
 
