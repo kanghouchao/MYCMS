@@ -40,7 +40,7 @@ public class TenantRegistrationServiceImpl implements TenantRegistrationService 
     try {
       return Long.valueOf(val);
     } catch (NumberFormatException e) {
-      throw new RuntimeException(e);
+      throw new ServiceException(e);
     }
   }
 

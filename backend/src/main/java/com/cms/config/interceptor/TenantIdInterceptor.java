@@ -27,15 +27,9 @@ public class TenantIdInterceptor implements HandlerInterceptor {
       @NonNull HttpServletResponse response,
       @NonNull Object handler) {
     if (HEADER_ROLE_TENANT.equals(request.getHeader(HEADER_ROLE))
-        && StringUtils.isNoneBlank(request.getHeader(HEADER_TENANT_ID))) {
-      String tenantId = request.getHeader(HEADER_TENANT_ID);
-      if (StringUtils.isNotBlank(tenantId) && StringUtils.isNumeric(tenantId)) {
-        try {
-          this.tenantContext.setTenantId(Long.parseLong(tenantId));
-        } catch (NumberFormatException e) {
-          log.error("Invalid tenant ID format: {}", tenantId, e);
-        }
-      }
+        && StringUtils.isNotBlank(request.getHeader(HEADER_TENANT_ID))
+        && StringUtils.isNumeric(request.getHeader(HEADER_TENANT_ID))) {
+      this.tenantContext.setTenantId(Long.parseLong(request.getHeader(HEADER_TENANT_ID)));
     }
     return true;
   }

@@ -9,7 +9,7 @@ public class TenantContext {
 
   public boolean isTenant() {
     Long tenantId = CURRENT_TENANT.get();
-    return tenantId != null && StringUtils.hasText(tenantId.toString());
+    return tenantId != null;
   }
 
   public void setTenantId(Long tenantId) {

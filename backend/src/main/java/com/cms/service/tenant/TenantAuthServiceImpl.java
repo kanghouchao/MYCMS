@@ -1,10 +1,9 @@
 package com.cms.service.tenant;
 
-import com.cms.config.TenantIdAutowired;
+import com.cms.config.Tenant;
 import com.cms.config.interceptor.TenantContext;
 import com.cms.model.dto.auth.Token;
 import com.cms.model.dto.tenant.TenantRegisterRequest;
-import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.model.entity.tenant.security.TenantUser;
 import com.cms.repository.central.TenantRepository;
 import com.cms.repository.tenant.TenantUserRepository;
@@ -35,7 +34,7 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional(readOnly = true)
-  @TenantIdAutowired
+  @Tenant
   public Token login(String username, String password) {
     Authentication auth =
         authenticationManager.authenticate(
@@ -54,8 +53,8 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional
-  public Tenant register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
-    Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
+  public com.cms.model.entity.central.tenant.Tenant register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
+    com.cms.model.entity.central.tenant.Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
     TenantUser entity = new TenantUser();
     String email = tenantRegisterRequest.getEmail();
     String nickname =
