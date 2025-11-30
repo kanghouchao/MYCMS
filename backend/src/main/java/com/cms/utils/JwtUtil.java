@@ -23,7 +23,7 @@ public class JwtUtil {
       @NonNull String subject, @Nullable String issuer, @NonNull Map<String, Object> claims) {
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
-    Date exp = new Date(nowMillis + appProperties.getJwtExpiration() * 1000);
+    Date exp = new Date(nowMillis + appProperties.getJwtExpiration());
     Key key = Keys.hmacShaKeyFor(appProperties.getJwtSecret().getBytes());
     String token =
         Jwts.builder()

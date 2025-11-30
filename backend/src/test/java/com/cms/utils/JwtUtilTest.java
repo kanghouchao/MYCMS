@@ -24,7 +24,7 @@ class JwtUtilTest {
 
   private static final String TEST_SECRET =
       "test-secret-key-must-be-at-least-256-bits-long-for-hs256";
-  private static final long TEST_EXPIRATION = 3600L; // 1 hour in seconds
+  private static final long TEST_EXPIRATION = 3600000L;
 
   @BeforeEach
   void setUp() {
@@ -116,8 +116,8 @@ class JwtUtilTest {
     Token token = jwtUtil.generateToken(subject, issuer, claims);
     long afterGeneration = System.currentTimeMillis();
 
-    long expectedMinExpiration = beforeGeneration + (TEST_EXPIRATION * 1000);
-    long expectedMaxExpiration = afterGeneration + (TEST_EXPIRATION * 1000);
+    long expectedMinExpiration = beforeGeneration + TEST_EXPIRATION;
+    long expectedMaxExpiration = afterGeneration + TEST_EXPIRATION;
 
     assertThat(token.expiresAt())
         .isGreaterThanOrEqualTo(expectedMinExpiration)
