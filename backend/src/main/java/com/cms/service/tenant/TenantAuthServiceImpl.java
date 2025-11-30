@@ -1,6 +1,6 @@
 package com.cms.service.tenant;
 
-import com.cms.config.Tenant;
+import com.cms.config.TenantScoped;
 import com.cms.config.interceptor.TenantContext;
 import com.cms.model.dto.auth.Token;
 import com.cms.model.dto.tenant.TenantRegisterRequest;
@@ -34,7 +34,7 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional(readOnly = true)
-  @Tenant
+  @TenantScoped
   public Token login(String username, String password) {
     Authentication auth =
         authenticationManager.authenticate(

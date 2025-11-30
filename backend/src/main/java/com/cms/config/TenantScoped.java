@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
  * <p><b>Usage Example:</b>
  *
  * <pre>{@code
- * @TenantIdAutowired
+ * @TenantScoped
  * public List<User> getUsersForTenant() {
  *     // Implementation that will be automatically filtered by tenant
  * }
@@ -24,4 +24,4 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Tenant {}
+public @interface TenantScoped {}

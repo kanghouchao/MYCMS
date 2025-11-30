@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Aspect that enables Hibernate tenant filtering for methods annotated with
- * {@code @TenantIdAutowired}.
+ * {@code @TenantScoped}.
  *
- * <p>When a method is annotated with {@code @TenantIdAutowired}, this aspect intercepts the call
+ * <p>When a method is annotated with {@code @TenantScoped}, this aspect intercepts the call
  * and enables the Hibernate {@code tenantFilter}, setting the tenant ID from the {@link
  * TenantContext}. This ensures that all database operations within the method are scoped to the
  * current tenant.
@@ -29,7 +29,7 @@ public class TenantFilterEnable {
   private final EntityManager entityManager;
   private final TenantContext tenantContext;
 
-  @Around(value = "@annotation(com.cms.config.Tenant)")
+  @Around(value = "@annotation(com.cms.config.TenantScoped)")
   public Object enableTenantFilterForTenantServiceMethods(ProceedingJoinPoint pjp)
       throws Throwable {
     if (tenantContext.isTenant()) {
