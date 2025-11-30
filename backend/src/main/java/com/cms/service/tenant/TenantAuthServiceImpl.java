@@ -53,8 +53,10 @@ public class TenantAuthServiceImpl implements TenantAuthService {
 
   @Override
   @Transactional
-  public com.cms.model.entity.central.tenant.Tenant register(Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
-    com.cms.model.entity.central.tenant.Tenant tenant = tenantRepository.findById(tenantId).orElseThrow();
+  public com.cms.model.entity.central.tenant.Tenant register(
+      Long tenantId, TenantRegisterRequest tenantRegisterRequest) {
+    com.cms.model.entity.central.tenant.Tenant tenant =
+        tenantRepository.findById(tenantId).orElseThrow();
     TenantUser entity = new TenantUser();
     String email = tenantRegisterRequest.getEmail();
     String nickname =
