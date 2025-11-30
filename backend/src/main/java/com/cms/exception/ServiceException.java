@@ -9,10 +9,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 @NoArgsConstructor
-public class ServiceException extends  RuntimeException {
+public class ServiceException extends RuntimeException {
 
-    public ServiceException(String message) {
-        super(message);
-    }
-
+  public ServiceException(String message) {
+    super(message);
+  }
 }

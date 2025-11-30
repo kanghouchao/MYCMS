@@ -15,38 +15,37 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @AllArgsConstructor
 public class TenantIdInterceptor implements HandlerInterceptor {
 
-    private final TenantContext tenantContext;
+  private final TenantContext tenantContext;
 
-    private static final String HEADER_ROLE = "X-Role";
-    private static final String HEADER_TENANT_ID = "X-Tenant-ID";
-    private static final String HEADER_ROLE_TENANT = "tenant";
+  private static final String HEADER_ROLE = "X-Role";
+  private static final String HEADER_TENANT_ID = "X-Tenant-ID";
+  private static final String HEADER_ROLE_TENANT = "tenant";
 
-
-    @Override
-    public boolean preHandle(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull Object handler) {
-        if (HEADER_ROLE_TENANT.equals(request.getHeader(HEADER_ROLE))
-                && StringUtils.isNoneBlank(request.getHeader(HEADER_TENANT_ID))) {
-            String tenantId = request.getHeader(HEADER_TENANT_ID);
-            if (StringUtils.isNotBlank(tenantId) && StringUtils.isNumeric(tenantId)) {
-                try {
-                    this.tenantContext.setTenantId(Long.parseLong(tenantId));
-                } catch (NumberFormatException e) {
-                    log.error("Invalid tenant ID format: {}", tenantId, e);
-                }
-            }
+  @Override
+  public boolean preHandle(
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @NonNull Object handler) {
+    if (HEADER_ROLE_TENANT.equals(request.getHeader(HEADER_ROLE))
+        && StringUtils.isNoneBlank(request.getHeader(HEADER_TENANT_ID))) {
+      String tenantId = request.getHeader(HEADER_TENANT_ID);
+      if (StringUtils.isNotBlank(tenantId) && StringUtils.isNumeric(tenantId)) {
+        try {
+          this.tenantContext.setTenantId(Long.parseLong(tenantId));
+        } catch (NumberFormatException e) {
+          log.error("Invalid tenant ID format: {}", tenantId, e);
         }
-        return true;
+      }
     }
+    return true;
+  }
 
-    @Override
-    public void afterCompletion(
-            @NonNull HttpServletRequest request,
-            @NonNull HttpServletResponse response,
-            @NonNull Object handler,
-            @Nullable Exception ex) {
-        tenantContext.clear();
-    }
+  @Override
+  public void afterCompletion(
+      @NonNull HttpServletRequest request,
+      @NonNull HttpServletResponse response,
+      @NonNull Object handler,
+      @Nullable Exception ex) {
+    tenantContext.clear();
+  }
 }

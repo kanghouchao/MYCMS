@@ -6,11 +6,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.cms.model.dto.central.tenant.TenantCreateDTO;
-import com.cms.model.dto.central.tenant.TenantVO;
-import com.cms.model.dto.central.tenant.TenantUpdateDTO;
 import com.cms.config.listener.event.TenantCreatedEvent;
 import com.cms.exception.ServiceException;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
+import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
 import com.cms.model.entity.central.tenant.Tenant;
 import com.cms.repository.central.TenantRepository;
 import java.util.List;
@@ -112,8 +112,7 @@ class CentralTenantServiceImplTest {
     assertThat(existing.getName()).isEqualTo("E2");
 
     when(tenantRepository.findById(12L)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> service.update("12", req))
-        .isInstanceOf(ServiceException.class);
+    assertThatThrownBy(() -> service.update("12", req)).isInstanceOf(ServiceException.class);
   }
 
   @Test

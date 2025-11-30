@@ -9,7 +9,6 @@ import com.cms.model.entity.tenant.security.TenantUser;
 import com.cms.repository.central.TenantRepository;
 import com.cms.repository.tenant.TenantUserRepository;
 import com.cms.utils.JwtUtil;
-
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +44,8 @@ public class TenantAuthServiceImpl implements TenantAuthService {
     Map<String, Object> claims =
         new HashMap<>(
             Map.of(
-                "authorities", auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()));
+                "authorities",
+                auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList()));
     if (tenantId != null) {
       claims.put("tenantId", tenantId);
     }

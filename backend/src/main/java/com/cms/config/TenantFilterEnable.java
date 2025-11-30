@@ -18,15 +18,18 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class TenantFilterEnable {
 
-    private final EntityManager entityManager;
-    private final TenantContext tenantContext;
+  private final EntityManager entityManager;
+  private final TenantContext tenantContext;
 
-    @Around(value = "@annotation(com.cms.config.TenantIdAutowired)")
-    public Object enableTenantFilterForTenantServiceMethods(ProceedingJoinPoint pjp) throws Throwable {
-        if (tenantContext.isTenant()) {
-            entityManager.unwrap(org.hibernate.Session.class).enableFilter("tenantFilter")
-                    .setParameter("tenantId", tenantContext.getTenantId());
-        }
-        return pjp.proceed();
+  @Around(value = "@annotation(com.cms.config.TenantIdAutowired)")
+  public Object enableTenantFilterForTenantServiceMethods(ProceedingJoinPoint pjp)
+      throws Throwable {
+    if (tenantContext.isTenant()) {
+      entityManager
+          .unwrap(org.hibernate.Session.class)
+          .enableFilter("tenantFilter")
+          .setParameter("tenantId", tenantContext.getTenantId());
     }
+    return pjp.proceed();
+  }
 }

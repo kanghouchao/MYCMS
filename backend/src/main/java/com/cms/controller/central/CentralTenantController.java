@@ -1,10 +1,10 @@
 package com.cms.controller.central;
 
-import com.cms.model.dto.central.tenant.TenantCreateDTO;
 import com.cms.model.dto.central.tenant.PaginatedTenantVO;
-import com.cms.model.dto.central.tenant.TenantVO;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
 import com.cms.model.dto.central.tenant.TenantStatusVO;
 import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
 import com.cms.service.central.tenant.CentralTenantService;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
@@ -73,8 +73,7 @@ public class CentralTenantController {
 
   @PutMapping("tenant/{id}")
   @RolesAllowed("ADMIN")
-  public ResponseEntity<Void> update(
-      @PathVariable String id, @RequestBody TenantUpdateDTO tenant) {
+  public ResponseEntity<Void> update(@PathVariable String id, @RequestBody TenantUpdateDTO tenant) {
     tenantService.update(id, tenant);
     return ResponseEntity.noContent().build();
   }

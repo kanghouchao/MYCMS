@@ -25,42 +25,43 @@ import org.springframework.util.StringUtils;
 @EnableMethodSecurity(jsr250Enabled = true)
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    private static final RequestMatcher[] CSRF_IGNORED_MATCHERS = {
-            PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
-            PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
-            PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
-            request -> {
-                String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-                return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
-            }
-    };
-
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+  private static final RequestMatcher[] CSRF_IGNORED_MATCHERS = {
+    PathPatternRequestMatcher.withDefaults().matcher("/central/login"),
+    PathPatternRequestMatcher.withDefaults().matcher("/tenant/login"),
+    PathPatternRequestMatcher.withDefaults().matcher("/tenant/register"),
+    request -> {
+      String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+      return StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ");
     }
+  };
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf ->
-                        csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
-                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .formLogin(AbstractHttpConfigurer::disable);
-        return http.build();
-    }
+  public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+    this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http.csrf(
+            csrf ->
+                csrf.ignoringRequestMatchers(CSRF_IGNORED_MATCHERS)
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+        .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .formLogin(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
 
-    @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public AuthenticationManager authenticationManager(
+      AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    return authenticationConfiguration.getAuthenticationManager();
+  }
 }

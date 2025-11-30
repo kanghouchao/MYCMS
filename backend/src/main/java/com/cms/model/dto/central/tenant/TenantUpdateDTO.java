@@ -10,6 +10,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TenantUpdateDTO {
 
-    @NotBlank(message = "name is required")
-    private String name;
+  @NotBlank(message = "name is required")
+  private String name;
 }

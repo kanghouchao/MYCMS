@@ -29,8 +29,8 @@ class CentralTenantControllerTest {
 
   @Test
   void list_returnsOk() {
-    PaginatedTenantVO<TenantVO> page = new PaginatedTenantVO<>(
-        Collections.emptyList(), 1, 0, 1, 10, 0, 0, "", "", null, null);
+    PaginatedTenantVO<TenantVO> page =
+        new PaginatedTenantVO<>(Collections.emptyList(), 1, 0, 1, 10, 0, 0, "", "", null, null);
     when(tenantService.list(1, 10, null)).thenReturn(page);
 
     ResponseEntity<PaginatedTenantVO<TenantVO>> response = controller.list(1, 10, null);

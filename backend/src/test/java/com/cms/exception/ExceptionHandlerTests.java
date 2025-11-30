@@ -37,11 +37,13 @@ public class ExceptionHandlerTests {
 
     MethodArgumentNotValidException ex = mock(MethodArgumentNotValidException.class);
     when(ex.getBindingResult()).thenReturn(bindingResult);
-    // The real implementation uses ex.getMessage() for logging, so we might want to mock it to avoid NPE if logger uses it, 
-    // but checking the code: log.error(ex.getMessage(), ex); so it's safe if it returns null? 
-    // Actually the implementation uses ex.getBindingResult().getFieldError().getDefaultMessage() for the body "error".
-    
-    // We also need to ensure ex.getMessage() doesn't crash the logger if that's critical, 
+    // The real implementation uses ex.getMessage() for logging, so we might want to mock it to
+    // avoid NPE if logger uses it,
+    // but checking the code: log.error(ex.getMessage(), ex); so it's safe if it returns null?
+    // Actually the implementation uses ex.getBindingResult().getFieldError().getDefaultMessage()
+    // for the body "error".
+
+    // We also need to ensure ex.getMessage() doesn't crash the logger if that's critical,
     // but here we just care about the response.
 
     ResponseEntity<Map<String, Object>> resp = handler.handle(ex);

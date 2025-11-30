@@ -107,5 +107,5 @@ check.dependsOn spotlessCheck
 
 jar {
     archiveBaseName.set(rootProject.name)
-    archiveVersion.set(version as Provider<? extends String>)
+    archiveVersion.set(version)
 }

@@ -1,10 +1,10 @@
 package com.cms.service.central.tenant;
 
-import com.cms.model.dto.central.tenant.TenantCreateDTO;
 import com.cms.model.dto.central.tenant.PaginatedTenantVO;
-import com.cms.model.dto.central.tenant.TenantVO;
+import com.cms.model.dto.central.tenant.TenantCreateDTO;
 import com.cms.model.dto.central.tenant.TenantStatusVO;
 import com.cms.model.dto.central.tenant.TenantUpdateDTO;
+import com.cms.model.dto.central.tenant.TenantVO;
 import java.util.Optional;
 
 public interface CentralTenantService {

@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 public class TenantContext {
   private final ThreadLocal<Long> CURRENT_TENANT = new ThreadLocal<>();
 
-  public boolean isTenant(){
+  public boolean isTenant() {
     Long tenantId = CURRENT_TENANT.get();
     return tenantId != null && StringUtils.hasText(tenantId.toString());
   }

@@ -20,7 +20,6 @@ import java.security.Principal;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,8 +67,8 @@ class CentralAuthControllerTest {
     ResponseEntity<AdminDto> response = controller.me(principal);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-      Assertions.assertNotNull(response.getBody());
-      assertThat(response.getBody().getUsername()).isEqualTo("admin");
+    Assertions.assertNotNull(response.getBody());
+    assertThat(response.getBody().getUsername()).isEqualTo("admin");
   }
 
   @Test
@@ -103,13 +102,14 @@ class CentralAuthControllerTest {
     ResponseEntity<?> response = controller.logout(header);
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-    verify(valueOps).set(eq("blacklist:tokens:" + token), eq("1"), any(Long.class), eq(TimeUnit.MILLISECONDS));
+    verify(valueOps)
+        .set(eq("blacklist:tokens:" + token), eq("1"), any(Long.class), eq(TimeUnit.MILLISECONDS));
   }
-  
+
   @Test
   void logout_doesNothingNormally_whenNoHeader() {
-     ResponseEntity<?> response = controller.logout(null);
-     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
-     verifyNoInteractions(redisTemplate);
+    ResponseEntity<?> response = controller.logout(null);
+    assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+    verifyNoInteractions(redisTemplate);
   }
 }

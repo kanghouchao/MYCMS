@@ -14,7 +14,7 @@ class WebMvcConfigTest {
   void addsTenantInterceptorToRegistry() {
     TenantIdInterceptor interceptor = mock(TenantIdInterceptor.class);
     InterceptorRegistry registry = mock(InterceptorRegistry.class);
-    org.springframework.web.servlet.config.annotation.InterceptorRegistration registration = 
+    org.springframework.web.servlet.config.annotation.InterceptorRegistration registration =
         mock(org.springframework.web.servlet.config.annotation.InterceptorRegistration.class);
 
     // When addInterceptor is called, return the mock registration to prevent NPE on chained calls
