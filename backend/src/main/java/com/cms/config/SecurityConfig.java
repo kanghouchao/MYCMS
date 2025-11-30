@@ -20,6 +20,11 @@ import org.springframework.security.web.servlet.util.matcher.PathPatternRequestM
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StringUtils;
 
+/**
+ * Security configuration that uses method-level annotations for permission validation. URL-level
+ * security is set to permit all requests, while actual authorization is handled by JSR-250
+ * annotations (@RolesAllowed, @PermitAll, @DenyAll) on controller methods.
+ */
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(jsr250Enabled = true)
