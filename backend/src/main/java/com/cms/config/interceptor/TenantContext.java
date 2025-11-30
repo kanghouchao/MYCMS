@@ -1,7 +1,6 @@
 package com.cms.config.interceptor;
 
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 @Component
 public class TenantContext {
