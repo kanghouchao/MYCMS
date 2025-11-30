@@ -34,7 +34,6 @@ class CentralTenantServiceImplTest {
   @Mock ApplicationEventPublisher publisher;
 
   @Captor ArgumentCaptor<Tenant> tenantCaptor;
-  @Captor ArgumentCaptor<TenantCreatedEvent> eventCaptor;
 
   @InjectMocks CentralTenantServiceImpl service;
 

@@ -96,6 +96,7 @@ class CentralAuthControllerTest {
     when(claims.getExpiration()).thenReturn(new Date(System.currentTimeMillis() + 10000));
     when(jwtUtil.getClaims(token)).thenReturn(claims);
 
+    @SuppressWarnings("unchecked")
     ValueOperations<String, Object> valueOps = mock(ValueOperations.class);
     when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
