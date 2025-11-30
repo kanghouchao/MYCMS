@@ -40,7 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
       String token = authHeader.substring(7);
       Claims claims = jwtUtil.getClaims(token);
       if (!redisTemplate.hasKey("blacklist:tokens:" + token)) {
-          log.debug("Expiration is : {}", claims.getExpiration());
+        log.debug("Expiration is : {}", claims.getExpiration());
         if (new Date().before(claims.getExpiration())) {
           String username = claims.getSubject();
           List<?> authorities = claims.get("authorities", List.class);
