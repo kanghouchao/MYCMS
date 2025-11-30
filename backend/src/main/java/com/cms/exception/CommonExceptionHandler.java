@@ -19,7 +19,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<Map<String, Object>> handle(AuthenticationException ex) {
-        log.error(ex.getMessage(), ex);
+        log.error(ex.getMessage());
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
@@ -27,7 +27,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handle(MethodArgumentNotValidException ex) {
-        log.error(ex.getMessage(), ex);
+        log.warn(ex.getMessage());
         Map<String, Object> body = new HashMap<>();
         body.put("error", Objects.requireNonNull(ex.getBindingResult().getFieldError()).getDefaultMessage());
         Map<String, String> fieldErrors = new HashMap<>();
@@ -40,7 +40,7 @@ public class CommonExceptionHandler {
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<Map<String, Object>> handle(NoResourceFoundException ex) {
-        log.error(ex.getMessage(), ex);
+        log.warn(ex.getMessage());
         Map<String, Object> body = new HashMap<>();
         body.put("error", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);

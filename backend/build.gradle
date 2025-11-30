@@ -21,7 +21,7 @@ dependencyManagement {
 }
 
 
-tasks.withType(JavaCompile) {
+tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
@@ -29,7 +29,7 @@ repositories {
     mavenCentral()
 }
 
-configurations.all {
+configurations.configureEach {
     exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     exclude group: 'ch.qos.logback', module: 'logback-classic'
 }
@@ -50,7 +50,6 @@ dependencies {
     runtimeOnly 'io.lettuce:lettuce-core'
     implementation 'org.liquibase:liquibase-core'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'com.h2database:h2'
     testImplementation 'org.springframework.security:spring-security-test'
 
     compileOnly 'org.projectlombok:lombok'
@@ -108,5 +107,5 @@ check.dependsOn spotlessCheck
 
 jar {
     archiveBaseName.set(rootProject.name)
-    archiveVersion.set(version)
+    archiveVersion.set(version as Provider<? extends String>)
 }
