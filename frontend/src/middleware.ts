@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_DOMAINS = new Set(['oli-cms.test']);
+const ADMIN_DOMAINS = new Set([process.env.APP_DOMAIN || 'oli-cms.test']);
 
 export const config = {
   // Match all paths except static assets and API routes
