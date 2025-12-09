@@ -1,4 +1,3 @@
-import { defineConfig } from 'eslint/config';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import js from '@eslint/js';
@@ -12,8 +11,5 @@ const compat = new FlatCompat({
   allConfig: js.configs.all,
 });
 
-export default defineConfig([
-  {
-    extends: compat.extends('next/core-web-vitals'),
-  },
-]);
+// eslint-disable-next-line import/no-anonymous-default-export
+export default [...compat.extends('next/core-web-vitals')];
