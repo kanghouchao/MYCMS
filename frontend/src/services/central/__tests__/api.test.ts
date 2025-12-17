@@ -51,21 +51,21 @@ describe('central api wrappers', () => {
     mockGet.mockResolvedValueOnce({ data: { id: '2' } });
     const byId = await centralApi.getById('2');
     expect(byId).toEqual({ id: '2' });
-    expect(mockGet).toHaveBeenCalledWith('/central/tenants/2');
+    expect(mockGet).toHaveBeenCalledWith('/central/tenant/2');
 
     mockPost.mockResolvedValueOnce({ data: { id: '3' } });
     const created = await centralApi.create({ name: 't' } as any);
     expect(created).toEqual({ id: '3' });
-    expect(mockPost).toHaveBeenCalledWith('/central/tenants', { name: 't' });
+    expect(mockPost).toHaveBeenCalledWith('/central/tenant', { name: 't' });
 
     mockPut.mockResolvedValueOnce({ data: { id: '3', name: 'u' } });
     const updated = await centralApi.update('3', { name: 'u' } as any);
     expect(updated).toEqual({ id: '3', name: 'u' });
-    expect(mockPut).toHaveBeenCalledWith('/central/tenants/3', { name: 'u' });
+    expect(mockPut).toHaveBeenCalledWith('/central/tenant/3', { name: 'u' });
 
     mockDelete.mockResolvedValueOnce({});
     await centralApi.delete('3');
-    expect(mockDelete).toHaveBeenCalledWith('/central/tenants/3');
+    expect(mockDelete).toHaveBeenCalledWith('/central/tenant/3');
 
     mockGet.mockResolvedValueOnce({ data: { total: 1 } });
     const stats = await centralApi.getStats();

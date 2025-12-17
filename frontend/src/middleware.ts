@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const validationApiUrl =
-    process.env.TENANT_VALIDATION_API_URL || 'http://backend:8080/central/tenants';
+    process.env.TENANT_VALIDATION_API_URL || 'http://backend:8080/central/tenant';
 
   const url = validationApiUrl + `?domain=${encodeURIComponent(hostname)}`;
   console.error('🔍 Validating tenant with URL:', url);

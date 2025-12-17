@@ -93,7 +93,7 @@ describe('middleware routing contract', () => {
     global.fetch = jest.fn().mockResolvedValue({
       json: () => Promise.resolve(payload),
     });
-    process.env.TENANT_VALIDATION_API_URL = 'http://backend:8080/central/tenants';
+    process.env.TENANT_VALIDATION_API_URL = 'http://backend:8080/central/tenant';
 
     const request = createRequest('http://shop.example.test/home', {
       host: 'shop.example.test',
