@@ -63,7 +63,7 @@ class TenantCreatedListenerTest {
     verify(mailService).send(eq("owner@example.com"), anyString(), bodyCaptor.capture());
 
     assertThat(bodyCaptor.getValue())
-        .contains("http://acme.example/central/register?token=tok123")
+        .contains("http://acme.example/register?token=tok123")
         .contains("Acme");
   }
 

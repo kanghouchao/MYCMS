@@ -52,7 +52,6 @@ public class TenantCreatedListener {
   }
 
   private String buildTenantRegisterLink(String domain, String token) {
-    return String.format(
-        "%s://%s/central/register?token=%s", appProperties.getScheme(), domain, token);
+    return String.format("%s://%s/register?token=%s", appProperties.getScheme(), domain, token);
   }
 }
