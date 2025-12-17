@@ -1,9 +1,9 @@
-import { headers } from 'next/headers';
+import { cookies } from 'next/headers';
 
 export default async function Page() {
-  const hdrs = await headers();
-  const tenantId = hdrs.get('x-mw-tenant-id');
-  const tenantName = hdrs.get('x-mw-tenant-name');
+  const cookieStore = await cookies();
+  const tenantId = cookieStore.get('x-mw-tenant-id')?.value;
+  const tenantName = decodeURIComponent(cookieStore.get('x-mw-tenant-name')?.value || '');
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
