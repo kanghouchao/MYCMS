@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const ADMIN_DOMAINS = new Set(['oli-cms.test']);
+const ADMIN_DOMAINS = new Set([process.env.APP_DOMAIN || 'oli-cms.test']);
 
 export const config = {
   // Match all paths except static assets and API routes
@@ -47,7 +47,7 @@ export async function middleware(request: NextRequest) {
   }
 
   const validationApiUrl =
-    process.env.TENANT_VALIDATION_API_URL || 'http://backend:8080/central/tenants';
+    process.env.TENANT_VALIDATION_API_URL || 'http://backend:8080/central/tenant';
 
   const url = validationApiUrl + `?domain=${encodeURIComponent(hostname)}`;
   console.error('🔍 Validating tenant with URL:', url);

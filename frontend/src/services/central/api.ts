@@ -36,19 +36,19 @@ export const centralApi = {
     return response.data;
   },
   getById: async (id: string): Promise<Tenant> => {
-    const response = await apiClient.get(`/central/tenants/${id}`);
+    const response = await apiClient.get(`/central/tenant/${id}`);
     return response.data;
   },
   create: async (data: CreateTenantRequest): Promise<Tenant> => {
-    const response = await apiClient.post('/central/tenants', data);
+    const response = await apiClient.post('/central/tenant', data);
     return response.data;
   },
   update: async (id: string, data: UpdateTenantRequest): Promise<Tenant> => {
-    const response = await apiClient.put(`/central/tenants/${id}`, data);
+    const response = await apiClient.put(`/central/tenant/${id}`, data);
     return response.data;
   },
   delete: async (id: string): Promise<void> => {
-    await apiClient.delete(`/central/tenants/${id}`);
+    await apiClient.delete(`/central/tenant/${id}`);
   },
   getStats: async (): Promise<TenantStats> => {
     const response = await apiClient.get('/central/tenants/stats');

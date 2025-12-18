@@ -12,10 +12,10 @@ ps:
 
 logs:
 ifndef service
-	@docker compose -p $(PROJECT_NAME) logs --tail=100
+	@docker compose -p $(PROJECT_NAME) logs -f
 else
 	echo "📜 $(service)サービスのログを表示中...";
-	@docker compose -p $(PROJECT_NAME) logs --tail=100 $(service)
+	@docker compose -p $(PROJECT_NAME) logs -f $(service)
 endif
 
 exec:
