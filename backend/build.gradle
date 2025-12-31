@@ -49,6 +49,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     runtimeOnly 'io.lettuce:lettuce-core'
     implementation 'org.liquibase:liquibase-core'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.9.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.security:spring-security-test'
 
