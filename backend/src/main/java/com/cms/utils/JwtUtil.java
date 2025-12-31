@@ -20,7 +20,7 @@ public class JwtUtil {
   private final AppProperties appProperties;
 
   public Token generateToken(
-      @NonNull String subject, @Nullable String issuer, @NonNull Map<String, Object> claims) {
+      @NonNull String subject, @Nullable String issuer, Map<String, Object> claims) {
     long nowMillis = System.currentTimeMillis();
     Date now = new Date(nowMillis);
     Date exp = new Date(nowMillis + appProperties.getJwtExpiration());
