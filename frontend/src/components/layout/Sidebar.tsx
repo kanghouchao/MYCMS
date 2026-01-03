@@ -30,9 +30,7 @@ const centralNavigation = [
 const tenantNavigation = [
   {
     name: 'メイン',
-    items: [
-      { name: 'ダッシュボード', href: '/central/dashboard/tenant', icon: HomeIcon },
-    ],
+    items: [{ name: 'ダッシュボード', href: '/central/dashboard/tenant', icon: HomeIcon }],
   },
   {
     name: '配車システム',
