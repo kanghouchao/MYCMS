@@ -14,16 +14,23 @@ export default async function Home() {
   /**
    * TODO 如果判定是租户，就得看是访问管理员页面还是访问前端页面
    * 如果没有登录信息，则直接访问前端首页
-   * 如果有登录信息，则需要查看是否访问管理员页面 
+   * 如果有登录信息，则需要查看是否访问管理员页面
    */
   if (role === 'tenant') {
-    const templateKey = cookieStore.get('x-mw-tenant-template')?.value || 'default';
-    try {
-      const TemplateComponent = require(`@/app/tenant/templates/${templateKey}/page`).default;
-      return <TemplateComponent />;
-    } catch (e) {
-      console.error('Template not found:', e);
-      notFound();
+    const token = cookieStore.get('token')?.value; // 读取 token 以确保登录状态
+    if (!token) {
+      const templateKey = cookieStore.get('x-mw-tenant-template')?.value || 'default';
+      try {
+        const { default: TemplateComponent } = await import(
+          `@/app/tenant/templates/${templateKey}/page`
+        );
+        return <TemplateComponent />;
+      } catch (e) {
+        console.error('Template not found:', e);
+        notFound();
+      }
+    } else {
+      redirect('/central/dashboard/tenant/'); // 未登录则跳转到租户前端首页
     }
   }
 
