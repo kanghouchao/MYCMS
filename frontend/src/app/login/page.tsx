@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 import { authApi as centralAuthApi } from '@/services/central/api';
 import { authApi as tenantAuthApi } from '@/services/tenant/api';
 import toast from 'react-hot-toast';
-import { getCentralDomain, isTenantDomain } from '@/lib/config';
+import { isTenantDomain } from '@/lib/config';
 
 function getAuthApi() {
   return isTenantDomain() ? tenantAuthApi : centralAuthApi;
