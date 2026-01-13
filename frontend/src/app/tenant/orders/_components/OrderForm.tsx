@@ -41,10 +41,7 @@ interface OrderFormProps {
 
 export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProps) {
   const router = useRouter();
-  const {
-    register,
-    handleSubmit,
-  } = useForm<OrderFormData>({
+  const { register, handleSubmit } = useForm<OrderFormData>({
     defaultValues: {
       businessDate: new Date().toISOString().split('T')[0],
       courseMinutes: 60,
