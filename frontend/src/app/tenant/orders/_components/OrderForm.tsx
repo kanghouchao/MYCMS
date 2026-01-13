@@ -44,7 +44,6 @@ export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProp
   const {
     register,
     handleSubmit,
-    formState: { errors },
   } = useForm<OrderFormData>({
     defaultValues: {
       businessDate: new Date().toISOString().split('T')[0],
@@ -64,7 +63,7 @@ export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProp
       onSubmit={handleSubmit(onSubmit)}
       className="space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-100"
     >
-      {/* 1. 基本信息 Section */}
+      {/* 1. 基本情報 Section */}
       <section>
         <h3 className="text-lg font-semibold text-gray-900 mb-6 border-l-4 border-indigo-500 pl-3">
           基本情報
@@ -119,7 +118,7 @@ export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProp
         </div>
       </section>
 
-      {/* 2. 顾客信息 Section */}
+      {/* 2. お客様情報 Section */}
       <section>
         <h3 className="text-lg font-semibold text-gray-900 mb-6 border-l-4 border-indigo-500 pl-3">
           お客様情報
@@ -190,7 +189,7 @@ export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProp
         </div>
       </section>
 
-      {/* 3. 课程与费用 Section */}
+      {/* 3. コース・料金 Section */}
       <section>
         <h3 className="text-lg font-semibold text-gray-900 mb-6 border-l-4 border-indigo-500 pl-3">
           コース・料金
@@ -237,7 +236,7 @@ export function OrderForm({ initialData, onSubmit, isSubmitting }: OrderFormProp
         </div>
       </section>
 
-      {/* 4. 备注与留言 Section */}
+      {/* 4. その他 Section */}
       <section>
         <h3 className="text-lg font-semibold text-gray-900 mb-6 border-l-4 border-indigo-500 pl-3">
           その他

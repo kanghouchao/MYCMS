@@ -30,13 +30,13 @@ const centralNavigation = [
 const tenantNavigation = [
   {
     name: 'メイン',
-    items: [{ name: 'ダッシュボード', href: '/central/dashboard/tenant', icon: HomeIcon }],
+    items: [{ name: 'ダッシュボード', href: '/tenant/dashboard', icon: HomeIcon }],
   },
   {
     name: '配車システム',
     items: [
-      { name: 'オーダー一覧', href: '/central/orders', icon: ClipboardDocumentListIcon },
-      { name: 'オーダー登録', href: '/central/orders/create', icon: PlusCircleIcon },
+      { name: 'オーダー一覧', href: '/tenant/orders', icon: ClipboardDocumentListIcon },
+      { name: 'オーダー登録', href: '/tenant/orders/create', icon: PlusCircleIcon },
       { name: '精算', href: '#', icon: CurrencyYenIcon },
       { name: '業務', href: '#', icon: BriefcaseIcon },
       { name: '集計', href: '#', icon: ChartBarIcon },

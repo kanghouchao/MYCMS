@@ -8,7 +8,7 @@ databaseChangeLog:
       changes:
         - createTable:
             tableName: t_girls
-            remarks: 女生（Cast）信息表
+            remarks: 女の子（キャスト）情報テーブル
             columns:
               - column:
                   name: id
@@ -27,12 +27,12 @@ databaseChangeLog:
                   type: VARCHAR(255)
                   constraints:
                     nullable: false
-                  remarks: 女生姓名
+                  remarks: 女の子名
               - column:
                   name: status
                   type: VARCHAR(50)
                   defaultValue: 'ACTIVE'
-                  remarks: 状态
+                  remarks: ステータス
               - column:
                   name: created_at
                   type: TIMESTAMP WITH TIME ZONE

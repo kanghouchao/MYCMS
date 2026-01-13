@@ -8,7 +8,7 @@ databaseChangeLog:
           changes:
               - createTable:
                     tableName: t_customers
-                    remarks: 顾客信息表
+                    remarks: 顧客情報テーブル
                     columns:
                         - column:
                               name: id
@@ -25,19 +25,19 @@ databaseChangeLog:
                         - column:
                               name: name
                               type: VARCHAR(255)
-                              remarks: 顾客姓名
+                              remarks: 顧客名
                         - column:
                               name: phone_number
                               type: VARCHAR(50)
-                              remarks: 电话号码
+                              remarks: 電話番号
                         - column:
                               name: phone_number2
                               type: VARCHAR(50)
-                              remarks: 电话号码2
+                              remarks: 電話番号2
                         - column:
                               name: address
                               type: VARCHAR(500)
-                              remarks: 地址
+                              remarks: 住所
                         - column:
                               name: building_name
                               type: VARCHAR(255)
@@ -49,22 +49,22 @@ databaseChangeLog:
                         - column:
                               name: classification
                               type: VARCHAR(50)
-                              remarks: 区分（比如：自宅、酒店等）
+                              remarks: 区分（自宅、ホテルなど）
                         - column:
                               name: has_pet
                               type: BOOLEAN
                               defaultValueBoolean: false
-                              remarks: 是否有宠物
+                              remarks: ペットの有無
                         - column:
                               name: points
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 保有积分
+                              remarks: 保有ポイント
                         - column:
                               name: rank
                               type: VARCHAR(50)
                               defaultValue: "SILVER"
-                              remarks: 会员等级
+                              remarks: 会員ランク
                         - column:
                               name: line_id
                               type: VARCHAR(100)
@@ -72,11 +72,11 @@ databaseChangeLog:
                         - column:
                               name: usage_areas
                               type: VARCHAR(255)
-                              remarks: 利用区域
+                              remarks: 利用エリア
                         - column:
                               name: ng_type
                               type: VARCHAR(50)
-                              remarks: NG类型 (注意/禁止等)
+                              remarks: NGタイプ（注意・禁止など）
                         - column:
                               name: ng_content
                               type: TEXT

@@ -8,7 +8,7 @@ databaseChangeLog:
           changes:
               - createTable:
                     tableName: t_orders
-                    remarks: 订单表
+                    remarks: 注文テーブル
                     columns:
                         - column:
                               name: id
@@ -25,123 +25,123 @@ databaseChangeLog:
                         - column:
                               name: store_name
                               type: VARCHAR(255)
-                              remarks: 店铺名
+                              remarks: 店舗名
                         - column:
                               name: receptionist_id
                               type: VARCHAR(64)
-                              remarks: 接待人员ID (关联 t_users)
+                              remarks: 受付担当者ID (关联 t_users)
                         - column:
                               name: business_date
                               type: DATE
                               constraints:
                                   nullable: false
-                              remarks: 营业日
+                              remarks: 営業日
                         - column:
                               name: arrival_scheduled_start_time
                               type: TIME
-                              remarks: 预定到达开始时间
+                              remarks: 到着予定開始時間
                         - column:
                               name: arrival_scheduled_end_time
                               type: TIME
-                              remarks: 预定到达结束时间
+                              remarks: 到着予定終了時間
                         - column:
                               name: customer_id
                               type: VARCHAR(64)
-                              remarks: 顾客ID
+                              remarks: 顧客ID
                         - column:
                               name: girl_id
                               type: VARCHAR(64)
-                              remarks: 女生ID
+                              remarks: 女の子ID
                         - column:
                               name: course_minutes
                               type: INTEGER
-                              remarks: 课程分钟数
+                              remarks: コース分数
                         - column:
                               name: extension_minutes
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 延长分钟数
+                              remarks: 延長分数
                         - column:
                               name: option_codes
                               type: JSONB
                               defaultValueComputed: "'[]'::jsonb"
-                              remarks: 选项代码列表 (JSON Array)
+                              remarks: オプションコード一覧 (JSON Array)
                         - column:
                               name: discount_name
                               type: VARCHAR(255)
-                              remarks: 折扣名称
+                              remarks: 割引名
                         - column:
                               name: manual_discount
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 手动折扣金额
+                              remarks: 手動割引金額
                         - column:
                               name: carrier
                               type: VARCHAR(100)
-                              remarks: 运营商/Carrier
+                              remarks: キャリア/Carrier
                         - column:
                               name: media_name
                               type: VARCHAR(100)
-                              remarks: 媒体名称
+                              remarks: 媒体名
                         - column:
                               name: used_points
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 使用积分
+                              remarks: 利用ポイント
                         - column:
                               name: manual_grant_points
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 手动赋予积分
+                              remarks: 手動付与ポイント
                         - column:
                               name: auto_grant_points
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 自动赋予积分
+                              remarks: 自動付与ポイント
                         - column:
                               name: survey_points
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 问卷积分
+                              remarks: アンケートポイント
                         - column:
                               name: total_fee
                               type: INTEGER
                               defaultValueNumeric: 0
-                              remarks: 总费用
+                              remarks: 総額
                         - column:
                               name: survey_status
                               type: VARCHAR(50)
                               defaultValue: "UNANSWERED"
-                              remarks: 问卷状态
+                              remarks: アンケートステータス
                         - column:
                               name: location_address
                               type: VARCHAR(500)
-                              remarks: 派遣地址
+                              remarks: 派遣先住所
                         - column:
                               name: location_building
                               type: VARCHAR(255)
-                              remarks: 派遣建筑物
+                              remarks: 派遣先建物
                         - column:
                               name: actual_arrival_time
                               type: TIME
-                              remarks: 实际到达时间 (IN)
+                              remarks: 実際の到着時間 (IN)
                         - column:
                               name: actual_end_time
                               type: TIME
-                              remarks: 实际结束时间 (OUT)
+                              remarks: 実際の終了時間 (OUT)
                         - column:
                               name: remarks
                               type: TEXT
-                              remarks: 备注
+                              remarks: 備考
                         - column:
                               name: girl_driver_message
                               type: TEXT
-                              remarks: 给女生/司机的留言
+                              remarks: 女の子・ドライバーへのメッセージ
                         - column:
                               name: status
                               type: VARCHAR(50)
                               defaultValue: "CREATED"
-                              remarks: 订单状态
+                              remarks: 注文ステータス
                         - column:
                               name: created_at
                               type: TIMESTAMP WITH TIME ZONE

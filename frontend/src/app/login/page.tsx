@@ -27,7 +27,7 @@ export default function AdminLogin() {
       if (response.token && response.expires_at) {
         Cookies.set('token', response.token, { expires: response.expires_at });
         const isTenant = isTenantDomain();
-        router.push(isTenant ? '/central/dashboard/tenant/' : '/central/dashboard/central/');
+        router.push(isTenant ? '/tenant/dashboard/' : '/central/dashboard/central/');
       }
     } catch (error) {
       console.error('Login failed:', error);

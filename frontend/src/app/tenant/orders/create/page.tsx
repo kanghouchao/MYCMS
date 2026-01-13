@@ -19,7 +19,7 @@ export default function CreateOrderPage() {
       await new Promise(resolve => setTimeout(resolve, 800));
 
       toast.success('オーダーを登録しました');
-      router.push('/central/orders');
+      router.push('/tenant/orders');
     } catch (error) {
       toast.error('オーダーの登録に失敗しました');
     } finally {

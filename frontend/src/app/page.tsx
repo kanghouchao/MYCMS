@@ -5,19 +5,19 @@ export default async function Home() {
   const cookieStore = await cookies();
   const role = cookieStore.get('x-mw-role')?.value;
 
-  // 这个页面应该根据登录信息和当前中间件的逻辑进行重定向
-  // 如果判定是平台管理员，直接跳转到平台管理员首页
+  // ログイン情報と現在のミドルウェアのロジックに基づいてリダイレクト
+  // サービス管理者（Central）の場合、管理画面へリダイレクト
   if (role === 'central') {
     redirect('/central/dashboard/central/');
   }
 
   /**
-   * TODO 如果判定是租户，就得看是访问管理员页面还是访问前端页面
-   * 如果没有登录信息，则直接访问前端首页
-   * 如果有登录信息，则需要查看是否访问管理员页面
+   * TODO: テナントユーザーの場合、管理画面かフロントエンドページかを確認
+   * ログイン情報がない場合はフロントエンドのホームページを表示
+   * ログインしている場合は管理画面（ダッシュボード）へリダイレクト
    */
   if (role === 'tenant') {
-    const token = cookieStore.get('token')?.value; // 读取 token 以确保登录状态
+    const token = cookieStore.get('token')?.value; // ログイン状態確認のためトークンを取得
     if (!token) {
       const templateKey = cookieStore.get('x-mw-tenant-template')?.value || 'default';
       try {
@@ -30,7 +30,7 @@ export default async function Home() {
         notFound();
       }
     } else {
-      redirect('/central/dashboard/tenant/'); // 未登录则跳转到租户前端首页
+      redirect('/tenant/dashboard/'); // ログイン済みの場合は管理画面へ
     }
   }
 
